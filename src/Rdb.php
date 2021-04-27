@@ -1,0 +1,308 @@
+<?php
+/**
+ * @link      https://github.com/Karmabunny
+ * @copyright Copyright (c) 2021 Karmabunny
+ */
+
+namespace karmabunny\rdb;
+
+use Generator;
+use InvalidArgumentException;
+use JsonException;
+use JsonSerializable;
+
+
+/**
+ * Rdb is a wrapper around other popular redis libraries.
+ *
+ * It doesn't implement connection utilities at all, it simply provides a
+ * unified interface for different adapters (php-redis, predis).
+ *
+ * It also contains some useful helpers, mostly around object serialisation.
+ * Feel free to add to it.
+ *
+ * @package karmabunny\rdb
+ */
+abstract class Rdb
+{
+    const ADAPTERS = [
+        RdbConfig::TYPE_PHP_REDIS => PhpRedisAdapter::class,
+        RdbConfig::TYPE_PREDIS => PredisAdapter::class,
+    ];
+
+
+    /** @var RdbConfig */
+    public $config;
+
+
+    /**
+     * - host
+     * - prefix
+     * - other predis options
+     *
+     * @example
+     *   new RmsCache([
+     *     'host' => '127.0.0.1:6379',
+     *     'prefix' => 'etc:rms:',
+     *   ]);
+     *
+     * @param RdbConfig|array $config
+     * @throws InvalidArgumentException
+     */
+    protected function __construct($config)
+    {
+        if ($config instanceof RdbConfig) {
+            $this->config = clone $config;
+        }
+        else {
+            $this->config = new RdbConfig($config);
+        }
+    }
+
+
+    /**
+     *
+     * @param RdbConfig|array $config
+     * @return static
+     */
+    public static function create($config)
+    {
+        if (is_array($config)) {
+            $config = new RdbConfig($config);
+        }
+
+        $adapter = self::ADAPTERS[$config->adapter] ?? PredisAdapter::class;
+        return new $adapter($config);
+    }
+
+
+    /**
+     *
+     * @param string $keys
+     * @return string[]
+     */
+    protected function stripPrefix(...$keys): array
+    {
+        if ($this->config->prefix) {
+            foreach ($keys as &$key) {
+                $key = preg_replace("/^{$this->config->prefix}/", '', $key);
+            }
+        }
+
+        return $keys;
+    }
+
+
+    /**
+     *
+     * @param string $key
+     * @param mixed $value
+     * @param int $ttl milliseconds
+     * @return bool
+     */
+    public abstract function set(string $key, $value, $ttl = 0): bool;
+
+
+    /**
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public abstract function get(string $key);
+
+
+    /**
+     *
+     * @param string[] $keys
+     * @return string[]
+     */
+    public abstract function mGet(array $keys): array;
+
+    /**
+     *
+     * @param string[] $items
+     * @return bool
+     */
+    public abstract function mSet(array $items): bool;
+
+
+    /**
+     *
+     * @param string $key
+     * @param mixed $values
+     * @return int
+     */
+    public abstract function sAdd(string $key, ...$values): int;
+
+
+    /**
+     *
+     * @param string $key
+     * @return array
+     */
+    public abstract function sMembers(string $key): array;
+
+
+    /**
+     *
+     * @param string $key
+     * @return bool
+     */
+    public abstract function exists(string $key): bool;
+
+
+    /**
+     *
+     * @param mixed $keys
+     * @return int
+     */
+    public abstract function del(...$keys): int;
+
+
+    /**
+     *
+     * @param string $pattern
+     * @return string[]
+     */
+    public abstract function keys(string $pattern): array;
+
+
+    /**
+     *
+     * @param string $pattern
+     * @return Generator
+     */
+    public abstract function scan(string $pattern): Generator;
+
+
+    /**
+     *
+     * @param string $key
+     * @param object $value
+     * @return void
+     */
+    public function setObject(string $key, object $value)
+    {
+        $this->set($key, serialize($value));
+    }
+
+
+    /**
+     *
+     * @param string $key
+     * @param string|null $expected
+     * @return object|null
+     * @throws InvalidArgumentException
+     */
+    public function getObject(string $key, string $expected)
+    {
+        if ($expected and !class_exists($expected)) {
+            throw new InvalidArgumentException('Not a class: ' . $expected);
+        }
+
+        $value = @unserialize($this->get($key));
+        if ($value === false) return null;
+        if (!is_object($value)) return null;
+
+        if ($expected) {
+            if (
+                // Checker doesn't like string classes.
+                // Or I'm dumb. One of those.
+                // @phpstan-ignore-next-line
+                get_class($value) !== $expected and
+                !is_subclass_of($value, $expected, false)
+            ) return null;
+        }
+
+        return $value ?: null;
+    }
+
+
+    /**
+     * Bulk fetch objects via a list of keys.
+     *
+     * Empty keys are filtered out.
+     *
+     * @param string[] $keys Non-prefixed keys
+     * @param string|null $expected Ensure all results is of this type
+     * @return Generator<object> key => item
+     * @throws InvalidArgumentException
+     */
+    public function mGetObject(array $keys, string $expected = null)
+    {
+        if ($expected and !class_exists($expected)) {
+            throw new InvalidArgumentException('Not a class: ' . $expected);
+        }
+
+        if (empty($keys)) return [];
+
+        $chunks = array_chunk($keys, $this->config->chunk_size);
+
+        foreach ($chunks as $keys_chunk) {
+            $items = $this->mGet($keys_chunk);
+
+            foreach ($items as $index => $item) {
+                $key = $keys_chunk[$index] ?? null;
+                $item = @unserialize($item) ?: null;
+
+                if (!$key or !$item) continue;
+
+                if (!$expected and is_object($item)) continue;
+                if (
+                    get_class($item) === $expected or
+                    is_subclass_of($item, $expected, false)
+                ) continue;
+
+                yield $key => $item;
+            }
+        }
+    }
+
+
+    /**
+     *
+     * @param object[] $items
+     * @return void
+     */
+    public function mSetObject(array $items)
+    {
+        if (empty($items)) return;
+
+        foreach ($items as &$item) {
+            $item = serialize($item);
+        }
+
+        $this->mSet($items);
+    }
+
+
+    /**
+     *
+     * @param string $key
+     * @param array|JsonSerializable $value
+     * @return void
+     */
+    public function setJson(string $key, $value)
+    {
+        $this->set($key, json_encode($value));
+    }
+
+
+    /**
+     *
+     * @param string $key
+     * @return array
+     */
+    public function getJson(string $key)
+    {
+        $out = json_decode($this->get($key), true);
+
+        $error = json_last_error();
+        if ($error !== JSON_ERROR_NONE) {
+            throw new JsonException(json_last_error_msg(), $error);
+        }
+
+        return $out;
+    }
+
+}
