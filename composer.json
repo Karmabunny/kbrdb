@@ -1,0 +1,13 @@
+{
+    "name": "karmabunny/rdb",
+    "description": "Redis wrapper for KB things",
+    "type": "library",
+    "require": {
+        "predis/predis": "^1.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "phpstan/phpstan": "^0.12.84"
+    },
+    "license": "MIT"
+}
