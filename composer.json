@@ -1,7 +1,14 @@
 {
+    "$schema": "https://getcomposer.org/schema.json",
     "name": "karmabunny/rdb",
     "description": "Redis wrapper for KB things",
     "type": "library",
+
+    "autoload": {
+        "psr-4": {
+            "karmabunny\\rdb\\": "src/"
+        }
+    },
     "require": {
         "predis/predis": "^1.1"
     },
@@ -11,6 +18,8 @@
     },
     "license": "MIT",
     "scripts": {
+        "tests": "phpunit --testdox tests",
+        "analyse": "phpstan analyse --level 5 src",
         "publish": "bash scripts/publish.sh"
     }
 }
