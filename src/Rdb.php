@@ -175,6 +175,27 @@ abstract class Rdb
     public abstract function scan(string $pattern): Generator;
 
 
+
+    /**
+     * Bulk fetch via a list of keys.
+     *
+     * Empty keys are filtered out.
+     *
+     * @param array $keys
+     * @return Generator
+     */
+    public function mScan(array $keys): Generator
+    {
+        if (empty($keys)) return [];
+
+        foreach (array_chunk($keys, $this->config->chunk_size) as $chunk) {
+            $items = $this->mGet($chunk);
+            foreach ($items as $item) yield $item;
+        }
+    }
+
+
+
     /**
      *
      * @param string $key
@@ -255,6 +276,30 @@ abstract class Rdb
 
                 yield $key => $item;
             }
+        }
+    }
+
+
+    /**
+     * Bulk fetch objects via a list of keys.
+     *
+     * Empty keys are filtered out.
+     *
+     * @param array $keys
+     * @param string|null $expected Ensure all results is of this type
+     * @return Generator<object>
+     */
+    public function mScanObject(array $keys, string $expected = null): Generator
+    {
+        if ($expected and !class_exists($expected)) {
+            throw new InvalidArgumentException('Not a class: ' . $expected);
+        }
+
+        if (empty($keys)) return [];
+
+        foreach (array_chunk($keys, $this->config->chunk_size) as $chunk) {
+            $items = $this->mGetObject($chunk, $expected);
+            foreach ($items as $item) yield $item;
         }
     }
 
