@@ -9,5 +9,8 @@
         "phpunit/phpunit": "^9.5",
         "phpstan/phpstan": "^0.12.84"
     },
-    "license": "MIT"
+    "license": "MIT",
+    "scripts": {
+        "publish": "bash scripts/publish.sh"
+    }
 }
