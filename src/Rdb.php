@@ -249,7 +249,7 @@ abstract class Rdb
      * @return Generator<object> key => item
      * @throws InvalidArgumentException
      */
-    public function mGetObject(array $keys, string $expected = null)
+    public function mGetObjects(array $keys, string $expected = null)
     {
         if ($expected and !class_exists($expected)) {
             throw new InvalidArgumentException('Not a class: ' . $expected);
@@ -289,7 +289,7 @@ abstract class Rdb
      * @param string|null $expected Ensure all results is of this type
      * @return Generator<object>
      */
-    public function mScanObject(array $keys, string $expected = null): Generator
+    public function mScanObjects(array $keys, string $expected = null): Generator
     {
         if ($expected and !class_exists($expected)) {
             throw new InvalidArgumentException('Not a class: ' . $expected);
@@ -298,7 +298,7 @@ abstract class Rdb
         if (empty($keys)) return [];
 
         foreach (array_chunk($keys, $this->config->chunk_size) as $chunk) {
-            $items = $this->mGetObject($chunk, $expected);
+            $items = $this->mGetObjects($chunk, $expected);
             foreach ($items as $item) yield $item;
         }
     }
@@ -309,7 +309,7 @@ abstract class Rdb
      * @param object[] $items
      * @return void
      */
-    public function mSetObject(array $items)
+    public function mSetObjects(array $items)
     {
         if (empty($items)) return;
 
