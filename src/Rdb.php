@@ -96,17 +96,17 @@ abstract class Rdb
     /**
      *
      * @param string $key
-     * @param mixed $value
+     * @param string $value
      * @param int $ttl milliseconds
      * @return bool
      */
-    public abstract function set(string $key, $value, $ttl = 0): bool;
+    public abstract function set(string $key, string $value, $ttl = 0): bool;
 
 
     /**
      *
      * @param string $key
-     * @return mixed
+     * @return string|null
      */
     public abstract function get(string $key);
 
