@@ -78,6 +78,8 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function set(string $key, string $value, $ttl = 0): bool
     {
+        $options = [];
+
         if ($ttl) {
             $options['px'] = $ttl;
         }

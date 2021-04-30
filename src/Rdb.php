@@ -63,9 +63,9 @@ abstract class Rdb
     /**
      *
      * @param RdbConfig|array $config
-     * @return static
+     * @return Rdb
      */
-    public static function create($config)
+    public static function create($config): Rdb
     {
         if (is_array($config)) {
             $config = new RdbConfig($config);
@@ -120,7 +120,7 @@ abstract class Rdb
 
     /**
      *
-     * @param string[] $items
+     * @param string[] $items key => string
      * @return bool
      */
     public abstract function mSet(array $items): bool;
@@ -215,7 +215,7 @@ abstract class Rdb
      * @return object|null
      * @throws InvalidArgumentException
      */
-    public function getObject(string $key, string $expected): ?object
+    public function getObject(string $key, string $expected = null): ?object
     {
         if ($expected and !class_exists($expected)) {
             throw new InvalidArgumentException('Not a class: ' . $expected);
@@ -235,7 +235,7 @@ abstract class Rdb
             ) return null;
         }
 
-        return $value ?: null;
+        return $value;
     }
 
 
@@ -311,8 +311,9 @@ abstract class Rdb
      */
     public function mSetObjects(array $items): bool
     {
-        if (empty($items)) return;
+        if (empty($items)) return true;
 
+        /** @var string[] $items */
         foreach ($items as &$item) {
             $item = serialize($item);
         }

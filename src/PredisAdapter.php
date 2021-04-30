@@ -97,7 +97,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function sAdd(string $key, ...$values): int
     {
-        return $this->predis->sAdd($key, $values);
+        return $this->predis->sadd($key, $values);
     }
 
 
