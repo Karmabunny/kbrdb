@@ -121,9 +121,9 @@ class PhpRedisAdapter extends Rdb
     }
 
     /** @inheritdoc */
-    public function exists(string $key): bool
+    public function exists(...$keys): int
     {
-        return $this->redis->exists($key);
+        return $this->redis->exists($keys);
     }
 
 

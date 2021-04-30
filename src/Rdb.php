@@ -145,10 +145,10 @@ abstract class Rdb
 
     /**
      *
-     * @param string $key
-     * @return bool
+     * @param string $keys
+     * @return int
      */
-    public abstract function exists(string $key): bool;
+    public abstract function exists(...$keys): int;
 
 
     /**

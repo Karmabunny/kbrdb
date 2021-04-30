@@ -107,10 +107,11 @@ class PredisAdapter extends Rdb
         return $this->predis->smembers($key);
     }
 
+
     /** @inheritdoc */
-    public function exists(string $key): bool
+    public function exists(...$keys): int
     {
-        return $this->predis->exists($key);
+        return $this->predis->exists($keys);
     }
 
 
