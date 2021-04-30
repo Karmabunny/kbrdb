@@ -108,7 +108,7 @@ abstract class Rdb
      * @param string $key
      * @return string|null
      */
-    public abstract function get(string $key);
+    public abstract function get(string $key): ?string;
 
 
     /**
@@ -200,11 +200,11 @@ abstract class Rdb
      *
      * @param string $key
      * @param object $value
-     * @return void
+     * @return bool
      */
-    public function setObject(string $key, object $value)
+    public function setObject(string $key, object $value): bool
     {
-        $this->set($key, serialize($value));
+        return $this->set($key, serialize($value));
     }
 
 
@@ -215,7 +215,7 @@ abstract class Rdb
      * @return object|null
      * @throws InvalidArgumentException
      */
-    public function getObject(string $key, string $expected)
+    public function getObject(string $key, string $expected): ?object
     {
         if ($expected and !class_exists($expected)) {
             throw new InvalidArgumentException('Not a class: ' . $expected);
@@ -249,7 +249,7 @@ abstract class Rdb
      * @return Generator<object> key => item
      * @throws InvalidArgumentException
      */
-    public function mGetObjects(array $keys, string $expected = null)
+    public function mGetObjects(array $keys, string $expected = null): Generator
     {
         if ($expected and !class_exists($expected)) {
             throw new InvalidArgumentException('Not a class: ' . $expected);
@@ -307,9 +307,9 @@ abstract class Rdb
     /**
      *
      * @param object[] $items
-     * @return void
+     * @return bool
      */
-    public function mSetObjects(array $items)
+    public function mSetObjects(array $items): bool
     {
         if (empty($items)) return;
 
@@ -317,7 +317,7 @@ abstract class Rdb
             $item = serialize($item);
         }
 
-        $this->mSet($items);
+        return $this->mSet($items);
     }
 
 
@@ -325,11 +325,11 @@ abstract class Rdb
      *
      * @param string $key
      * @param array|JsonSerializable $value
-     * @return void
+     * @return bool
      */
-    public function setJson(string $key, $value)
+    public function setJson(string $key, $value): bool
     {
-        $this->set($key, json_encode($value));
+        return $this->set($key, json_encode($value));
     }
 
 
@@ -338,7 +338,7 @@ abstract class Rdb
      * @param string $key
      * @return array
      */
-    public function getJson(string $key)
+    public function getJson(string $key): array
     {
         $out = json_decode($this->get($key), true);
 

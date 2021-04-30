@@ -74,7 +74,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function get(string $key)
+    public function get(string $key): ?string
     {
         return $this->predis->get($key);
     }

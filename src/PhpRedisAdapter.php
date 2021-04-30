@@ -87,7 +87,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function get(string $key)
+    public function get(string $key): ?string
     {
         return $this->redis->get($key);
     }
