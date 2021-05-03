@@ -246,10 +246,10 @@ abstract class Rdb
      *
      * @param string[] $keys Non-prefixed keys
      * @param string|null $expected Ensure all results is of this type
-     * @return Generator<object> key => item
+     * @return object[]
      * @throws InvalidArgumentException
      */
-    public function mGetObjects(array $keys, string $expected = null): Generator
+    public function mGetObjects(array $keys, string $expected = null): array
     {
         if ($expected and !class_exists($expected)) {
             throw new InvalidArgumentException('Not a class: ' . $expected);
@@ -257,26 +257,25 @@ abstract class Rdb
 
         if (empty($keys)) return [];
 
-        $chunks = array_chunk($keys, $this->config->chunk_size);
+        $items = $this->mGet($keys);
+        $output = [];
 
-        foreach ($chunks as $keys_chunk) {
-            $items = $this->mGet($keys_chunk);
+        foreach ($items as $index => $item) {
+            $key = $keys_chunk[$index] ?? null;
+            $item = @unserialize($item) ?: null;
 
-            foreach ($items as $index => $item) {
-                $key = $keys_chunk[$index] ?? null;
-                $item = @unserialize($item) ?: null;
+            if (!$key or !$item) continue;
 
-                if (!$key or !$item) continue;
+            if (!$expected and is_object($item)) continue;
+            if (
+                get_class($item) === $expected or
+                is_subclass_of($item, $expected, false)
+            ) continue;
 
-                if (!$expected and is_object($item)) continue;
-                if (
-                    get_class($item) === $expected or
-                    is_subclass_of($item, $expected, false)
-                ) continue;
-
-                yield $key => $item;
-            }
+            $output[] = $item;
         }
+
+        return $output;
     }
 
 
