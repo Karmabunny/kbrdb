@@ -69,7 +69,10 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function set(string $key, $value, $ttl = 0): bool
     {
-        return (bool) @$this->predis->set($key, $value, 'PX', $ttl ?: null);
+        $ttl = $ttl ?: null;
+        $resolution = $ttl ? 'PX' : null;
+
+        return (bool) @$this->predis->set($key, $value, $resolution, $ttl);
     }
 
 
