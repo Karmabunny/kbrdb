@@ -261,15 +261,16 @@ abstract class Rdb
         $output = [];
 
         foreach ($items as $index => $item) {
-            $key = $keys_chunk[$index] ?? null;
+            $key = $keys[$index] ?? null;
             $item = @unserialize($item) ?: null;
 
             if (!$key or !$item) continue;
 
-            if (!$expected and is_object($item)) continue;
+            if (!is_object($item)) continue;
+
             if (
-                get_class($item) === $expected or
-                is_subclass_of($item, $expected, false)
+                get_class($item) !== $expected and
+                !is_subclass_of($item, $expected, false)
             ) continue;
 
             $output[] = $item;
