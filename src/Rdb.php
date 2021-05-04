@@ -144,7 +144,7 @@ abstract class Rdb
 
     /**
      *
-     * @param string|string[] $key
+     * @param string $key
      * @param mixed $values
      * @return int
      */
@@ -285,6 +285,7 @@ abstract class Rdb
             if (!is_object($item)) continue;
 
             if (
+                // @phpstan-ignore-next-line : Not sure about this one.
                 get_class($item) !== $expected and
                 !is_subclass_of($item, $expected, false)
             ) continue;
