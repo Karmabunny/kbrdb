@@ -93,6 +93,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function mGet(array $keys): array
     {
+        if (empty($keys)) return [];
         return $this->predis->mget($keys);
     }
 
@@ -100,6 +101,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function mSet(array $items): bool
     {
+        if (empty($values)) return false;
         return (bool) @$this->predis->mset($items);
     }
 
@@ -108,6 +110,7 @@ class PredisAdapter extends Rdb
     public function sAdd(string $key, ...$values): int
     {
         $values = self::expandArrays($values);
+        if (empty($values)) return 0;
         return $this->predis->sadd($key, $values);
     }
 
@@ -123,6 +126,7 @@ class PredisAdapter extends Rdb
     public function exists(...$keys): int
     {
         $keys = self::expandArrays($keys);
+        if (empty($keys)) return 0;
         return $this->predis->exists($keys);
     }
 
@@ -131,6 +135,7 @@ class PredisAdapter extends Rdb
     public function del(...$keys): int
     {
         $keys = self::expandArrays($keys);
+        if (empty($keys)) return 0;
         return $this->predis->del($keys);
     }
 
