@@ -91,7 +91,9 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function get(string $key): ?string
     {
-        return $this->redis->get($key);
+        $result = $this->redis->get($key);
+        if ($result === false) return null;
+        return $result;
     }
 
 
@@ -120,7 +122,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function sMembers(string $key): array
     {
-        return $this->redis->smembers($key);
+        return $this->redis->sMembers($key);
     }
 
     /** @inheritdoc */
