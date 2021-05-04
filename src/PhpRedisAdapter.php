@@ -112,6 +112,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function sAdd(string $key, ...$values): int
     {
+        $values = self::expandArrays($values);
         return $this->redis->sAdd($key, ...$values);
     }
 
@@ -125,6 +126,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function exists(...$keys): int
     {
+        $keys = self::expandArrays($keys);
         return $this->redis->exists($keys);
     }
 
@@ -132,6 +134,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function del(...$keys): int
     {
+        $keys = self::expandArrays($keys);
         return $this->redis->del($keys);
     }
 

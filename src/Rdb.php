@@ -94,6 +94,22 @@ abstract class Rdb
 
 
     /**
+     * Flatten an array input.
+     *
+     * @param array $items
+     * @return array
+     */
+    protected static function expandArrays(array $items): array
+    {
+        $output = [];
+        array_walk_recursive($items, function($item) use (&$output) {
+            $output[] = $item;
+        });
+        return $output;
+    }
+
+
+    /**
      *
      * @param string $key
      * @param string $value
@@ -128,7 +144,7 @@ abstract class Rdb
 
     /**
      *
-     * @param string $key
+     * @param string|string[] $key
      * @param mixed $values
      * @return int
      */
@@ -145,7 +161,7 @@ abstract class Rdb
 
     /**
      *
-     * @param string $keys
+     * @param string|string[] $keys
      * @return int
      */
     public abstract function exists(...$keys): int;
@@ -153,7 +169,7 @@ abstract class Rdb
 
     /**
      *
-     * @param mixed $keys
+     * @param string|string[] $keys
      * @return int
      */
     public abstract function del(...$keys): int;

@@ -107,6 +107,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function sAdd(string $key, ...$values): int
     {
+        $values = self::expandArrays($values);
         return $this->predis->sadd($key, $values);
     }
 
@@ -121,6 +122,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function exists(...$keys): int
     {
+        $keys = self::expandArrays($keys);
         return $this->predis->exists($keys);
     }
 
@@ -128,6 +130,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function del(...$keys): int
     {
+        $keys = self::expandArrays($keys);
         return $this->predis->del($keys);
     }
 
