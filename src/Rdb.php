@@ -77,6 +77,7 @@ abstract class Rdb
 
 
     /**
+     * Strip the prefix from list of keys.
      *
      * @param string $keys
      * @return string[]
@@ -216,11 +217,13 @@ abstract class Rdb
      *
      * @param string $key
      * @param object $value
-     * @return bool
+     * @return int
      */
-    public function setObject(string $key, $value): bool
+    public function setObject(string $key, $value): int
     {
-        return $this->set($key, serialize($value));
+        $value = serialize($value);
+        if (!$this->set($key, $value)) return 0;
+        return strlen($value);
     }
 
 
@@ -324,18 +327,25 @@ abstract class Rdb
     /**
      *
      * @param object[] $items
-     * @return bool
+     * @return int[]
      */
-    public function mSetObjects(array $items): bool
+    public function mSetObjects(array $items): array
     {
-        if (empty($items)) return true;
+        if (empty($items)) return [];
+
+        $sizes = [];
 
         /** @var string[] $items */
         foreach ($items as &$item) {
             $item = serialize($item);
+            $sizes[] = strlen($item);
         }
 
-        return $this->mSet($items);
+        if (!$this->mSet($items)) {
+            return [];
+        }
+
+        return $sizes;
     }
 
 
@@ -343,11 +353,13 @@ abstract class Rdb
      *
      * @param string $key
      * @param array|JsonSerializable $value
-     * @return bool
+     * @return int
      */
-    public function setJson(string $key, $value): bool
+    public function setJson(string $key, $value): int
     {
-        return $this->set($key, json_encode($value));
+        $value = json_encode($value);
+        if (!$this->set($key, $value)) return 0;
+        return strlen($value);
     }
 
 
