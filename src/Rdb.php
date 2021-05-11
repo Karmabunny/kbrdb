@@ -218,7 +218,7 @@ abstract class Rdb
      * @param object $value
      * @return bool
      */
-    public function setObject(string $key, object $value): bool
+    public function setObject(string $key, $value): bool
     {
         return $this->set($key, serialize($value));
     }
@@ -231,7 +231,7 @@ abstract class Rdb
      * @return object|null
      * @throws InvalidArgumentException
      */
-    public function getObject(string $key, string $expected = null): ?object
+    public function getObject(string $key, string $expected = null)
     {
         if ($expected and !class_exists($expected)) {
             throw new InvalidArgumentException('Not a class: ' . $expected);
