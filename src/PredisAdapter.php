@@ -123,6 +123,15 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function sRem(string $key, ...$values): int
+    {
+        $values = self::expandArrays($values);
+        if (empty($values)) return 0;
+        return $this->predis->srem($key, $values);
+    }
+
+
+    /** @inheritdoc */
     public function exists(...$keys): int
     {
         $keys = self::expandArrays($keys);

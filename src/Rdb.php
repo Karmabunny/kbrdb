@@ -162,6 +162,15 @@ abstract class Rdb
 
     /**
      *
+     * @param string $key
+     * @param mixed $values
+     * @return int
+     */
+    public abstract function sRem(string $key, ...$values): int;
+
+
+    /**
+     *
      * @param string|string[] $keys
      * @return int
      */

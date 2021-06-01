@@ -128,6 +128,16 @@ class PhpRedisAdapter extends Rdb
         return $this->redis->sMembers($key);
     }
 
+
+    /** @inheritdoc */
+    public function sRem(string $key, ...$values): int
+    {
+        if (empty($values)) return 0;
+        $values = self::expandArrays($values);
+        return $this->redis->sRem($key, ...$values);
+    }
+
+
     /** @inheritdoc */
     public function exists(...$keys): int
     {
