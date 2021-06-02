@@ -136,7 +136,7 @@ class PredisAdapter extends Rdb
     {
         $keys = self::expandArrays($keys);
         if (empty($keys)) return 0;
-        return $this->predis->exists($keys);
+        return $this->predis->exists(...$keys);
     }
 
 
