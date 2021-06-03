@@ -16,7 +16,7 @@ use JsonSerializable;
  * Rdb is a wrapper around other popular redis libraries.
  *
  * It doesn't implement connection utilities at all, it simply provides a
- * unified interface for different adapters (php-redis, predis).
+ * unified interface for different adapters (php-redis, predis, credis).
  *
  * It also contains some useful helpers, mostly around object serialisation.
  * Feel free to add to it.
@@ -37,15 +37,9 @@ abstract class Rdb
 
 
     /**
-     * - host
-     * - prefix
-     * - other predis options
+     * Build the config.
      *
-     * @example
-     *   new RmsCache([
-     *     'host' => '127.0.0.1:6379',
-     *     'prefix' => 'etc:rms:',
-     *   ]);
+     * This _must_ be called first in any child constructors.
      *
      * @param RdbConfig|array $config
      * @throws InvalidArgumentException
@@ -62,6 +56,10 @@ abstract class Rdb
 
 
     /**
+     * Create an Rdb client for the given config.
+     *
+     * This will build a client with the appropriate adapter -  as defined
+     * by the config. If not specified, the default adapter is TYPE_PREDIS.
      *
      * @param RdbConfig|array $config
      * @return Rdb
@@ -74,7 +72,6 @@ abstract class Rdb
         }
 
         $adapter = self::ADAPTERS[$config->adapter] ?? null;
-
         if (!$adapter) {
             throw new InvalidArgumentException('Invalid rdb adapter: ' . $config->adapter);
         }
@@ -117,6 +114,10 @@ abstract class Rdb
 
 
     /**
+     * Store a value at a key.
+     *
+     * Optionall specify a TTL that will cause the key to automatically
+     * delete after a period of milliseconds.
      *
      * @param string $key
      * @param string $value
@@ -127,6 +128,7 @@ abstract class Rdb
 
 
     /**
+     * Get a value. Null if missing.
      *
      * @param string $key
      * @return string|null
@@ -135,30 +137,44 @@ abstract class Rdb
 
 
     /**
+     * Get many items.
+     *
+     * The number of returns will always match number of keys.
      *
      * @param string[] $keys
-     * @return string[]
+     * @return (string|null)[] Missing keys are null
      */
     public abstract function mGet(array $keys): array;
 
+
     /**
+     * Store many items.
+     *
+     * This will replace existing items.
      *
      * @param string[] $items key => string
-     * @return bool
+     * @return bool always true, unless items is empty.
      */
     public abstract function mSet(array $items): bool;
 
 
     /**
+     * Add a value (or many) to a set.
+     *
+     * Sets by nature are unique. Adding a new item will not create a
+     * duplicate entry.
      *
      * @param string $key
      * @param mixed $values
-     * @return int
+     * @return int number of new items added
      */
     public abstract function sAdd(string $key, ...$values): int;
 
 
     /**
+     * Get values of a set.
+     *
+     * All results will be unique.
      *
      * @param string $key
      * @return array
@@ -167,31 +183,37 @@ abstract class Rdb
 
 
     /**
+     * Remove an item (or items) from a set.
      *
      * @param string $key
      * @param mixed $values
-     * @return int
+     * @return int number of items removed
      */
     public abstract function sRem(string $key, ...$values): int;
 
 
     /**
+     * Do these keys exist?
      *
      * @param string|string[] $keys
-     * @return int
+     * @return int number of matches
      */
     public abstract function exists(...$keys): int;
 
 
     /**
+     * Delete a key, or a list of keys.
      *
      * @param string|string[] $keys
-     * @return int
+     * @return int number of keys deleted
      */
     public abstract function del(...$keys): int;
 
 
     /**
+     * Get a list of keys that match a pattern.
+     *
+     * You _should_ be using the `scan()` method.
      *
      * @param string $pattern
      * @return string[]
@@ -200,9 +222,12 @@ abstract class Rdb
 
 
     /**
+     * Iterate over a set of pattern to find a list of keys.
+     *
+     * Use this over the `keys()` method.
      *
      * @param string $pattern
-     * @return Generator
+     * @return Generator<string>
      */
     public abstract function scan(string $pattern): Generator;
 
@@ -214,7 +239,7 @@ abstract class Rdb
      * Empty keys are filtered out.
      *
      * @param array $keys
-     * @return Generator
+     * @return Generator<string>
      */
     public function mScan(array $keys): Generator
     {
@@ -229,10 +254,11 @@ abstract class Rdb
 
 
     /**
+     * Store an object at this key.
      *
      * @param string $key
      * @param object $value
-     * @return int
+     * @return int object size in bytes
      */
     public function setObject(string $key, $value): int
     {
@@ -243,9 +269,13 @@ abstract class Rdb
 
 
     /**
+     * Get an object at this key.
+     *
+     * This returns null if the key is empty or the object doesn't match the
+     * 'expected' type.
      *
      * @param string $key
-     * @param string|null $expected
+     * @param string|null $expected Ensure the result inherits/is this type
      * @return object|null
      * @throws InvalidArgumentException
      */
@@ -279,7 +309,7 @@ abstract class Rdb
      * Empty keys are filtered out.
      *
      * @param string[] $keys Non-prefixed keys
-     * @param string|null $expected Ensure all results is of this type
+     * @param string|null $expected Ensure all results inherits/is of this type
      * @return object[]
      * @throws InvalidArgumentException
      */
@@ -340,9 +370,10 @@ abstract class Rdb
 
 
     /**
+     * Bulk set an array of object.
      *
      * @param object[] $items
-     * @return int[]
+     * @return int[] object sizes in bytes
      */
     public function mSetObjects(array $items): array
     {
@@ -365,6 +396,7 @@ abstract class Rdb
 
 
     /**
+     * Store a JSON document in a key.
      *
      * @param string $key
      * @param array|JsonSerializable $value
@@ -379,6 +411,7 @@ abstract class Rdb
 
 
     /**
+     * Get a JSON document from this key.
      *
      * @param string $key
      * @return array

@@ -46,6 +46,9 @@ class CredisAdapter extends Rdb
 
 
     /**
+     * Credis can't guarantee that `setOption('prefix')` will always exist.
+     *
+     * So we're manually prefixing everything here. Yay!
      *
      * @param array $keys
      * @return string[]
