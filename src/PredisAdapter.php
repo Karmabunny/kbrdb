@@ -26,6 +26,7 @@ class PredisAdapter extends Rdb
     protected function __construct($config)
     {
         parent::__construct($config);
+        $config = $this->config;
 
         $options = $config->options;
         $options['prefix'] = $config->prefix;
