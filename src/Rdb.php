@@ -107,7 +107,7 @@ abstract class Rdb
      * @param array $items
      * @return array
      */
-    protected static function expandArrays(array $items): array
+    protected static function flattenArrays(array $items): array
     {
         $output = [];
         array_walk_recursive($items, function($item) use (&$output) {

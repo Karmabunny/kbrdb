@@ -118,7 +118,7 @@ class PhpRedisAdapter extends Rdb
     public function sAdd(string $key, ...$values): int
     {
         if (empty($values)) return 0;
-        $values = self::expandArrays($values);
+        $values = self::flattenArrays($values);
         return $this->redis->sAdd($key, ...$values);
     }
 
@@ -134,7 +134,7 @@ class PhpRedisAdapter extends Rdb
     public function sRem(string $key, ...$values): int
     {
         if (empty($values)) return 0;
-        $values = self::expandArrays($values);
+        $values = self::flattenArrays($values);
         return $this->redis->sRem($key, ...$values);
     }
 
@@ -142,7 +142,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function exists(...$keys): int
     {
-        $keys = self::expandArrays($keys);
+        $keys = self::flattenArrays($keys);
         if (empty($keys)) return 0;
         return $this->redis->exists($keys);
     }
@@ -151,7 +151,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function del(...$keys): int
     {
-        $keys = self::expandArrays($keys);
+        $keys = self::flattenArrays($keys);
         if (empty($keys)) return 0;
         return $this->redis->del($keys);
     }
