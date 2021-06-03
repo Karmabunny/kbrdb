@@ -45,9 +45,28 @@ class CredisAdapter extends Rdb
     }
 
 
+    /**
+     *
+     * @param array $keys
+     * @return string[]
+     */
+    protected function prefixKeys(array $keys): array
+    {
+        if (empty($keys)) return [];
+        $keys = self::flattenArrays($keys);
+
+        foreach ($keys as &$key) {
+            $key = $this->config->prefix . $key;
+        }
+        unset($key);
+        return $keys;
+    }
+
+
     /** @inheritdoc */
     public function keys(string $pattern): array
     {
+        $pattern = $this->config->prefix . $pattern;
         $keys = $this->credis->keys($pattern);
         $keys = $this->stripPrefix(...$keys);
         return $keys;
@@ -95,12 +114,8 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function mGet(array $keys): array
     {
+        $keys = $this->prefixKeys($keys);
         if (empty($keys)) return [];
-
-        foreach ($keys as &$key) {
-            $key = $this->config->prefix . $key;
-        }
-        unset($key);
 
         return $this->credis->mGet($keys);
     }
@@ -151,12 +166,8 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function exists(...$keys): int
     {
+        $keys = $this->prefixKeys($keys);
         if (empty($keys)) return 0;
-
-        foreach ($keys as &$key) {
-            $key = $this->config->prefix . $key;
-        }
-        unset($key);
 
         return $this->credis->exists(...$keys);
     }
@@ -165,12 +176,9 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function del(...$keys): int
     {
-        foreach ($keys as &$key) {
-            $key = $this->config->prefix . $key;
-        }
-        unset($key);
-
-        return $this->credis->del($keys);
+        $keys = $this->prefixKeys($keys);
+        if (empty($keys)) return 0;
+        return $this->credis->del(...$keys);
     }
 
 }
