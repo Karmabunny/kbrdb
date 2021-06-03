@@ -39,7 +39,7 @@ class RdbLock
      *
      * @param Rdb $rdb
      * @param string $key
-     * @param float|int $timeout seconds
+     * @param float $timeout seconds
      */
     public function __construct(Rdb $rdb, string $key, float $timeout = 60)
     {
@@ -47,7 +47,8 @@ class RdbLock
         $this->key = $key;
         $this->token = self::createToken();
 
-        $ok = $this->rdb->set($key, $this->token, $timeout * 1000);
+        $timeout *= 1000;
+        $this->rdb->set($key, $this->token, (int) $timeout);
     }
 
 

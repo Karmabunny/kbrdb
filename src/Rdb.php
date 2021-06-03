@@ -422,10 +422,11 @@ abstract class Rdb
         }
 
         $wait += microtime(true);
+        $tick = (int) ($this->config->lock_sleep * 1000000);
 
         // Begin a wait loop until the lock is free.
         while ($token = $this->get($key)) {
-            usleep($this->config->lock_sleep * 1000000);
+            usleep($tick);
 
             // Preventing infinite loops with a timeout.
             if ($wait < microtime(true)) break;
