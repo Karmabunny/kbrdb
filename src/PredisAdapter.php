@@ -40,8 +40,7 @@ class PredisAdapter extends Rdb
     public function keys(string $pattern): array
     {
         $keys = $this->predis->keys($pattern);
-        $keys = $this->stripPrefix(...$keys);
-        return $keys;
+        return array_map([$this, 'stripPrefix'], $keys);
     }
 
 

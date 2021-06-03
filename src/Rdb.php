@@ -86,18 +86,17 @@ abstract class Rdb
     /**
      * Strip the prefix from list of keys.
      *
-     * @param string $keys
-     * @return string[]
+     * @param string $key
+     * @return string
      */
-    protected function stripPrefix(...$keys): array
+    protected function stripPrefix(string $key): string
     {
         if ($this->config->prefix) {
-            foreach ($keys as &$key) {
-                $key = preg_replace("/^{$this->config->prefix}/", '', $key);
-            }
+            return preg_replace("/^{$this->config->prefix}/", '', $key);
         }
-
-        return $keys;
+        else {
+            return $key;
+        }
     }
 
 

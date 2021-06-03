@@ -58,8 +58,7 @@ class PhpRedisAdapter extends Rdb
     public function keys(string $pattern): array
     {
         $keys = $this->redis->keys($pattern);
-        $keys = $this->stripPrefix(...$keys);
-        return $keys;
+        return array_map([$this, 'stripPrefix'], $keys);
     }
 
 

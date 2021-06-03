@@ -55,10 +55,13 @@ class CredisAdapter extends Rdb
         if (empty($keys)) return [];
         $keys = self::flattenArrays($keys);
 
-        foreach ($keys as &$key) {
-            $key = $this->config->prefix . $key;
+        if ($this->config->prefix) {
+            foreach ($keys as &$key) {
+                $key = $this->config->prefix . $key;
+            }
+            unset($key);
         }
-        unset($key);
+
         return $keys;
     }
 
@@ -68,8 +71,7 @@ class CredisAdapter extends Rdb
     {
         $pattern = $this->config->prefix . $pattern;
         $keys = $this->credis->keys($pattern);
-        $keys = $this->stripPrefix(...$keys);
-        return $keys;
+        return array_map([$this, 'stripPrefix'], $keys);
     }
 
 
