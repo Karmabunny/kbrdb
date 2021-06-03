@@ -28,6 +28,7 @@ abstract class Rdb
     const ADAPTERS = [
         RdbConfig::TYPE_PHP_REDIS => PhpRedisAdapter::class,
         RdbConfig::TYPE_PREDIS => PredisAdapter::class,
+        RdbConfig::TYPE_CREDIS => CredisAdapter::class,
     ];
 
 
@@ -64,6 +65,7 @@ abstract class Rdb
      *
      * @param RdbConfig|array $config
      * @return Rdb
+     * @throws InvalidArgumentException
      */
     public static function create($config): Rdb
     {
@@ -71,7 +73,12 @@ abstract class Rdb
             $config = new RdbConfig($config);
         }
 
-        $adapter = self::ADAPTERS[$config->adapter] ?? PredisAdapter::class;
+        $adapter = self::ADAPTERS[$config->adapter] ?? null;
+
+        if (!$adapter) {
+            throw new InvalidArgumentException('Invalid rdb adapter: ' . $config->adapter);
+        }
+
         return new $adapter($config);
     }
 
