@@ -11,7 +11,7 @@ use Generator;
 
 
 /**
- * Rdb using the predis library.
+ * Rdb using the credis library, which conditionally wraps php-redis.
  *
  * @package karmabunny\rdb
  */
@@ -78,7 +78,7 @@ class CredisAdapter extends Rdb
         }
 
         $key = $this->config->prefix . $key;
-        return $this->redis->set($key, $value, $options);
+        return $this->credis->set($key, $value, $options);
     }
 
 
@@ -102,7 +102,7 @@ class CredisAdapter extends Rdb
         }
         unset($key);
 
-        return $this->credis->mget($keys);
+        return $this->credis->mGet($keys);
     }
 
 
@@ -118,7 +118,7 @@ class CredisAdapter extends Rdb
 
         $items = array_combine($keys, $items);
 
-        return (bool) @$this->credis->mset($items);
+        return (bool) @$this->credis->mSet($items);
     }
 
 
@@ -127,7 +127,7 @@ class CredisAdapter extends Rdb
     {
         if (empty($values)) return 0;
         $key = $this->config->prefix . $key;
-        return $this->credis->sadd($key, ...$values);
+        return $this->credis->sAdd($key, ...$values);
     }
 
 
@@ -135,7 +135,7 @@ class CredisAdapter extends Rdb
     public function sMembers(string $key): array
     {
         $key = $this->config->prefix . $key;
-        return $this->credis->smembers($key);
+        return $this->credis->sMembers($key);
     }
 
 
@@ -144,7 +144,7 @@ class CredisAdapter extends Rdb
     {
         if (empty($values)) return 0;
         $key = $this->config->prefix . $key;
-        return $this->credis->srem($key, $values);
+        return $this->credis->sRem($key, $values);
     }
 
 
@@ -165,8 +165,6 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function del(...$keys): int
     {
-        $keys = self::expandArrays($keys);
-
         foreach ($keys as &$key) {
             $key = $this->config->prefix . $key;
         }
