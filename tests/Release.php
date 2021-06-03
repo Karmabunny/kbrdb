@@ -1,5 +1,7 @@
 <?php
 
+namespace kbtests;
+
 use karmabunny\rdb\Rdb;
 
 if (realpath(@$argv[0]) === __FILE__) {
@@ -11,6 +13,8 @@ if (realpath(@$argv[0]) === __FILE__) {
     return null;
 }
 
-function release(string $key, float $wait) {
-    exec('php ' . __FILE__ . " {$key} {$wait} > /dev/null 2>&1 &");
+class Release {
+    static function release(string $key, float $wait) {
+        exec('php ' . __FILE__ . " {$key} {$wait} > /dev/null 2>&1 &");
+    }
 }

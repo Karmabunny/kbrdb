@@ -9,6 +9,11 @@
             "karmabunny\\rdb\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "kbtests\\": "tests"
+        }
+    },
     "require": {
         "predis/predis": "^1.1"
     },

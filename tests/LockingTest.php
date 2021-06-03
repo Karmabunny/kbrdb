@@ -1,10 +1,13 @@
 <?php
 
+namespace kbtests;
+
 use karmabunny\rdb\Rdb;
 use karmabunny\rdb\RdbLock;
 use PHPUnit\Framework\TestCase;
+use kbtests\Release;
 
-include __DIR__ . '/release.php';
+// include __DIR__ . '/release.php';
 
 /**
  * Test the locking mechanism.
@@ -53,7 +56,7 @@ final class LockingTest extends TestCase
         $this->assertNotNull($lock1);
 
         // Release after 1/2 second off-thread.
-        release('lock:1', 0.5);
+        Release::release('lock:1', 0.5);
 
         // Existing lock, waits 0.5, gets a lock.
         $time = microtime(true);
