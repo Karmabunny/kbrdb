@@ -418,7 +418,9 @@ abstract class Rdb
             if ($wait <= 0) return null;
         }
         else {
-            return new RdbLock($this, $key, $ttl);
+            $lock = new RdbLock($this, $key, $ttl);
+            if (!$lock->isLocked()) return null;
+            return $lock;
         }
 
         $wait += microtime(true);
@@ -435,6 +437,8 @@ abstract class Rdb
         // Lock still exists, no dice.
         if ($token) return null;
 
-        return new RdbLock($this, $key, $ttl);
+        $lock = new RdbLock($this, $key, $ttl);
+        if (!$lock->isLocked()) return null;
+        return $lock;
     }
 }
