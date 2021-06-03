@@ -72,5 +72,10 @@
         "Zend OPcache",
         "zip",
         "zlib"
+    ],
+    "cSpell.words": [
+        "credis",
+        "kbtests",
+        "predis"
     ]
 }
