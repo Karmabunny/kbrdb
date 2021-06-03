@@ -101,7 +101,13 @@ class PhpRedisAdapter extends Rdb
     public function mGet(array $keys): array
     {
         if (empty($keys)) return [];
-        return $this->redis->mGet($keys);
+        $items = $this->redis->mGet($keys);
+
+        foreach ($items as &$item) {
+            if ($item === false) return null;
+        }
+        unset($item);
+        return $items;
     }
 
 

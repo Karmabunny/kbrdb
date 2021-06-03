@@ -94,6 +94,7 @@ class PredisAdapter extends Rdb
     public function mGet(array $keys): array
     {
         if (empty($keys)) return [];
+        // TODO are missing keys null or not??
         return $this->predis->mget($keys);
     }
 
