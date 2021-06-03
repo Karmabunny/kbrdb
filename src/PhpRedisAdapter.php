@@ -108,7 +108,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function mSet(array $items): bool
     {
-        if (empty($keys)) return false;
+        if (empty($items)) return false;
         return $this->redis->mSet($items);
     }
 
