@@ -414,11 +414,11 @@ abstract class Rdb
      * Get a JSON document from this key.
      *
      * @param string $key
-     * @return array
+     * @return array|null
      */
-    public function getJson(string $key): array
+    public function getJson(string $key)
     {
-        $out = json_decode($this->get($key), true);
+        $out = json_decode($this->get($key) ?? 'null', true);
 
         $error = json_last_error();
         if ($error !== JSON_ERROR_NONE) {
