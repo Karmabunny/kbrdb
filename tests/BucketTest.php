@@ -48,7 +48,6 @@ final class BucketTest extends TestCase
         $this->assertTrue($bucket->drip());
         $this->assertTrue($bucket->drip());
         $this->assertTrue($bucket->drip());
-        $this->assertTrue($bucket->drip());
 
         // Oh no we're full!
         $this->assertFalse($bucket->drip());
