@@ -5,7 +5,7 @@ Like Pdb, but for Redis. I guess.
 
 Big emphasis on prefixing keys and object serialization.
 
-Also because I don't want a hard dependency on either predis or php-redis. They both have their problems. Or wouldn't it be wonderful if a 3rd option showed up /s.
+Also because I don't want a hard dependency on either predis or php-redis. They both have their problems. ~~Or wouldn't it be wonderful if a 3rd option showed up /s~~. Also supports credis.
 
 
 ### Methods
@@ -34,13 +34,14 @@ TODO: more
 
 - php-redis (binary extension)
 - predis (composer package)
+- credis (composer package)
 
 
 ### Config
 
 - `host` - server name + port
 - `prefix` - key prefix
-- `adapter` - 'predis' (default) or 'php-redis'
+- `adapter` - 'predis' (default), 'php-redis', 'credis'
 - `chunk_size` - max key size for scan methods
 - `options` - adapter specific options
 
@@ -54,4 +55,4 @@ Notes:
 
 - tests
 - more methods
-
+- Static version for Sprout compat
