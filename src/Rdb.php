@@ -236,10 +236,8 @@ abstract class Rdb
     /**
      * Bulk fetch via a list of keys.
      *
-     * Empty keys are filtered out.
-     *
-     * @param array $keys
-     * @return Generator<string>
+     * @param string[] $keys
+     * @return Generator<string|null>
      */
     public function mScan(array $keys): Generator
     {
@@ -350,7 +348,7 @@ abstract class Rdb
      *
      * Empty keys are filtered out.
      *
-     * @param array $keys
+     * @param string[] $keys
      * @param string|null $expected Ensure all results is of this type
      * @return Generator<object>
      */
