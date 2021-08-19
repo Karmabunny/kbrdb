@@ -66,7 +66,7 @@ class RdbLock
      *
      * @return void
      */
-    public function release(): void
+    public function release()
     {
         if ($this->isLocked()) {
             $this->rdb->del($this->key);

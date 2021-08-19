@@ -89,7 +89,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function get(string $key): ?string
+    public function get(string $key)
     {
         $result = $this->redis->get($key);
         if ($result === false) return null;

@@ -133,7 +133,7 @@ abstract class Rdb
      * @param string $key
      * @return string|null
      */
-    public abstract function get(string $key): ?string;
+    public abstract function get(string $key);
 
 
     /**

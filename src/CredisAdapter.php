@@ -107,7 +107,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function get(string $key): ?string
+    public function get(string $key)
     {
         $key = $this->config->prefix . $key;
         $result = $this->credis->get($key);
