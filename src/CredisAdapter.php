@@ -124,7 +124,8 @@ class CredisAdapter extends Rdb
 
         $items = $this->credis->mGet($keys);
         foreach ($items as &$item) {
-            if ($item === false) return null;
+            if ($item !== false) continue;
+            $item = null;
         }
         unset($item);
         return $items;
