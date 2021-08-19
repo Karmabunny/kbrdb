@@ -473,4 +473,16 @@ abstract class Rdb
         if (!$lock->isLocked()) return null;
         return $lock;
     }
+
+
+    /**
+     * Create or fetch a leaky bucket for rate limiting.
+     *
+     * @param array|string $config
+     * @return RdbBucket
+     */
+    public function getBucket($config): RdbBucket
+    {
+        return new RdbBucket($this, $config);
+    }
 }
