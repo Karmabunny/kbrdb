@@ -28,7 +28,7 @@ class RdbBucket
     /** @var float */
     public $drip_rate = 1;
 
-    /** @var array */
+    /** @var int[] [ name => drip size ] */
     public $costs = [];
 
 
@@ -44,8 +44,9 @@ class RdbBucket
      *
      * The config is this:
      * - key
-     * - capacity
-     * - drip_rate
+     * - prefix (def: 'drip:')
+     * - capacity (def: 60)
+     * - drip_rate (def: 1)
      * - costs
      *
      * @param Rdb $rdb
@@ -54,7 +55,7 @@ class RdbBucket
     public function __construct(Rdb $rdb, $config)
     {
         // Shorthand config.
-        if (is_string($config)){
+        if (is_string($config)) {
             $config = [ 'key' => $config ];
         }
 
@@ -178,9 +179,9 @@ class RdbBucket
      *
      * Or, per region:
      * - 'AU' is 1 drip
-     * ' 'US' is 2 drips
+     * - 'US' is 2 drips
      *
-     * @param int|string $size
+     * @param int|string $size drop size or cost lookup
      *  - `int` - How many drips
      *  - `string` - A cost name
      * @return bool
