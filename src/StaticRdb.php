@@ -9,7 +9,7 @@ namespace karmabunny\rdb;
 /**
  * Static version of Rdb.
  *
- * Extend this and implement the init() method.
+ * Extend this and implement the getInstance() method.
  *
  * @method static bool set(string $key, string $value, int $ttl = 0)
  * @method static string|null get(string $key)
@@ -25,7 +25,7 @@ namespace karmabunny\rdb;
  *
  * @method static (string|null)[] mGet(string $key)
  * @method static bool mSet(string[] $items)
- * @method static Generator<strng|null> mScan(string[] $keys)
+ * @method static Generator<string|null> mScan(string[] $keys)
  *
  * @method static int setObject(string $key, object $value)
  * @method static object|null getObject(string $key, string $expected = null)
@@ -43,7 +43,7 @@ namespace karmabunny\rdb;
 abstract class StaticRdb
 {
 
-    public static abstract function init(): Rdb;
+    public static abstract function getInstance(): Rdb;
 
 
     /**
@@ -55,7 +55,7 @@ abstract class StaticRdb
      */
     public static function __callStatic($name, $arguments)
     {
-        $rdb = static::init();
+        $rdb = static::getInstance();
         return $rdb->$name(...$arguments);
     }
 }
