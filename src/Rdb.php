@@ -256,12 +256,13 @@ abstract class Rdb
      *
      * @param string $key
      * @param object $value
+     * @param int $ttl milliseconds
      * @return int object size in bytes
      */
-    public function setObject(string $key, $value): int
+    public function setObject(string $key, $value, $ttl = 0): int
     {
         $value = serialize($value);
-        if (!$this->set($key, $value)) return 0;
+        if (!$this->set($key, $value, $ttl)) return 0;
         return strlen($value);
     }
 
@@ -398,12 +399,13 @@ abstract class Rdb
      *
      * @param string $key
      * @param array|JsonSerializable $value
+     * @param int $ttl milliseconds
      * @return int
      */
-    public function setJson(string $key, $value): int
+    public function setJson(string $key, $value, $ttl = 0): int
     {
         $value = json_encode($value);
-        if (!$this->set($key, $value)) return 0;
+        if (!$this->set($key, $value, $ttl)) return 0;
         return strlen($value);
     }
 
