@@ -8,6 +8,28 @@ Big emphasis on prefixing keys and object serialization.
 Also because I don't want a hard dependency on either predis or php-redis. They both have their problems. ~~Or wouldn't it be wonderful if a 3rd option showed up /s~~. Also supports credis.
 
 
+## Install
+
+Install with composer from our private package repo.
+
+Add the repository:
+
+```json
+"repositories": [
+    {
+        "type": "composer",
+        "url": "https://packages.bunnysites.com"
+    }
+]
+```
+
+Add as a dependency:
+
+```sh
+composer require karmabunny/rdb
+```
+
+
 ### Methods
 
 - get
