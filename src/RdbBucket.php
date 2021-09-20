@@ -22,10 +22,10 @@ class RdbBucket
     /** @var string */
     public $prefix = 'drip:';
 
-    /** @var int */
+    /** @var int Bucket size. */
     public $capacity = 60;
 
-    /** @var float */
+    /** @var float Drips per second. */
     public $drip_rate = 1;
 
     /** @var int[] [ name => drip size ] */

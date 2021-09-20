@@ -433,7 +433,8 @@ abstract class Rdb
      * Create a lock.
      *
      * This will block for `$wait` seconds until the lock is released.
-     * It will then return a _new_ lock.
+     * It will then return a _new_ lock if available. If the resource is still
+     * locked it returns null.
      *
      * The `$ttl` will auto-expire a lock should it somehow not self-destruct.
      * If your code runs longer than 5 minutes, it's recommended to bump this up.

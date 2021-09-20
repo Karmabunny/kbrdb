@@ -106,7 +106,7 @@ Locking provides a mechanism to restrict atomic access to a resource.
 $lock = $rdb->lock('locks:key', 10);
 
 if ($lock === null) {
-    echo "Too much contention\n";
+    echo "Busy - too much contention\n";
 }
 else {
     // Do atomic things.
@@ -119,7 +119,7 @@ else {
 ```php
 // A bucket with 60 drips per minute.
 $bucket = $rdb->getBucket([
-    'key' => 'buckets:key',
+    'key' => 'key',
 
     // Defaults.
     'capacity' => 60,
