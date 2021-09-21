@@ -72,7 +72,7 @@ Basic usage with a TTL. Great for caching.
 use karmabunny\rdb\Rdb;
 
 $config = require 'config.php';
-$rdb = new Rdb($config);
+$rdb = Rdb::create($config);
 
 // Store 'blah' for 100 ms
 $rdb->set('key', 'blah', 100);
