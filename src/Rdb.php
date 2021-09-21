@@ -355,19 +355,31 @@ abstract class Rdb
      *
      * Empty keys are filtered out.
      *
-     * @param string[] $keys Non-prefixed keys
+     * @param iterable $keys Non-prefixed keys
      * @param string|null $expected Ensure all results is of this type
      * @return Generator<object>
      */
-    public function mScanObjects(array $keys, string $expected = null): Generator
+    public function mScanObjects($keys, string $expected = null): Generator
     {
         if ($expected and !class_exists($expected)) {
             throw new InvalidArgumentException('Not a class: ' . $expected);
         }
 
-        if (empty($keys)) return [];
+        $chunk = [];
 
-        foreach (array_chunk($keys, $this->config->chunk_size) as $chunk) {
+        foreach ($keys as $key) {
+            // Build a chunk of keys.
+            $chunk[] = $key;
+            if (count($chunk) !== $this->config->chunk_size) continue;
+
+            // Fetch and yield them.
+            $items = $this->mGetObjects($chunk, $expected);
+            foreach ($items as $item) yield $item;
+            $chunk = [];
+        }
+
+        // Also emit those leftovers.
+        if (!empty($chunk)) {
             $items = $this->mGetObjects($chunk, $expected);
             foreach ($items as $item) yield $item;
         }
