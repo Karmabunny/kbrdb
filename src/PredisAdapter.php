@@ -69,17 +69,10 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function set(string $key, $value, $ttl = 0): bool
     {
-        $args[] = $key;
-        $args[] = $value;
-
-        if ($ttl) {
-            $args[] = 'PX';
-            $args[] = $ttl;
-        }
-
-        // Fun hack because predis is built with weird command interfaces.
-        // Legit, this doesn't work: set($key, $value, null, null);
-        return (bool) @call_user_func_array([$this->predis, 'set'], $args);
+        $status = $ttl
+            ? $this->predis->set($key, $value, 'PX', $ttl)
+            : $this->predis->set($key, $value);
+        return $status == 'OK';
     }
 
 
