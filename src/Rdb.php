@@ -15,10 +15,16 @@ use JsonSerializable;
 /**
  * Rdb is a wrapper around other popular redis libraries.
  *
- * It doesn't implement connection utilities at all, it simply provides a
- * unified interface for different adapters (php-redis, predis, credis).
+ * It tries to create a unified interface for different adapters
+ * (php-redis, predis, credis).
  *
- * It also contains some useful helpers, mostly around object serialisation.
+ * It also contains some useful helpers:
+ * - prefixing
+ * - object serialisation
+ * - scanning generators
+ * - locking
+ * - rate limiting
+ *
  * Feel free to add to it.
  *
  * @package karmabunny\rdb
@@ -58,7 +64,7 @@ abstract class Rdb
     /**
      * Create an Rdb client for the given config.
      *
-     * This will build a client with the appropriate adapter -  as defined
+     * This will build a client with the appropriate adapter - as defined
      * by the config. If not specified, the default adapter is TYPE_PREDIS.
      *
      * @param RdbConfig|array $config
@@ -116,7 +122,7 @@ abstract class Rdb
     /**
      * Store a value at a key.
      *
-     * Optionall specify a TTL that will cause the key to automatically
+     * Optionally specify a TTL that will cause the key to automatically
      * delete after a period of milliseconds.
      *
      * @param string $key
@@ -349,7 +355,7 @@ abstract class Rdb
      *
      * Empty keys are filtered out.
      *
-     * @param string[] $keys
+     * @param string[] $keys Non-prefixed keys
      * @param string|null $expected Ensure all results is of this type
      * @return Generator<object>
      */
