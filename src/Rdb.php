@@ -513,42 +513,18 @@ abstract class Rdb
      * locked it returns null.
      *
      * The `$ttl` will auto-expire a lock should it somehow not self-destruct.
-     * If your code runs longer than 5 minutes, it's recommended to bump this up.
+     * If your code runs longer than 1 minute, it's recommended to bump this up.
      *
      * @param string $key
      * @param float $wait seconds
-     * @param float $ttl seconds (default 5 minutes)
+     * @param float $ttl seconds (default 1 minute)
      * @return RdbLock|null
      */
-    public function lock(string $key, float $wait, float $ttl = 300)
+    public function lock(string $key, float $wait = 0, float $ttl = 60)
     {
-        // Skipping the wait loop.
-        if ($this->exists($key)) {
-            if ($wait <= 0) return null;
-        }
-        else {
-            $lock = new RdbLock($this, $key, $ttl);
-            if (!$lock->isLocked()) return null;
-            return $lock;
-        }
-
-        $wait += microtime(true);
-        $tick = (int) ($this->config->lock_sleep * 1000000);
-
-        // Begin a wait loop until the lock is free.
-        while ($token = $this->get($key)) {
-            usleep($tick);
-
-            // Preventing infinite loops with a timeout.
-            if ($wait < microtime(true)) break;
-        }
-
-        // Lock still exists, no dice.
-        if ($token) return null;
-
-        $lock = new RdbLock($this, $key, $ttl);
-        if (!$lock->isLocked()) return null;
-        return $lock;
+        $wait *= 1000;
+        $ttl *= 1000;
+        return RdbLock::acquire($this, $key, (int) $wait, (int) $ttl);
     }
 
 
