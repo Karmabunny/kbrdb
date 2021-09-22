@@ -110,6 +110,20 @@ class RdbLock
 
 
     /**
+     * Extend the timeout for this lock by X milliseconds.
+     *
+     * @return bool False if expired
+     */
+    public function extend(int $timeout = 60000): bool
+    {
+        if (!$this->isLocked()) return false;
+        return $this->rdb->set($this->key, $this->token, $timeout, [
+            'replace' => 'XX',
+        ]);
+    }
+
+
+    /**
      * Is the lock acquired?
      *
      * This should always be 'true' after obtaining a fresh lock.
