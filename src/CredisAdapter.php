@@ -95,37 +95,30 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function set(string $key, $value, $ttl = 0, $flags = [])
     {
-        $flags = array_map('strtolower', $flags);
-        $keep_ttl = in_array('keep_ttl', $flags);
-        $time_at = in_array('time_at', $flags);
-        $get_set = in_array('get_set', $flags);
-        $replace = (
-            in_array('replace', $flags) ?:
-            ($flags['replace'] ?? null)
-        );
+        $flags = self::parseFlags($flags);
 
         $options = [];
 
         if ($ttl) {
-            $name = $time_at ? 'pxat' : 'px';
+            $name = $flags['time_at'] ? 'pxat' : 'px';
             $options[$name] = $ttl;
         }
 
         // Retain the TTL.
-        if ($keep_ttl) {
+        if ($flags['keep_ttl']) {
             $options[] = 'keepttl';
         }
 
         // Toggle set-only flags.
-        if ($replace === true) {
+        if ($flags['replace'] === true) {
             $options[] = 'xx';
         }
-        else if ($replace === false) {
+        else if ($flags['replace'] === false) {
             $options[] = 'nx';
         }
 
         // Get the value before setting it.
-        if ($get_set) {
+        if ($flags['get_set']) {
             $options[] = 'get';
         }
 
@@ -133,7 +126,7 @@ class CredisAdapter extends Rdb
         $result = $this->credis->set($key, $value, $options);
 
         // TODO Uhh.. does getset actually work here?
-        if ($get_set) {
+        if ($flags['get_set']) {
             return $result === false ? null : $result;
         }
 

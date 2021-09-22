@@ -69,46 +69,39 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function set(string $key, $value, $ttl = 0, $flags = [])
     {
-        $flags = array_map('strtolower', $flags);
-        $keep_ttl = in_array('keep_ttl', $flags);
-        $time_at = in_array('time_at', $flags);
-        $get_set = in_array('get_set', $flags);
-        $replace = (
-            in_array('replace', $flags) ?:
-            ($flags['replace'] ?? null)
-        );
+        $flags = self::parseFlags($flags);
 
         $args = [];
         $args[] = $key;
         $args[] = $value;
 
         if ($ttl) {
-            $args[] = $time_at ? 'PXAT' : 'PX';
+            $args[] = $flags['time_at'] ? 'PXAT' : 'PX';
             $args[] = $ttl;
         }
 
         // Retain the TTL.
-        if ($keep_ttl) {
+        if ($flags['keep_ttl']) {
             $args[] = 'KEEPTTL';
         }
 
         // Toggle set-only flags.
-        if ($replace === true) {
+        if ($flags['replace'] === true) {
             $args[] = 'XX';
         }
-        else if ($replace === false) {
+        else if ($flags['replace'] === false) {
             $args[] = 'NX';
         }
 
         // Get the value before setting it.
-        if ($get_set) {
+        if ($flags['get_set']) {
             $args[] = 'GET';
         }
 
         /** @var Status */
         $status = @call_user_func_array([$this->predis, 'set'], $args);
 
-        if ($get_set) {
+        if ($flags['get_set']) {
             return $status->getPayload();
         }
 

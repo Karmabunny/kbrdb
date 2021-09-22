@@ -120,6 +120,47 @@ abstract class Rdb
 
 
     /**
+     * Parse + normalise set() flags.
+     *
+     * @param array $items
+     * @return array
+     */
+    protected static function parseFlags(array $flags): array
+    {
+        // Defaults.
+        $output = [
+            'keep_ttl' => null,
+            'time_at' => null,
+            'get_set' => null,
+            'replace' => null,
+        ];
+
+        // Normalise.
+        foreach ($flags as $key => $value) {
+            if (is_numeric($key)) {
+                $output[strtolower($value)] = true;
+            }
+            else {
+                $output[strtolower($key)] = $value;
+            }
+        }
+
+        // For those smarty pants that write 'replace => NX/XX'.
+        if ($output['replace'] === 'NX') {
+            $output['replace'] = false;
+        }
+        else if ($output['replace'] === 'XX') {
+            $output['replace'] = true;
+        }
+        else if (!is_bool($output['replace'])) {
+            $output['replace'] = null;
+        }
+
+        return $output;
+    }
+
+
+    /**
      * Store a value at a key.
      *
      * Optionally specify a TTL that will cause the key to automatically
