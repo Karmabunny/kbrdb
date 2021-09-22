@@ -8,7 +8,7 @@ namespace karmabunny\rdb;
 
 use Generator;
 use Predis\Client;
-
+use Predis\Response\Status;
 
 /**
  * Rdb using the predis library.
@@ -67,11 +67,51 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function set(string $key, $value, $ttl = 0): bool
+    public function set(string $key, $value, $ttl = 0, $flags = [])
     {
-        $status = $ttl
-            ? $this->predis->set($key, $value, 'PX', $ttl)
-            : $this->predis->set($key, $value);
+        $flags = array_map('strtolower', $flags);
+        $keep_ttl = in_array('keep_ttl', $flags);
+        $time_at = in_array('time_at', $flags);
+        $get_set = in_array('get_set', $flags);
+        $replace = (
+            in_array('replace', $flags) ?:
+            ($flags['replace'] ?? null)
+        );
+
+        $args = [];
+        $args[] = $key;
+        $args[] = $value;
+
+        if ($ttl) {
+            $args[] = $time_at ? 'PXAT' : 'PX';
+            $args[] = $ttl;
+        }
+
+        // Retain the TTL.
+        if ($keep_ttl) {
+            $args[] = 'KEEPTTL';
+        }
+
+        // Toggle set-only flags.
+        if ($replace === true) {
+            $args[] = 'XX';
+        }
+        else if ($replace === false) {
+            $args[] = 'NX';
+        }
+
+        // Get the value before setting it.
+        if ($get_set) {
+            $args[] = 'GET';
+        }
+
+        /** @var Status */
+        $status = @call_user_func_array([$this->predis, 'set'], $args);
+
+        if ($get_set) {
+            return $status->getPayload();
+        }
+
         return $status == 'OK';
     }
 

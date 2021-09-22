@@ -125,12 +125,29 @@ abstract class Rdb
      * Optionally specify a TTL that will cause the key to automatically
      * delete after a period of milliseconds.
      *
+     * Flags are an array for modifying behaviour, for example:
+     *
+     * ```
+     * $rdb->set('key', 'value', 1000, [
+     *    'time_at',           // PXAT
+     *    'get_set',           // GET
+     *    'replace' => false,  // NX
+     * ]);
+     * ```
+     *
      * @param string $key
      * @param string $value
      * @param int $ttl milliseconds
-     * @return bool
+     * @param array $flags
+     *  - keep_ttl: retain the TTL when replacing a key
+     *  - time_at: the TTL is an expiry unix time in milliseconds
+     *  - get_set: get the old value before setting the new one
+     *  - replace: `bool` - only set if it (not) exists (true: XX, false: NX)
+     * @return bool|string|null
+     *    - string|null if the GET flag is set
+     *    - bool for everything else
      */
-    public abstract function set(string $key, string $value, $ttl = 0): bool;
+    public abstract function set(string $key, string $value, $ttl = 0, $flags = []);
 
 
     /**

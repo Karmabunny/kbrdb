@@ -76,15 +76,50 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function set(string $key, string $value, $ttl = 0): bool
+    public function set(string $key, string $value, $ttl = 0, $flags = [])
     {
+        $flags = array_map('strtolower', $flags);
+        $keep_ttl = in_array('keep_ttl', $flags);
+        $time_at = in_array('time_at', $flags);
+        $get_set = in_array('get_set', $flags);
+        $replace = (
+            in_array('replace', $flags) ?:
+            ($flags['replace'] ?? null)
+        );
+
         $options = [];
 
         if ($ttl) {
-            $options['px'] = $ttl;
+            $name = $time_at ? 'pxat' : 'px';
+            $options[$name] = $ttl;
         }
 
-        return $this->redis->set($key, $value, $options);
+        // Retain the TTL.
+        if ($keep_ttl) {
+            $options[] = 'keepttl';
+        }
+
+        // Toggle set-only flags.
+        if ($replace === true) {
+            $options[] = 'xx';
+        }
+        else if ($replace === false) {
+            $options[] = 'nx';
+        }
+
+        // Get the value before setting it.
+        if ($get_set) {
+            $options[] = 'get';
+        }
+
+        $result = $this->redis->set($key, $value, $options);
+
+        // TODO Uhh.. does getset actually work here?
+        if ($get_set) {
+            return $result === false ? null : $result;
+        }
+
+        return (bool) $result;
     }
 
 
