@@ -382,6 +382,9 @@ abstract class Rdb
             throw new InvalidArgumentException('Not a class: ' . $expected);
         }
 
+        // Fix sequential indexes.
+        $keys = array_values($keys);
+
         if (empty($keys)) return [];
 
         $items = $this->mGet($keys);
