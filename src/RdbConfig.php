@@ -40,8 +40,8 @@ class RdbConfig
     /** @var int */
     public $chunk_size = 50;
 
-    /** @var float in seconds */
-    public $lock_sleep = 0.005;
+    /** @var int in milliseconds */
+    public $lock_sleep = 5;
 
     /** @var array */
     public $options = [];

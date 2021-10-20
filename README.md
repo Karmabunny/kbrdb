@@ -29,7 +29,7 @@ composer require karmabunny/rdb
 - `prefix` - key prefix
 - `adapter` - 'predis' (default), 'php-redis', 'credis'
 - `chunk_size` - max key size for scan methods (default: 50)
-- `lock_sleep` - tick size for locking, in seconds (default: 0.005)
+- `lock_sleep` - tick size for locking, in milliseconds (default: 5)
 - `options` - adapter specific options
 
 Notes:
@@ -45,7 +45,7 @@ return [
     // Defaults
     'adapter' => 'predis',
     'chunk_size' => 50,
-    'lock_sleep' => 0.005,
+    'lock_sleep' => 5,
     'options' => [],
 ];
 ```
@@ -67,7 +67,7 @@ $rdb->set('key', 'blah', 100);
 $rdb->get('key');
 // => blah
 
-usleep(150);
+usleep(150 * 1000);
 
 $rdb->get('key');
 // => NULL
@@ -90,7 +90,7 @@ Locking provides a mechanism to restrict atomic access to a resource.
 
 ```php
 // Wait for a lock for up to 10 seconds.
-$lock = $rdb->lock('locks:key', 10);
+$lock = $rdb->lock('locks:key', 10 * 1000);
 
 if ($lock === null) {
     echo "Busy - too much contention\n";
