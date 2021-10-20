@@ -122,7 +122,7 @@ abstract class Rdb
     /**
      * Parse + normalise set() flags.
      *
-     * @param array $items
+     * @param array $flags
      * @return array
      */
     protected static function parseFlags(array $flags): array
