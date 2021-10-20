@@ -30,23 +30,23 @@ final class LockingTest extends TestCase
 
     public function testLock()
     {
-        $time = microtime(true);
-        $lock1 = $this->rdb->lock('lock:1', 1);
+        $time = self::mtime();
+        $lock1 = $this->rdb->lock('lock:1', 1000);
 
         // Matching key + token.
         $this->assertEquals($lock1->key, 'lock:1');
         $this->assertEquals($lock1->token, $this->rdb->get('lock:1'));
 
         // No existing lock - no waiting, got a lock.
-        $this->assertLessThan(0.1, microtime(true) - $time);
+        $this->assertLessThan(100, self::mtime() - $time);
         $this->assertInstanceOf(RdbLock::class, $lock1);
 
         // Existing lock, no wait, no lock.
-        $time = microtime(true);
+        $time = self::mtime();
         $lock2 = $this->rdb->lock('lock:1', 0);
 
         $this->assertNull($lock2);
-        $this->assertLessThan(0.1, microtime(true) - $time);
+        $this->assertLessThan(100, self::mtime() - $time);
     }
 
 
@@ -59,10 +59,10 @@ final class LockingTest extends TestCase
         Release::release('lock:1', 0.5);
 
         // Existing lock, waits 0.5, gets a lock.
-        $time = microtime(true);
-        $lock2 = $this->rdb->lock('lock:1', 1);
+        $time = self::mtime();
+        $lock2 = $this->rdb->lock('lock:1', 1000);
 
-        $this->assertEqualsWithDelta(0.5, microtime(true) - $time, 0.1);
+        $this->assertEqualsWithDelta(500, self::mtime() - $time, 100);
         $this->assertInstanceOf(RdbLock::class, $lock2);
 
         $this->assertNotEquals($lock1->token, $lock2->token);
@@ -71,7 +71,7 @@ final class LockingTest extends TestCase
 
     public function testTimeout()
     {
-        $lock1 = $this->rdb->lock('lock:1', 0, 0.5);
+        $lock1 = $this->rdb->lock('lock:1', 0, 500);
         $this->assertNotNull($lock1);
 
         usleep(0.25 * 1000000);
@@ -79,5 +79,11 @@ final class LockingTest extends TestCase
 
         usleep(0.75 * 1000000);
         $this->assertFalse((bool) $this->rdb->exists('lock:1'));
+    }
+
+
+    public static function mtime(): int
+    {
+        return (int) floor(microtime(true) * 1000);
     }
 }

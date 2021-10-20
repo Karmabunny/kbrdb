@@ -519,14 +519,12 @@ abstract class Rdb
      * If your code runs longer than 1 minute, it's recommended to bump this up.
      *
      * @param string $key
-     * @param float $wait seconds
-     * @param float $ttl seconds (default 1 minute)
+     * @param int $wait milliseconds
+     * @param int $ttl milliseconds (default 1 minute)
      * @return RdbLock|null
      */
-    public function lock(string $key, float $wait = 0, float $ttl = 60)
+    public function lock(string $key, int $wait = 0, int $ttl = 60000)
     {
-        $wait *= 1000;
-        $ttl *= 1000;
         return RdbLock::acquire($this, $key, (int) $wait, (int) $ttl);
     }
 
