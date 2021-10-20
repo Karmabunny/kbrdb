@@ -2,8 +2,14 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "karmabunny/rdb",
     "description": "Redis wrapper for KB things",
+    "keywords": ["redis", "rdb"],
     "type": "library",
-
+    "authors": [
+        {
+            "name": "Karmabunny",
+            "email": "info@karmabunny.com.au"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "karmabunny\\rdb\\": "src/"
@@ -16,7 +22,8 @@
     },
     "require": {
         "predis/predis": "^1",
-        "colinmollenhour/credis": "^1"
+        "colinmollenhour/credis": "^1",
+        "php": ">=7.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
