@@ -369,14 +369,15 @@ abstract class Rdb
     /**
      * Bulk fetch objects via a list of keys.
      *
-     * Empty keys are filtered out.
+     * Empty keys are filtered out - if `nullish` is false (default).
      *
      * @param string[] $keys Non-prefixed keys
      * @param string|null $expected Ensure all results inherits/is of this type
-     * @return object[]
+     * @param bool $nullish (false) return empty values
+     * @return (object|null)[]
      * @throws InvalidArgumentException
      */
-    public function mGetObjects(array $keys, string $expected = null): array
+    public function mGetObjects(array $keys, string $expected = null, bool $nullish = false): array
     {
         if ($expected and !class_exists($expected)) {
             throw new InvalidArgumentException('Not a class: ' . $expected);
@@ -389,6 +390,10 @@ abstract class Rdb
 
         $items = $this->mGet($keys);
         $output = [];
+
+        if ($nullish) {
+            $output = array_fill(0, count($keys), null);
+        }
 
         foreach ($items as $index => $item) {
             $key = $keys[$index] ?? null;
@@ -414,13 +419,14 @@ abstract class Rdb
     /**
      * Bulk fetch objects via a list of keys.
      *
-     * Empty keys are filtered out.
+     * Empty keys are filtered out - if `nullish` is false (default).
      *
      * @param iterable $keys Non-prefixed keys
      * @param string|null $expected Ensure all results is of this type
-     * @return Generator<object>
+     * @param bool $nullish (false) return empty values
+     * @return Generator<object|null>
      */
-    public function mScanObjects($keys, string $expected = null): Generator
+    public function mScanObjects($keys, string $expected = null, bool $nullish = false): Generator
     {
         if ($expected and !class_exists($expected)) {
             throw new InvalidArgumentException('Not a class: ' . $expected);
@@ -434,14 +440,14 @@ abstract class Rdb
             if (count($chunk) !== $this->config->chunk_size) continue;
 
             // Fetch and yield them.
-            $items = $this->mGetObjects($chunk, $expected);
+            $items = $this->mGetObjects($chunk, $expected, $nullish);
             foreach ($items as $item) yield $item;
             $chunk = [];
         }
 
         // Also emit those leftovers.
         if (!empty($chunk)) {
-            $items = $this->mGetObjects($chunk, $expected);
+            $items = $this->mGetObjects($chunk, $expected, $nullish);
             foreach ($items as $item) yield $item;
         }
     }
