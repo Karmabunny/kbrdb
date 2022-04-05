@@ -8,7 +8,7 @@ use karmabunny\rdb\RdbConfig;
 /**
  * Test the credis adapter while wrapping php-redis.
  *
- * @requires php-redis
+ * @requires extension redis
  */
 final class CredisTest extends AdapterTestCase
 {
