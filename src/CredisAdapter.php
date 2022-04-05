@@ -57,6 +57,7 @@ class CredisAdapter extends Rdb
     {
         if (empty($keys)) return [];
         $keys = self::flattenArrays($keys);
+        if (empty($keys)) return [];
 
         if ($this->config->prefix) {
             foreach ($keys as &$key) {
@@ -205,6 +206,7 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function exists(...$keys): int
     {
+        if (empty($keys)) return 0;
         $keys = $this->prefixKeys($keys);
         if (empty($keys)) return 0;
 
@@ -215,8 +217,10 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function del(...$keys): int
     {
+        if (empty($keys)) return 0;
         $keys = $this->prefixKeys($keys);
         if (empty($keys)) return 0;
+
         return $this->credis->del(...$keys);
     }
 
