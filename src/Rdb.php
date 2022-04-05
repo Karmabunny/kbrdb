@@ -257,6 +257,26 @@ abstract class Rdb
 
 
     /**
+     * Increment a value by X.
+     *
+     * @param string $key
+     * @param int $amount
+     * @return int the value after incrementing
+     */
+    public abstract function incr(string $key, int $amount = 1): int;
+
+
+    /**
+     * Decrement a value by X.
+     *
+     * @param string $key
+     * @param int $amount
+     * @return int the value after decrementing
+     */
+    public abstract function decr(string $key, int $amount = 1): int;
+
+
+    /**
      * Do these keys exist?
      *
      * @param string|string[] $keys

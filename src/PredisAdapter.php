@@ -159,6 +159,20 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function incr(string $key, int $amount = 1): int
+    {
+        return $this->predis->incrby($key, $amount);
+    }
+
+
+    /** @inheritdoc */
+    public function decr(string $key, int $amount = 1): int
+    {
+        return $this->predis->decrby($key, $amount);
+    }
+
+
+    /** @inheritdoc */
     public function exists(...$keys): int
     {
         $keys = self::flattenArrays($keys);

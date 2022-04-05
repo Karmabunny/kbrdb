@@ -174,6 +174,20 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function incr(string $key, int $amount = 1): int
+    {
+        return $this->redis->incrby($key, $amount);
+    }
+
+
+    /** @inheritdoc */
+    public function decr(string $key, int $amount = 1): int
+    {
+        return $this->redis->decrby($key, $amount);
+    }
+
+
+    /** @inheritdoc */
     public function exists(...$keys): int
     {
         $keys = self::flattenArrays($keys);

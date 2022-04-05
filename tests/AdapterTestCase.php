@@ -68,6 +68,42 @@ abstract class AdapterTestCase extends TestCase
     }
 
 
+    public function testIncrement()
+    {
+        // No exist.
+        $thing = $this->rdb->get('my:value');
+        $this->assertNull($thing);
+
+        $new = $this->rdb->incr('my:value');
+        $this->assertEquals(1, $new);
+
+        $new = $this->rdb->incr('my:value');
+        $this->assertEquals(2, $new);
+
+        $new = $this->rdb->incr('my:value', 2);
+        $this->assertEquals(4, $new);
+
+        $new = $this->rdb->incr('my:other:value', 1);
+        $this->assertEquals(1, $new);
+
+        $new = $this->rdb->decr('my:value');
+        $this->assertEquals(3, $new);
+
+        $new = $this->rdb->decr('my:value', 3);
+        $this->assertEquals(0, $new);
+
+        $actual = $this->rdb->get('my:value');
+        $expected = 0;
+
+        $this->assertEquals($expected, $actual);
+
+        $actual = $this->rdb->get('my:other:value');
+        $expected = 1;
+
+        $this->assertEquals($expected, $actual);
+    }
+
+
     public function testKeysExists()
     {
     }

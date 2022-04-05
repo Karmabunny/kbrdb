@@ -204,6 +204,22 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function incr(string $key, int $amount = 1): int
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->incrby($key, $amount);
+    }
+
+
+    /** @inheritdoc */
+    public function decr(string $key, int $amount = 1): int
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->decrby($key, $amount);
+    }
+
+
+    /** @inheritdoc */
     public function exists(...$keys): int
     {
         if (empty($keys)) return 0;
