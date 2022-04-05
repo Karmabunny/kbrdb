@@ -14,7 +14,7 @@ final class CredisStandaloneTest extends AdapterTestCase
     {
         static $rdb;
         if (!$rdb) $rdb = Rdb::create([
-            'prefix' => 'rdb:',
+            'prefix' => uniqid('rdb:') . ':',
             'adapter' => RdbConfig::TYPE_CREDIS,
             'options' => [
                 'standalone' => true,

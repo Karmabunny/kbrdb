@@ -16,7 +16,7 @@ final class PhpRedisTest extends AdapterTestCase
     {
         static $rdb;
         if (!$rdb) $rdb = Rdb::create([
-            'prefix' => 'rdb:',
+            'prefix' => uniqid('rdb:') . ':',
             'adapter' => RdbConfig::TYPE_PHP_REDIS,
         ]);
 
