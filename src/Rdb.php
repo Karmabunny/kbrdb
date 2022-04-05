@@ -364,8 +364,12 @@ abstract class Rdb
      */
     public function getObject(string $key, string $expected = null)
     {
-        if ($expected and !class_exists($expected)) {
-            throw new InvalidArgumentException('Not a class: ' . $expected);
+        if (
+            $expected
+            and !class_exists($expected)
+            and !interface_exists($expected)
+        ) {
+            throw new InvalidArgumentException('Not a class or interface: ' . $expected);
         }
 
         $value = @unserialize($this->get($key));
@@ -399,8 +403,12 @@ abstract class Rdb
      */
     public function mGetObjects(array $keys, string $expected = null, bool $nullish = false): array
     {
-        if ($expected and !class_exists($expected)) {
-            throw new InvalidArgumentException('Not a class: ' . $expected);
+        if (
+            $expected
+            and !class_exists($expected)
+            and !interface_exists($expected)
+        ) {
+            throw new InvalidArgumentException('Not a class or interface: ' . $expected);
         }
 
         // Fix sequential indexes.
@@ -448,8 +456,12 @@ abstract class Rdb
      */
     public function mScanObjects($keys, string $expected = null, bool $nullish = false): Generator
     {
-        if ($expected and !class_exists($expected)) {
-            throw new InvalidArgumentException('Not a class: ' . $expected);
+        if (
+            $expected
+            and !class_exists($expected)
+            and !interface_exists($expected)
+        ) {
+            throw new InvalidArgumentException('Not a class or interface: ' . $expected);
         }
 
         $chunk = [];
