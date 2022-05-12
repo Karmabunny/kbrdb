@@ -8,6 +8,7 @@ namespace karmabunny\rdb;
 
 use Generator;
 use Predis\Client;
+use Predis\Collection\Iterator\Keyspace;
 use Predis\Response\Status;
 
 /**
@@ -53,21 +54,11 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function scan(string $pattern): Generator
     {
-        $offset = 0;
+        $iterator = new Keyspace($this->predis, $pattern, $this->config->chunk_size);
 
-        while (true) {
-            $keys = $this->predis->scan($offset, [
-                'MATCH' => $pattern,
-                'COUNT' => $this->config->chunk_size,
-            ]);
-
-            if (empty($keys)) break;
-
-            $offset += count($keys);
-
-            foreach ($keys as $key) {
-                yield $this->stripPrefix($key);
-            }
+        foreach ($iterator as $key) {
+            $key = $this->stripPrefix($key);
+            yield $key;
         }
     }
 
