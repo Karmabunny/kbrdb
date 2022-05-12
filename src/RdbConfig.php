@@ -46,6 +46,21 @@ class RdbConfig
     /** @var array */
     public $options = [];
 
+    /**
+     * Replace keys() with a scan().
+     *
+     * Warning! It's considerably slower but is a better citizen than `keys`.
+     *
+     * Because redis is single-threaded the iterative `scan` command helps
+     * prevent other clients/connections/requests from blocking up the server.
+     *
+     * Using this setting may improve overall responsiveness when the database
+     * is under increased load at the cost of immediate performance.
+     *
+     * @var bool
+     */
+    public $scan_keys = false;
+
 
     /**
      * Create a new config object.

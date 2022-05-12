@@ -57,6 +57,12 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function keys(string $pattern): array
     {
+        if ($this->config->scan_keys) {
+            $keys = $this->scan($pattern);
+            $keys = iterator_to_array($keys, false);
+            return $keys;
+        }
+
         $keys = $this->redis->keys($pattern);
         return array_map([$this, 'stripPrefix'], $keys);
     }
