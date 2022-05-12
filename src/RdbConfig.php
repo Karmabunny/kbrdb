@@ -26,7 +26,7 @@ class RdbConfig
 
     const TYPE_PHP_REDIS = 'php-redis';
 
-    const TYPE_CREDIS = 'credit';
+    const TYPE_CREDIS = 'credis';
 
     /** @var string */
     public $host = '127.0.0.1';
