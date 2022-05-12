@@ -342,9 +342,20 @@ abstract class Rdb
     {
         if (empty($keys)) return [];
 
-        foreach (array_chunk($keys, $this->config->chunk_size) as $chunk) {
+        $chunk = [];
+
+        foreach ($keys as $key) {
+            $chunk[] = $key;
+            if (count($chunk) !== $this->config->chunk_size) continue;
+
             $items = $this->mGet($chunk);
-            foreach ($items as $item) yield $item;
+            yield from $items;
+            $chunk = [];
+        }
+
+        if (!empty($chunk)) {
+            $items = $this->mGet($chunk);
+            yield from $items;
         }
     }
 
@@ -488,14 +499,14 @@ abstract class Rdb
 
             // Fetch and yield them.
             $items = $this->mGetObjects($chunk, $expected, $nullish);
-            foreach ($items as $item) yield $item;
+            yield from $items;
             $chunk = [];
         }
 
         // Also emit those leftovers.
         if (!empty($chunk)) {
             $items = $this->mGetObjects($chunk, $expected, $nullish);
-            foreach ($items as $item) yield $item;
+            yield from $items;
         }
     }
 
