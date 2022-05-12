@@ -207,7 +207,7 @@ class CredisAdapter extends Rdb
     public function incr(string $key, int $amount = 1): int
     {
         $key = $this->config->prefix . $key;
-        return $this->credis->incrby($key, $amount);
+        return $this->credis->incrBy($key, $amount);
     }
 
 
@@ -215,7 +215,7 @@ class CredisAdapter extends Rdb
     public function decr(string $key, int $amount = 1): int
     {
         $key = $this->config->prefix . $key;
-        return $this->credis->decrby($key, $amount);
+        return $this->credis->decrBy($key, $amount);
     }
 
 
