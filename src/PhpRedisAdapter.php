@@ -166,7 +166,9 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function sMembers(string $key): array
     {
-        return $this->redis->sMembers($key);
+        $items = $this->redis->sMembers($key);
+        if ($items === false) return [];
+        return $items;
     }
 
 
