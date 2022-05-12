@@ -170,6 +170,96 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function lPush(string $key, ...$items)
+    {
+        $count = $this->predis->lpush($key, $items);
+        if ($count <= 0) return null;
+        return $count;
+    }
+
+
+    /** @inheritdoc */
+    public function rPush(string $key, ...$items)
+    {
+        $count = $this->predis->rpush($key, $items);
+        if ($count <= 0) return null;
+        return $count;
+    }
+
+
+    /** @inheritdoc */
+    public function lPop(string $key)
+    {
+        return $this->predis->lpop($key);
+    }
+
+
+    /** @inheritdoc */
+    public function rPop(string $key)
+    {
+        return $this->predis->rpop($key);
+    }
+
+
+    /** @inheritdoc */
+    public function lRange(string $key, int $start = 0, int $stop = -1): array
+    {
+        return $this->predis->lrange($key, $start, $stop);
+    }
+
+
+    /** @inheritdoc */
+    public function lTrim(string $key, int $start = 0, int $stop = -1): bool
+    {
+        return (bool) $this->predis->ltrim($key, $start, $stop);
+    }
+
+
+    /** @inheritdoc */
+    public function lLen(string $key)
+    {
+        $count = $this->predis->llen($key);
+        if ($count < 0) return null;
+        return $count;
+    }
+
+
+    /** @inheritdoc */
+    public function lSet(string $key, int $index, string $item): bool
+    {
+        return (bool) $this->predis->lset($key, $index, $item);
+    }
+
+
+    /** @inheritdoc */
+    public function lIndex(string $key, int $index)
+    {
+        return $this->predis->lIndex($key, $index);
+    }
+
+
+    /** @inheritdoc */
+    public function lRem(string $key, string $item, int $count = 0): int
+    {
+        return $this->predis->lrem($key, $item, $count);
+    }
+
+
+    /** @inheritdoc */
+    public function blPop($keys, int $timeout = 0)
+    {
+        return $this->predis->blpop($keys, $timeout);
+    }
+
+
+    /** @inheritdoc */
+    public function brPop($keys, int $timeout = 0)
+    {
+        return $this->predis->brpop($keys, $timeout);
+    }
+
+
+    /** @inheritdoc */
     public function exists(...$keys): int
     {
         $keys = self::flattenArrays($keys);

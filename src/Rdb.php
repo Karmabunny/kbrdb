@@ -292,6 +292,167 @@ abstract class Rdb
 
 
     /**
+     * Add items to the start of a list.
+     *
+     * - aka: LEFT PUSH
+     * - aka: unshift()
+     *
+     * @param string $key
+     * @param string[] $items
+     * @return int|null the list length after after pushing
+     */
+    public abstract function lPush(string $key, ...$items);
+
+
+    /**
+     * Add items to the end of a list.
+     *
+     * - aka: RIGHT PUSH
+     * - aka: append()
+     *
+     * @param string $key
+     * @param string[] $items
+     * @return int|null the list length after after pushing
+     */
+    public abstract function rPush(string $key, ...$items);
+
+
+    /**
+     * Remove (and return) an item from the start of a list.
+     *
+     * - aka: LEFT POP
+     * - aka: shift()
+     *
+     * @param string $key
+     * @return string|null the item or `null` if empty
+     */
+    public abstract function lPop(string $key);
+
+
+    /**
+     * Remove (and return) an item from the end of a list.
+     *
+     * - aka: RIGHT POP
+     * - aka: pop()
+     *
+     * @param string $key
+     * @return string|null the item or `null` if empty
+     */
+    public abstract function rPop(string $key);
+
+
+    /**
+     * Retrieve items from a list.
+     *
+     * aka: LIST RANGE
+     *
+     * Note, start/stop can be negative - they behave circularly.
+     *
+     * @param string $key
+     * @param int $start
+     * @param int $stop
+     * @return string[]
+     */
+    public abstract function lRange(string $key, int $start = 0, int $stop = -1): array;
+
+
+    /**
+     * Remove items from a list.
+     *
+     * aka: LIST TRIM
+     *
+     * Note, start/stop can be negative - they behave circularly.
+     *
+     * @param string $key
+     * @param int $start
+     * @param int $stop
+     * @return bool
+     */
+    public abstract function lTrim(string $key, int $start = 0, int $stop = -1): bool;
+
+
+    /**
+     * Get the length of a list.
+     *
+     * aka: LIST LENGTH
+     *
+     * @param string $key
+     * @return int|null list length or `null` if not a list.
+     */
+    public abstract function lLen(string $key);
+
+
+    /**
+     * Store a item at this index of a list.
+     *
+     * aka: LIST SET
+     *
+     * @param string $key
+     * @param int $index
+     * @param string $item
+     * @return bool
+     */
+    public abstract function lSet(string $key, int $index, string $item): bool;
+
+
+    /**
+     * Get an item from a list at this index.
+     *
+     * aka: LIST INDEX
+     *
+     * Note, `index` can be negative - it behaves circularly.
+     *
+     * @param string $key
+     * @param int $index
+     * @return string|null the item or `null` if out-of-range
+     */
+    public abstract function lIndex(string $key, int $index);
+
+
+    /**
+     * Remove an item from a list.
+     *
+     * aka: LIST REMOVE
+     *
+     * - count > 0: Remove elements equal to element moving from head to tail.
+     * - count < 0: Remove elements equal to element moving from tail to head.
+     * - count = 0: Remove all elements equal to element.
+     *
+     * @param string $key
+     * @param string $item
+     * @param int $count
+     * @return int number of removed items
+     */
+    public abstract function lRem(string $key, string $item, int $count = 0): int;
+
+
+    /**
+     * Remove (and return) an item from the start of a list. If there are no
+     * items then this method will block until an item is added.
+     *
+     * aka: BLOCKING LET POP
+     *
+     * @param string[]|string $keys
+     * @param int $timeout in seconds
+     * @return string[]|null [key, item] or `null` if the timeout occurs
+     */
+    public abstract function blPop($keys, int $timeout = 0);
+
+
+    /**
+     * Remove (and return) an item from the end of a list. If there are no
+     * items then this method will block until an item is added.
+     *
+     * aka: BLOCKING RIGHT POP
+     *
+     * @param string[]|string $keys
+     * @param int $timeout in seconds
+     * @return string[]|null [key, item] or `null` if the timeout occurs
+     */
+    public abstract function brPop($keys, int $timeout = 0);
+
+
+    /**
      * Do these keys exist?
      *
      * @param string|string[] $keys

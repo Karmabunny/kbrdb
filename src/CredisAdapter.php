@@ -226,6 +226,126 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function lPush(string $key, ...$items)
+    {
+        $key = $this->config->prefix . $key;
+        $count = $this->credis->lPush($key, ...$items);
+        if ($count === false) return null;
+        return $count;
+    }
+
+
+    /** @inheritdoc */
+    public function rPush(string $key, ...$items)
+    {
+        $key = $this->config->prefix . $key;
+        $count = $this->credis->rPush($key, ...$items);
+        if ($count === false) return null;
+        return $count;
+    }
+
+
+    /** @inheritdoc */
+    public function lPop(string $key)
+    {
+        $key = $this->config->prefix . $key;
+        $value = $this->credis->lPop($key);
+        if ($value === false) return null;
+        return $value;
+    }
+
+
+    /** @inheritdoc */
+    public function rPop(string $key)
+    {
+        $key = $this->config->prefix . $key;
+        $value = $this->credis->rPop($key);
+        if ($value === false) return null;
+        return $value;
+    }
+
+
+    /** @inheritdoc */
+    public function lRange(string $key, int $start = 0, int $stop = -1): array
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->lRange($key, $start, $stop);
+    }
+
+
+    /** @inheritdoc */
+    public function lTrim(string $key, int $start = 0, int $stop = -1): bool
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->lTrim($key, $start, $stop);
+    }
+
+
+    /** @inheritdoc */
+    public function lLen(string $key)
+    {
+        $key = $this->config->prefix . $key;
+        $count = $this->credis->lLen($key);
+        if ($count === false) return null;
+        return $count;
+    }
+
+
+    /** @inheritdoc */
+    public function lSet(string $key, int $index, string $item): bool
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->lSet($key, $index, $item);
+    }
+
+
+    /** @inheritdoc */
+    public function lIndex(string $key, int $index)
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->lIndex($key, $index);
+    }
+
+
+    /** @inheritdoc */
+    public function lRem(string $key, string $item, int $count = 0): int
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->lRem($key, $item, $count);
+    }
+
+
+    /** @inheritdoc */
+    public function blPop($keys, int $timeout = 0)
+    {
+        if (!is_array($keys)) {
+            $keys = [$keys];
+        }
+
+        $keys = $this->prefixKeys($keys);
+
+        $value = $this->credis->blPop($keys, $timeout);
+        if (empty($value)) return null;
+        return $value;
+    }
+
+
+    /** @inheritdoc */
+    public function brPop($keys, int $timeout = 0)
+    {
+        if (!is_array($keys)) {
+            $keys = [$keys];
+        }
+
+        $keys = $this->prefixKeys($keys);
+
+        $value = $this->credis->brPop($keys, $timeout);
+        if (empty($value)) return null;
+        return $value;
+    }
+
+
+    /** @inheritdoc */
     public function exists(...$keys): int
     {
         $keys = $this->prefixKeys($keys);

@@ -194,6 +194,114 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function lPush(string $key, ...$items)
+    {
+        $count = $this->redis->lPush($key, ...$items);
+        if ($count === false) return null;
+        return $count;
+    }
+
+
+    /** @inheritdoc */
+    public function rPush(string $key, ...$items)
+    {
+        $count = $this->redis->rPush($key, ...$items);
+        if ($count === false) return null;
+        return $count;
+    }
+
+
+    /** @inheritdoc */
+    public function lPop(string $key)
+    {
+        $value = $this->redis->lPop($key);
+        if ($value === false) return null;
+        return $value;
+    }
+
+
+    /** @inheritdoc */
+    public function rPop(string $key)
+    {
+        $value = $this->redis->rPop($key);
+        if ($value === false) return null;
+        return $value;
+    }
+
+
+    /** @inheritdoc */
+    public function lRange(string $key, int $start = 0, int $stop = -1): array
+    {
+        return $this->redis->lRange($key, $start, $stop);
+    }
+
+
+    /** @inheritdoc */
+    public function lTrim(string $key, int $start = 0, int $stop = -1): bool
+    {
+        return $this->redis->lTrim($key, $start, $stop);
+    }
+
+
+    /** @inheritdoc */
+    public function lLen(string $key)
+    {
+        $count = $this->redis->lLen($key);
+        if ($count === false) return null;
+        return $count;
+    }
+
+
+    /** @inheritdoc */
+    public function lSet(string $key, int $index, string $item): bool
+    {
+        return $this->redis->lSet($key, $index, $item);
+    }
+
+
+    /** @inheritdoc */
+    public function lIndex(string $key, int $index)
+    {
+        $item = $this->redis->lIndex($key, $index);
+        if ($item === false) return null;
+        return $item;
+    }
+
+
+    /** @inheritdoc */
+    public function lRem(string $key, string $item, int $count = 0): int
+    {
+        return $this->redis->lRem($key, $item, $count);
+    }
+
+
+    /** @inheritdoc */
+    public function blPop($keys, int $timeout = 0)
+    {
+        if (!is_array($keys)) {
+            $keys = [$keys];
+        }
+
+        $value = $this->redis->blPop($keys, $timeout);
+        if (empty($value)) return null;
+        return $value;
+    }
+
+
+    /** @inheritdoc */
+    public function brPop($keys, int $timeout = 0)
+    {
+        if (!is_array($keys)) {
+            $keys = [$keys];
+        }
+
+        $value = $this->redis->brPop($keys, $timeout);
+        if (empty($value)) return null;
+        return $value;
+    }
+
+
+    /** @inheritdoc */
     public function exists(...$keys): int
     {
         $keys = self::flattenArrays($keys);
