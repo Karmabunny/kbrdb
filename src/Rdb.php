@@ -87,6 +87,21 @@ abstract class Rdb
 
 
     /**
+     * Apply a prefix to all items.
+     *
+     * @param string $prefix
+     * @param iterable<string> $items
+     * @return Generator<string>
+     */
+    public static function prefix(string $prefix, $items): Generator
+    {
+        foreach ($items as $item) {
+            yield $prefix . $item;
+        }
+    }
+
+
+    /**
      * Strip the prefix from list of keys.
      *
      * @param string $key
