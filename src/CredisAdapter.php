@@ -222,7 +222,6 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function exists(...$keys): int
     {
-        if (empty($keys)) return 0;
         $keys = $this->prefixKeys($keys);
         if (empty($keys)) return 0;
 
@@ -233,7 +232,6 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function del(...$keys): int
     {
-        if (empty($keys)) return 0;
         $keys = $this->prefixKeys($keys);
         if (empty($keys)) return 0;
 
