@@ -166,6 +166,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function sMembers(string $key): array
     {
+        /** @var array|false $items - typings are LYING */
         $items = $this->redis->sMembers($key);
         if ($items === false) return [];
         return $items;
@@ -216,6 +217,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function lPop(string $key)
     {
+        /** @var mixed $value */
         $value = $this->redis->lPop($key);
         if ($value === false) return null;
         return $value;
@@ -225,6 +227,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function rPop(string $key)
     {
+        /** @var mixed $value */
         $value = $this->redis->rPop($key);
         if ($value === false) return null;
         return $value;

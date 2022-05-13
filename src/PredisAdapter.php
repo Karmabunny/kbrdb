@@ -234,7 +234,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function lIndex(string $key, int $index)
     {
-        return $this->predis->lIndex($key, $index);
+        return $this->predis->lindex($key, $index);
     }
 
 

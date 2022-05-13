@@ -230,7 +230,7 @@ class CredisAdapter extends Rdb
     {
         $key = $this->config->prefix . $key;
         $count = $this->credis->lPush($key, ...$items);
-        if ($count === false) return null;
+        if (!is_numeric($count)) return null;
         return $count;
     }
 
@@ -240,7 +240,7 @@ class CredisAdapter extends Rdb
     {
         $key = $this->config->prefix . $key;
         $count = $this->credis->rPush($key, ...$items);
-        if ($count === false) return null;
+        if (!is_numeric($count)) return null;
         return $count;
     }
 
@@ -249,9 +249,7 @@ class CredisAdapter extends Rdb
     public function lPop(string $key)
     {
         $key = $this->config->prefix . $key;
-        $value = $this->credis->lPop($key);
-        if ($value === false) return null;
-        return $value;
+        return $this->credis->lPop($key);
     }
 
 
@@ -259,9 +257,7 @@ class CredisAdapter extends Rdb
     public function rPop(string $key)
     {
         $key = $this->config->prefix . $key;
-        $value = $this->credis->rPop($key);
-        if ($value === false) return null;
-        return $value;
+        return $this->credis->rPop($key);
     }
 
 
@@ -286,7 +282,7 @@ class CredisAdapter extends Rdb
     {
         $key = $this->config->prefix . $key;
         $count = $this->credis->lLen($key);
-        if ($count === false) return null;
+        if (!is_numeric($count)) return null;
         return $count;
     }
 
@@ -351,7 +347,11 @@ class CredisAdapter extends Rdb
     {
         $src = $this->config->prefix . $src;
         $dst = $this->config->prefix . $dst;
-        return $this->credis->brpoplpush($src, $dst, $timeout);
+
+        $items = $this->credis->brPoplPush($src, $dst, $timeout);
+
+        if (empty($items)) return null;
+        return reset($items);
     }
 
 
