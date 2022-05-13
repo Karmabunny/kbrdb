@@ -310,8 +310,9 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function lRem(string $key, string $item, int $count = 0): int
     {
+        // Args item/count are swapped.
         $key = $this->config->prefix . $key;
-        return $this->credis->lRem($key, $item, $count);
+        return $this->credis->lRem($key, $count, $item);
     }
 
 

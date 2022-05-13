@@ -241,7 +241,8 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function lRem(string $key, string $item, int $count = 0): int
     {
-        return $this->predis->lrem($key, $item, $count);
+        // Args item/count are swapped.
+        return $this->predis->lrem($key, $count, $item);
     }
 
 

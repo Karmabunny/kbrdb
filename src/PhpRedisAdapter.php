@@ -273,6 +273,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function lRem(string $key, string $item, int $count = 0): int
     {
+        // Args item/count are NOT swapped.
         return $this->redis->lRem($key, $item, $count);
     }
 
