@@ -298,7 +298,7 @@ abstract class Rdb
      * - aka: unshift()
      *
      * @param string $key
-     * @param string[] $items
+     * @param string $items
      * @return int|null the list length after after pushing
      */
     public abstract function lPush(string $key, ...$items);
@@ -311,7 +311,7 @@ abstract class Rdb
      * - aka: append()
      *
      * @param string $key
-     * @param string[] $items
+     * @param string $items
      * @return int|null the list length after after pushing
      */
     public abstract function rPush(string $key, ...$items);
