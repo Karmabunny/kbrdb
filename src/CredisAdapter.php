@@ -346,6 +346,15 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function brPoplPush(string $src, string $dst, int $timeout = 0)
+    {
+        $src = $this->config->prefix . $src;
+        $dst = $this->config->prefix . $dst;
+        return $this->credis->brpoplpush($src, $dst, $timeout);
+    }
+
+
+    /** @inheritdoc */
     public function exists(...$keys): int
     {
         $keys = $this->prefixKeys($keys);

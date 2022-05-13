@@ -453,6 +453,23 @@ abstract class Rdb
 
 
     /**
+     * Remove (and return) an item from the end of a list. If there are no
+     * items then this method will block until an item is added.
+     *
+     * aka: BLOCKING RIGHT POP -> LEFT PUSH
+     *
+     * Note, although this is deprecated in redis 6.2 it will indefinitely be
+     * supported here, if removed, with a polyfill via `BLMOVE`.
+     *
+     * @param string $src
+     * @param string $dst
+     * @param int $timeout in seconds
+     * @return string|null item being moved or `null` if the timeout occurs
+     */
+    public abstract function brPoplPush(string $src, string $dst, int $timeout = 0);
+
+
+    /**
      * Do these keys exist?
      *
      * @param string|string[] $keys

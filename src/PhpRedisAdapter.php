@@ -304,6 +304,15 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function brPoplPush(string $src, string $dst, int $timeout = 0)
+    {
+        $value = $this->redis->brpoplpush($src, $dst, $timeout);
+        if ($value === false) return null;
+        return $value;
+    }
+
+
+    /** @inheritdoc */
     public function exists(...$keys): int
     {
         $keys = self::flattenArrays($keys);

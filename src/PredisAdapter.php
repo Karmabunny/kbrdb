@@ -260,6 +260,13 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function brPoplPush(string $src, string $dst, int $timeout = 0)
+    {
+        return $this->predis->brpoplpush($src, $dst, $timeout);
+    }
+
+
+    /** @inheritdoc */
     public function exists(...$keys): int
     {
         $keys = self::flattenArrays($keys);
