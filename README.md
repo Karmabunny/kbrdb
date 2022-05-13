@@ -23,6 +23,15 @@ composer require karmabunny/rdb
 - credis (composer package)
 
 
+### Version support
+
+This wrapper doesn't try to polyfill any missing features. It targets Redis server v3.0, as that's the common support among all the adapters.
+
+This library wouldn't ever try to _hide_ features behind target versions, but perhaps it could help smooth out any differences. Lua scripting could polyfill a lot of things tbh.
+
+For example, `BRPOPLPUSH` is deprecated in v6.2 and might be removed in the distance future. In this case, the library would be able to dynamically replace (based on the server version) this with `BLMOVE`.
+
+
 ### Config
 
 - `host` - server name + port
@@ -30,6 +39,7 @@ composer require karmabunny/rdb
 - `adapter` - 'predis' (default), 'php-redis', 'credis'
 - `chunk_size` - max key size for scan methods (default: 50)
 - `lock_sleep` - tick size for locking, in milliseconds (default: 5)
+- `scan_keys` - replace keys() with scan() (default: false)
 - `options` - adapter specific options
 
 Notes:
@@ -155,8 +165,43 @@ $bucket->writeHeaders();
 - exists
 - sMembers
 - sAdd
+- lLen
+- lRange
+- lTrim
+- lSet
+- lRem
+- lIndex
+- lPush
+- lPop
+- blPop
+- rPush
+- rPop
+- brPop
+- brPoplPush
+
 
 TODO: more
+
+sets:
+- sScan
+- sCard
+- sIsMember
+- sRandMember
+- sMove
+- sDiff (+ store)
+- sInter (+ store)
+- sUnion (+ store)
+
+generic:
+- type
+- touch
+- rename
+
+ttls:
+- getTtl (+ expireTime)
+- expire
+- persist
+
 
 #### Extended Methods
 

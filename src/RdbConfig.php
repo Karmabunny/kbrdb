@@ -17,6 +17,10 @@ namespace karmabunny\rdb;
  * - chunk_size
  * - options (adapter specific)
  *
+ * Also:
+ * - lock_sleep
+ * - scan_keys
+ *
  * @package karmabunny\rdb
  */
 class RdbConfig
