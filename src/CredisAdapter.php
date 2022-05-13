@@ -321,7 +321,11 @@ class CredisAdapter extends Rdb
 
         $keys = $this->prefixKeys($keys);
 
-        $value = $this->credis->blPop($keys, $timeout);
+        // I can only assume the typings are lying.
+        $args = $keys;
+        $args[] = $timeout;
+
+        $value = $this->credis->__call('blPop', $args);
         if (empty($value)) return null;
         return $value;
     }
@@ -336,7 +340,11 @@ class CredisAdapter extends Rdb
 
         $keys = $this->prefixKeys($keys);
 
-        $value = $this->credis->brPop($keys, $timeout);
+        // I can only assume the typings are lying.
+        $args = $keys;
+        $args[] = $timeout;
+
+        $value = $this->credis->__call('brPop', $args);
         if (empty($value)) return null;
         return $value;
     }
