@@ -2,8 +2,10 @@
 
 namespace kbtests;
 
+use ArrayIterator;
 use karmabunny\rdb\Rdb;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use Traversable;
 
 /**
@@ -134,5 +136,129 @@ abstract class AdapterTestCase extends TestCase
 
         $actual = iterator_to_array($actual);
         $this->assertArraySameAs($expected, $actual);
+    }
+
+
+    public function testObjects()
+    {
+        // get/set object
+        $object = new RandoObject([ 'foo' => 123, 'bar' => 456 ]);
+
+        $actual = $this->rdb->setObject('obj:1', $object);
+        $expected = strlen(serialize($object));
+        $this->assertEquals($expected, $actual);
+
+        $exists = $this->rdb->exists('obj:1');
+        $this->assertEquals(1, $exists);
+
+        $actual = $this->rdb->getObject('obj:1');
+        $this->assertEquals($object, $actual);
+
+        $actual = $this->rdb->getObject('obj:1', RandoObject::class);
+        $this->assertEquals($object, $actual);
+
+        $actual = $this->rdb->getObject('obj:1', stdClass::class);
+        $this->assertNull($actual);
+
+        // multi get/set objects
+        $objects = [
+            'multi:1' => new RandoObject([ 'foo' => 123, 'bar' => 456 ]),
+            'multi:2' => new RandoObject([ 'foo' => 'aaa', 'bar' => ['bbb', 'ccc'] ]),
+            'multi:3' => (object) ['xyz' => 'abc', 'def' => [1,2,3,4]],
+        ];
+
+        $actual = $this->rdb->mSetObjects($objects);
+
+        // TODO sizes result should be keyed.
+        $expected = array_values($objects);
+        $expected = array_map('serialize', $expected);
+        $expected = array_map('strlen', $expected);
+
+        $this->assertEquals($expected, $actual);
+
+        $keys = [
+            'multi:1',
+            'multi:2',
+            'multi:null',
+            'multi:3',
+        ];
+
+        // Fetch all, the null key is filtered out.
+        $expected = array_values($objects);
+
+        $actual = $this->rdb->mGetObjects($keys);
+        $this->assertEquals($expected, $actual);
+
+        $actual = $this->rdb->mScanObjects($keys);
+        $this->assertInstanceOf(Traversable::class, $actual);
+        $actual = iterator_to_array($actual);
+        $this->assertEquals($expected, $actual);
+
+        // Fetch all, _including_ the null key.
+        $expected = [
+            $objects['multi:1'],
+            $objects['multi:2'],
+            null,
+            $objects['multi:3'],
+        ];
+
+        $actual = $this->rdb->mGetObjects($keys, null, true);
+        $this->assertEquals($expected, $actual);
+
+        $actual = $this->rdb->mScanObjects($keys, null, true);
+        $this->assertInstanceOf(Traversable::class, $actual);
+        $actual = iterator_to_array($actual);
+        $this->assertEquals($expected, $actual);
+
+        // Fetch just the 'randoboject' keys.
+        $expected = [
+            $objects['multi:1'],
+            $objects['multi:2'],
+        ];
+
+        $actual = $this->rdb->mGetObjects($keys, RandoObject::class);
+        $this->assertEquals($expected, $actual);
+
+        $actual = $this->rdb->mScanObjects($keys, RandoObject::class);
+        $this->assertInstanceOf(Traversable::class, $actual);
+        $actual = iterator_to_array($actual);
+        $this->assertEquals($expected, $actual);
+
+        // Fetch just the 'randoboject' keys, invalid/missing are null.
+        $expected = [
+            $objects['multi:1'],
+            $objects['multi:2'],
+            null,
+            null,
+        ];
+
+        $actual = $this->rdb->mGetObjects($keys, RandoObject::class, true);
+        $this->assertEquals($expected, $actual);
+
+        $actual = $this->rdb->mScanObjects($keys, RandoObject::class, true);
+        $this->assertInstanceOf(Traversable::class, $actual);
+        $actual = iterator_to_array($actual);
+        $this->assertEquals($expected, $actual);
+    }
+
+}
+
+
+class RandoObject
+{
+    public $foo;
+    public $bar;
+
+    public function __construct(array $config)
+    {
+        foreach ($config as $key => $value) {
+            $this->$key = $value;
+        }
+    }
+
+    public function toArray(): array
+    {
+        $iterator = new ArrayIterator($this);
+        return iterator_to_array($iterator);
     }
 }
