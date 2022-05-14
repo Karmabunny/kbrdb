@@ -10,7 +10,7 @@ use Generator;
 use InvalidArgumentException;
 use JsonException;
 use JsonSerializable;
-
+use Traversable;
 
 /**
  * Rdb is a wrapper around other popular redis libraries.
@@ -121,16 +121,46 @@ abstract class Rdb
     /**
      * Flatten an array input.
      *
-     * @param array $items
+     * This also discards keys.
+     *
+     * @param iterable $items
      * @return array
      */
-    protected static function flattenArrays(array $items): array
+    protected static function flattenArrays(iterable $items): array
     {
         $output = [];
         array_walk_recursive($items, function($item) use (&$output) {
             $output[] = $item;
         });
         return $output;
+    }
+
+
+    /**
+     * Normalize values into an array.
+     *
+     * - converts iterators to arrays
+     * - discards keys (optionally)
+     *
+     * @param iterable $items
+     * @param bool $preserve_keys (default false) strip keys if false
+     * @return array
+     */
+    protected static function normalizeIterable($items, $preserve_keys = false): array
+    {
+        // Iterables.
+        if (is_object($items) and $items instanceof Traversable) {
+            return iterator_to_array($items, $preserve_keys);
+        }
+
+        /** @var array $items */
+
+        // Strip the keys.
+        if (!$preserve_keys) {
+            return array_values($items);
+        }
+
+        return $items;
     }
 
 
@@ -274,10 +304,10 @@ abstract class Rdb
      *
      * The number of returns will always match number of keys.
      *
-     * @param string[] $keys
+     * @param iterable<string> $keys
      * @return (string|null)[] Missing keys are null
      */
-    public abstract function mGet(array $keys): array;
+    public abstract function mGet(iterable $keys): array;
 
 
     /**
@@ -285,7 +315,7 @@ abstract class Rdb
      *
      * This will replace existing items.
      *
-     * @param string[] $items key => string
+     * @param string[] $items [ key => string ]
      * @return bool always true, unless items is empty.
      */
     public abstract function mSet(array $items): bool;
@@ -571,7 +601,7 @@ abstract class Rdb
     /**
      * Do these keys exist?
      *
-     * @param string|string[] $keys
+     * @param string|iterable<string> $keys
      * @return int number of matches
      */
     public abstract function exists(...$keys): int;
@@ -580,7 +610,7 @@ abstract class Rdb
     /**
      * Delete a key, or a list of keys.
      *
-     * @param string|string[] $keys
+     * @param string|iterable<string> $keys
      * @return int number of keys deleted
      */
     public abstract function del(...$keys): int;
@@ -612,13 +642,11 @@ abstract class Rdb
     /**
      * Bulk fetch via a list of keys.
      *
-     * @param string[] $keys
+     * @param iterable<string> $keys
      * @return Generator<string|null> [ key => item ]
      */
-    public function mScan(array $keys): Generator
+    public function mScan(iterable $keys): Generator
     {
-        if (empty($keys)) return [];
-
         $chunk = [];
 
         foreach ($keys as $key) {
@@ -695,13 +723,13 @@ abstract class Rdb
      *
      * Empty keys are filtered out - if `nullish` is false (default).
      *
-     * @param string[] $keys Non-prefixed keys
+     * @param iterable<string> $keys Non-prefixed keys
      * @param string|null $expected Ensure all results inherits/is of this type
      * @param bool $nullish (false) return empty values
      * @return (object|null)[] [ key => item ]
      * @throws InvalidArgumentException
      */
-    public function mGetObjects(array $keys, string $expected = null, bool $nullish = false): array
+    public function mGetObjects($keys, string $expected = null, bool $nullish = false): array
     {
         if (
             $expected
@@ -711,10 +739,11 @@ abstract class Rdb
             throw new InvalidArgumentException('Not a class or interface: ' . $expected);
         }
 
-        // Fix sequential indexes.
-        $keys = array_values($keys);
+        $keys = self::normalizeIterable($keys, false);
 
-        if (empty($keys)) return [];
+        if (empty($keys)) {
+            return [];
+        }
 
         $items = $this->mGet($keys);
         $output = [];
@@ -754,7 +783,7 @@ abstract class Rdb
      * @param bool $nullish (false) return empty values
      * @return Generator<object|null> [ key => item ]
      */
-    public function mScanObjects($keys, string $expected = null, bool $nullish = false): Generator
+    public function mScanObjects(iterable $keys, string $expected = null, bool $nullish = false): Generator
     {
         if (
             $expected
@@ -788,7 +817,7 @@ abstract class Rdb
     /**
      * Bulk set an array of object.
      *
-     * @param object[] $items
+     * @param object[] $items [ key => string ]
      * @return int[] [ key => int ] object sizes in bytes
      */
     public function mSetObjects(array $items): array
@@ -802,8 +831,11 @@ abstract class Rdb
             $item = serialize($item);
             $sizes[$key] = strlen($item);
         }
+        unset($item);
 
-        if (!$this->mSet($items)) {
+        $ok = $this->mSet($items);
+
+        if (!$ok) {
             return [];
         }
 

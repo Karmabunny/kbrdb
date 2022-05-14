@@ -152,9 +152,14 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function mGet(array $keys): array
+    public function mGet(iterable $keys): array
     {
-        if (empty($keys)) return [];
+        $keys = self::normalizeIterable($keys, false);
+
+        if (empty($keys)) {
+            return [];
+        }
+
         $items = $this->predis->mget($keys);
         $items = array_combine($keys, $items);
         return $items;
@@ -328,6 +333,13 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function blPop($keys, int $timeout = null)
     {
+        if (is_scalar($keys)) {
+            $keys = [$keys];
+        }
+        else {
+            $keys = self::normalizeIterable($keys, false);
+        }
+
         if ($timeout === null) {
             $timeout = $this->config->timeout;
         }
@@ -339,6 +351,13 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function brPop($keys, int $timeout = null)
     {
+        if (is_scalar($keys)) {
+            $keys = [$keys];
+        }
+        else {
+            $keys = self::normalizeIterable($keys, false);
+        }
+
         if ($timeout === null) {
             $timeout = $this->config->timeout;
         }

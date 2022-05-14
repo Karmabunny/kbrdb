@@ -49,20 +49,16 @@ class CredisAdapter extends Rdb
      *
      * So we're manually prefixing everything here. Yay!
      *
-     * @param array $keys
+     * @param iterable $keys
      * @return string[]
      */
-    protected function prefixKeys(array $keys): array
+    protected function prefixKeys(iterable $keys): array
     {
-        if (empty($keys)) return [];
         $keys = self::flattenArrays($keys);
-        if (empty($keys)) return [];
 
         if ($this->config->prefix) {
-            foreach ($keys as &$key) {
-                $key = $this->config->prefix . $key;
-            }
-            unset($key);
+            $keys = self::prefix($this->config->prefix, $keys);
+            $keys = iterator_to_array($keys, false);
         }
 
         return $keys;
@@ -197,7 +193,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function mGet(array $keys): array
+    public function mGet(iterable $keys): array
     {
         $prefixed = $this->prefixKeys($keys);
         if (empty($prefixed)) return [];
@@ -210,6 +206,7 @@ class CredisAdapter extends Rdb
         }
         unset($item);
 
+        $keys = self::normalizeIterable($keys);
         $items = array_combine($keys, $items);
         return $items;
     }
@@ -400,11 +397,13 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function blPop($keys, int $timeout = null)
     {
-        if (!is_array($keys)) {
+        if (is_scalar($keys)) {
+            $keys = $this->config->prefix . $keys;
             $keys = [$keys];
         }
-
-        $keys = $this->prefixKeys($keys);
+        else {
+            $keys = $this->prefixKeys($keys);
+        }
 
         if ($timeout === null) {
             $timeout = $this->config->timeout;
@@ -423,11 +422,13 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function brPop($keys, int $timeout = null)
     {
-        if (!is_array($keys)) {
+        if (is_scalar($keys)) {
+            $keys = $this->config->prefix . $keys;
             $keys = [$keys];
         }
-
-        $keys = $this->prefixKeys($keys);
+        else {
+            $keys = self::prefixKeys($keys);
+        }
 
         if ($timeout === null) {
             $timeout = $this->config->timeout;

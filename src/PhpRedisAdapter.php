@@ -191,9 +191,14 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function mGet(array $keys): array
+    public function mGet(iterable $keys): array
     {
-        if (empty($keys)) return [];
+        $keys = self::normalizeIterable($keys, false);
+
+        if (empty($keys)) {
+            return [];
+        }
+
         $items = $this->redis->mGet($keys);
 
         foreach ($items as &$item) {
@@ -380,8 +385,11 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function blPop($keys, int $timeout = null)
     {
-        if (!is_array($keys)) {
+        if (is_scalar($keys)) {
             $keys = [$keys];
+        }
+        else {
+            $keys = self::normalizeIterable($keys, false);
         }
 
         if ($timeout === null) {
@@ -397,8 +405,8 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function brPop($keys, int $timeout = null)
     {
-        if (!is_array($keys)) {
-            $keys = [$keys];
+        if (!is_scalar($keys)) {
+            $keys = self::normalizeIterable($keys, false);
         }
 
         if ($timeout === null) {
