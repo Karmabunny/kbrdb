@@ -372,6 +372,21 @@ abstract class Rdb
 
 
     /**
+     * Remove (and return) an item from the end of a list.
+     *
+     * aka: BLOCKING RIGHT POP -> LEFT PUSH
+     *
+     * Note, although this is deprecated in redis 6.2 it will indefinitely be
+     * supported here, if removed, with a polyfill via `LMOVE`.
+     *
+     * @param string $src
+     * @param string $dst
+     * @return string|null item being moved or `null` if src list is empty
+     */
+    public abstract function rPoplPush(string $src, string $dst);
+
+
+    /**
      * Retrieve items from a list.
      *
      * aka: LIST RANGE

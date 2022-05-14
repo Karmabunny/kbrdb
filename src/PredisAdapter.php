@@ -230,6 +230,13 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function rPoplPush(string $src, string $dst)
+    {
+        return $this->predis->rpoplpush($src, $dst);
+    }
+
+
+    /** @inheritdoc */
     public function lRange(string $key, int $start = 0, int $stop = -1): array
     {
         try {

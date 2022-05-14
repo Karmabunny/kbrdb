@@ -300,6 +300,16 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function rPoplPush(string $src, string $dst)
+    {
+        $src = $this->config->prefix . $src;
+        $dst = $this->config->prefix . $dst;
+
+        return $this->credis->rPoplPush($src, $dst);
+    }
+
+
+    /** @inheritdoc */
     public function lRange(string $key, int $start = 0, int $stop = -1): array
     {
         $key = $this->config->prefix . $key;

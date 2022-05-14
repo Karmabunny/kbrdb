@@ -268,6 +268,16 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function rPoplPush(string $src, string $dst)
+    {
+        /** @var string|false $value */
+        $value = $this->redis->rPoplPush($src, $dst);
+        if ($value === false) return null;
+        return $value;
+    }
+
+
+    /** @inheritdoc */
     public function lRange(string $key, int $start = 0, int $stop = -1): array
     {
         /** @var array|false $range */
