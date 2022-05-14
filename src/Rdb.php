@@ -641,7 +641,11 @@ abstract class Rdb
                 !is_subclass_of($item, $expected, false)
             ) continue;
 
-            $output[] = $item;
+            if ($nullish) {
+                $output[$index] = $item;
+            } else {
+                $output[] = $item;
+            }
         }
 
         return $output;
