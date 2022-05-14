@@ -4,6 +4,7 @@ namespace kbtests;
 
 use karmabunny\rdb\Rdb;
 use PHPUnit\Framework\TestCase;
+use Traversable;
 
 /**
  * Tests for adapters.
@@ -14,6 +15,13 @@ abstract class AdapterTestCase extends TestCase
 {
     /** @var Rdb */
     public $rdb;
+
+
+    public function assertArraySameAs($expected, $actual)
+    {
+        $actual = array_intersect($expected, $actual);
+        $this->assertEquals($expected, $actual);
+    }
 
 
     public function testSetGet()
@@ -111,5 +119,20 @@ abstract class AdapterTestCase extends TestCase
 
     public function testScan()
     {
+        $expected = [];
+        foreach (range(1, 100) as $i) {
+            $key = 'item:' . $i;
+            $expected[] = $key;
+            $this->rdb->set($key, $i);
+        }
+
+        $actual = $this->rdb->keys('item:*');
+        $this->assertArraySameAs($expected, $actual);
+
+        $actual = $this->rdb->scan('item:*');
+        $this->assertInstanceOf(Traversable::class, $actual);
+
+        $actual = iterator_to_array($actual);
+        $this->assertArraySameAs($expected, $actual);
     }
 }
