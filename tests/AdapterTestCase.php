@@ -126,6 +126,8 @@ abstract class AdapterTestCase extends TestCase
 
     public function testScan()
     {
+        $this->rdb->config->scan_keys = false;
+
         $expected = [];
         foreach (range(1, 100) as $i) {
             $key = 'item:' . $i;
@@ -141,6 +143,15 @@ abstract class AdapterTestCase extends TestCase
 
         $actual = iterator_to_array($actual);
         $this->assertArraySameAs($expected, $actual);
+
+        // Test fake keys().
+        $this->rdb->config->scan_keys = true;
+
+        $actual = $this->rdb->keys('item:*');
+        $this->assertTrue(is_array($actual), 'Expected an array');
+        $this->assertArraySameAs($expected, $actual);
+
+        $this->rdb->config->scan_keys = false;
     }
 
 
