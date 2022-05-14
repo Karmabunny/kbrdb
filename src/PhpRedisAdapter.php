@@ -296,10 +296,14 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function blPop($keys, int $timeout = 0)
+    public function blPop($keys, int $timeout = null)
     {
         if (!is_array($keys)) {
             $keys = [$keys];
+        }
+
+        if ($timeout === null) {
+            $timeout = $this->config->timeout;
         }
 
         $value = $this->redis->blPop($keys, $timeout);
@@ -309,10 +313,14 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPop($keys, int $timeout = 0)
+    public function brPop($keys, int $timeout = null)
     {
         if (!is_array($keys)) {
             $keys = [$keys];
+        }
+
+        if ($timeout === null) {
+            $timeout = $this->config->timeout;
         }
 
         $value = $this->redis->brPop($keys, $timeout);
@@ -322,8 +330,12 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPoplPush(string $src, string $dst, int $timeout = 0)
+    public function brPoplPush(string $src, string $dst, int $timeout = null)
     {
+        if ($timeout === null) {
+            $timeout = $this->config->timeout;
+        }
+
         $value = $this->redis->brpoplpush($src, $dst, $timeout);
         if ($value === false) return null;
         return $value;

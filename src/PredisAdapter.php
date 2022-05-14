@@ -260,22 +260,34 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function blPop($keys, int $timeout = 0)
+    public function blPop($keys, int $timeout = null)
     {
+        if ($timeout === null) {
+            $timeout = $this->config->timeout;
+        }
+
         return $this->predis->blpop($keys, $timeout);
     }
 
 
     /** @inheritdoc */
-    public function brPop($keys, int $timeout = 0)
+    public function brPop($keys, int $timeout = null)
     {
+        if ($timeout === null) {
+            $timeout = $this->config->timeout;
+        }
+
         return $this->predis->brpop($keys, $timeout);
     }
 
 
     /** @inheritdoc */
-    public function brPoplPush(string $src, string $dst, int $timeout = 0)
+    public function brPoplPush(string $src, string $dst, int $timeout = null)
     {
+        if ($timeout === null) {
+            $timeout = $this->config->timeout;
+        }
+
         return $this->predis->brpoplpush($src, $dst, $timeout);
     }
 

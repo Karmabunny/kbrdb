@@ -321,13 +321,17 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function blPop($keys, int $timeout = 0)
+    public function blPop($keys, int $timeout = null)
     {
         if (!is_array($keys)) {
             $keys = [$keys];
         }
 
         $keys = $this->prefixKeys($keys);
+
+        if ($timeout === null) {
+            $timeout = $this->config->timeout;
+        }
 
         // I can only assume the typings are lying.
         $args = $keys;
@@ -340,13 +344,17 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPop($keys, int $timeout = 0)
+    public function brPop($keys, int $timeout = null)
     {
         if (!is_array($keys)) {
             $keys = [$keys];
         }
 
         $keys = $this->prefixKeys($keys);
+
+        if ($timeout === null) {
+            $timeout = $this->config->timeout;
+        }
 
         // I can only assume the typings are lying.
         $args = $keys;
@@ -359,10 +367,14 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPoplPush(string $src, string $dst, int $timeout = 0)
+    public function brPoplPush(string $src, string $dst, int $timeout = null)
     {
         $src = $this->config->prefix . $src;
         $dst = $this->config->prefix . $dst;
+
+        if ($timeout === null) {
+            $timeout = $this->config->timeout;
+        }
 
         $items = $this->credis->brPoplPush($src, $dst, $timeout);
 
