@@ -55,10 +55,6 @@ class PhpRedisAdapter extends Rdb
         // Skip empty results within the extension, which is hopefully
         // a bit faster than doing it in PHP.
         $this->redis->setOption(Redis::OPT_SCAN, Redis::SCAN_RETRY);
-
-        // Make sure scan patterns are prefixed.
-        // Can't imagine why this isn't the default?
-        $this->redis->setOption(Redis::OPT_SCAN, Redis::SCAN_PREFIX);
     }
 
 
@@ -79,6 +75,9 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function scan(string $pattern): Generator
     {
+        // I can't trust that setOption(SCAN_PREFIX) is always available.
+        $pattern = $this->config->prefix . $pattern;
+
         $it = null;
 
         for (;;) {
