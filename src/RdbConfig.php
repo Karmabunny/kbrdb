@@ -44,6 +44,9 @@ class RdbConfig
     /** @var int */
     public $chunk_size = 50;
 
+    /** @var int in seconds - connection timeout */
+    public $timeout = 5;
+
     /** @var int in milliseconds */
     public $lock_sleep = 5;
 

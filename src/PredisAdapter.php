@@ -32,6 +32,7 @@ class PredisAdapter extends Rdb
 
         $options = $config->options;
         $options['prefix'] = $config->prefix;
+        $options['timeout'] = $config->timeout;
 
         $this->predis = new Client($config->getHost(true), $options);
         $this->predis->connect();

@@ -28,13 +28,12 @@ class CredisAdapter extends Rdb
         parent::__construct($config);
         $config = $this->config;
 
-        $timeout = $config->options['timeout'] ?? null;
         $standalone = $config->options['standalone'] ?? false;
 
         $this->credis = new Credis_Client(
             $config->getHost(false),
             $config->getPort(),
-            $timeout
+            $config->timeout
         );
 
         if ($standalone) {
