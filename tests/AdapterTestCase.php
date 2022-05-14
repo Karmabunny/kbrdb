@@ -63,6 +63,11 @@ abstract class AdapterTestCase extends TestCase
     }
 
 
+    public function testKeysExists()
+    {
+    }
+
+
     public function testSetExpire()
     {
     }
@@ -74,6 +79,11 @@ abstract class AdapterTestCase extends TestCase
 
 
     public function testSets()
+    {
+    }
+
+
+    public function testLists()
     {
     }
 
@@ -111,11 +121,6 @@ abstract class AdapterTestCase extends TestCase
         $expected = 1;
 
         $this->assertEquals($expected, $actual);
-    }
-
-
-    public function testKeysExists()
-    {
     }
 
 
@@ -241,6 +246,10 @@ abstract class AdapterTestCase extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+
+    public function testJson()
+    {
+    }
 }
 
 
