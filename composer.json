@@ -23,7 +23,7 @@
     "require": {
         "predis/predis": "^1",
         "colinmollenhour/credis": "^1",
-        "php": ">=7.0"
+        "php": ">=7.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
@@ -38,6 +38,6 @@
         "tests": "phpunit --testdox tests",
         "analyse": "phpstan analyse --level 5 src",
         "publish": "bash scripts/publish.sh",
-        "compat": "phpcs -p --standard=PHPCompatibility --colors --extensions=php --runtime-set testVersion 7.0 src"
+        "compat": "phpcs -p --standard=PHPCompatibility --colors --extensions=php --runtime-set testVersion 7.1 src"
     }
 }
