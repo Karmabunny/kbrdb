@@ -54,6 +54,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function scan(string $pattern): Generator
     {
+        $pattern = $this->config->prefix . $pattern;
         $iterator = new Keyspace($this->predis, $pattern, $this->config->chunk_size);
 
         foreach ($iterator as $key) {

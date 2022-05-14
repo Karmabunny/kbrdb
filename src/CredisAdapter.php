@@ -91,10 +91,19 @@ class CredisAdapter extends Rdb
         $pattern = $this->config->prefix . $pattern;
         $it = null;
 
-        while ($keys = $this->credis->scan($it, $pattern, $this->config->chunk_size)) {
-            foreach ($keys as $key) {
-                yield $this->stripPrefix($key);
+        for (;;) {
+            $keys = $this->credis->scan($it, $pattern, $this->config->chunk_size);
+
+            // If it's backed by php-redis it might return false.
+            if ($keys) {
+                foreach ($keys as $key) {
+                    yield $this->stripPrefix($key);
+                }
             }
+
+            // The iterator is done.
+            // Keys might not be empty though, so do this last.
+            if (!$it) break;
         }
     }
 

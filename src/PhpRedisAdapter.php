@@ -51,6 +51,14 @@ class PhpRedisAdapter extends Rdb
         if ($config->prefix) {
             $this->redis->setOption(Redis::OPT_PREFIX, $config->prefix);
         }
+
+        // Skip empty results within the extension, which is hopefully
+        // a bit faster than doing it in PHP.
+        $this->redis->setOption(Redis::OPT_SCAN, Redis::SCAN_RETRY);
+
+        // Make sure scan patterns are prefixed.
+        // Can't imagine why this isn't the default?
+        $this->redis->setOption(Redis::OPT_SCAN, Redis::SCAN_PREFIX);
     }
 
 
@@ -73,7 +81,10 @@ class PhpRedisAdapter extends Rdb
     {
         $it = null;
 
-        while ($keys = $this->redis->scan($it, $pattern, $this->config->chunk_size)) {
+        for (;;) {
+            $keys = $this->redis->scan($it, $pattern, $this->config->chunk_size);
+            if ($keys === false) break;
+
             foreach ($keys as $key) {
                 yield $this->stripPrefix($key);
             }
