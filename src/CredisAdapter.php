@@ -179,13 +179,10 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function mSet(array $items): bool
     {
-        if (empty($values)) return false;
+        if (empty($items)) return false;
 
-        $keys = [];
-        foreach ($items as $key => $item) {
-            $keys[] = $this->config->prefix . $key;
-        }
-
+        $keys = array_keys($items);
+        $keys = $this->prefixKeys($keys);
         $items = array_combine($keys, $items);
 
         return (bool) @$this->credis->mSet($items);

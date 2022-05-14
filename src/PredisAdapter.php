@@ -126,7 +126,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function mSet(array $items): bool
     {
-        if (empty($values)) return false;
+        if (empty($items)) return false;
         return (bool) @$this->predis->mset($items);
     }
 
