@@ -9,6 +9,7 @@ namespace karmabunny\rdb;
 use Generator;
 use Predis\Client;
 use Predis\Collection\Iterator\Keyspace;
+use Predis\Response\ServerException;
 use Predis\Response\Status;
 
 /**
@@ -205,7 +206,16 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function lRange(string $key, int $start = 0, int $stop = -1): array
     {
-        return $this->predis->lrange($key, $start, $stop);
+        try {
+            $range = $this->predis->lrange($key, $start, $stop);
+            return $range;
+        }
+        catch (ServerException $exception) {
+            if (strpos($exception->getMessage(), 'WRONGTYPE') === 0) {
+                return [];
+            }
+            throw $exception;
+        }
     }
 
 
