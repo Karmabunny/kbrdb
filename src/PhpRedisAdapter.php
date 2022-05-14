@@ -152,6 +152,8 @@ class PhpRedisAdapter extends Rdb
             $item = null;
         }
         unset($item);
+
+        $items = array_combine($keys, $items);
         return $items;
     }
 

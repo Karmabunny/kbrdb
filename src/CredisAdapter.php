@@ -163,15 +163,18 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function mGet(array $keys): array
     {
-        $keys = $this->prefixKeys($keys);
-        if (empty($keys)) return [];
+        $prefixed = $this->prefixKeys($keys);
+        if (empty($prefixed)) return [];
 
-        $items = $this->credis->mGet($keys);
+        $items = $this->credis->mGet($prefixed);
+
         foreach ($items as &$item) {
             if ($item !== false) continue;
             $item = null;
         }
         unset($item);
+
+        $items = array_combine($keys, $items);
         return $items;
     }
 

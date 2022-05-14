@@ -514,7 +514,7 @@ abstract class Rdb
      * Bulk fetch via a list of keys.
      *
      * @param string[] $keys
-     * @return Generator<string|null>
+     * @return Generator<string|null> [ key => item ]
      */
     public function mScan(array $keys): Generator
     {
@@ -599,7 +599,7 @@ abstract class Rdb
      * @param string[] $keys Non-prefixed keys
      * @param string|null $expected Ensure all results inherits/is of this type
      * @param bool $nullish (false) return empty values
-     * @return (object|null)[]
+     * @return (object|null)[] [ key => item ]
      * @throws InvalidArgumentException
      */
     public function mGetObjects(array $keys, string $expected = null, bool $nullish = false): array
@@ -621,11 +621,10 @@ abstract class Rdb
         $output = [];
 
         if ($nullish) {
-            $output = array_fill(0, count($keys), null);
+            $output = array_fill_keys($keys, null);
         }
 
-        foreach ($items as $index => $item) {
-            $key = $keys[$index] ?? null;
+        foreach ($items as $key => $item) {
             $item = @unserialize($item) ?: null;
 
             if (!$key or !$item) continue;
@@ -639,11 +638,7 @@ abstract class Rdb
                 !is_subclass_of($item, $expected, false)
             ) continue;
 
-            if ($nullish) {
-                $output[$index] = $item;
-            } else {
-                $output[] = $item;
-            }
+            $output[$key] = $item;
         }
 
         return $output;
@@ -658,7 +653,7 @@ abstract class Rdb
      * @param iterable $keys Non-prefixed keys
      * @param string|null $expected Ensure all results is of this type
      * @param bool $nullish (false) return empty values
-     * @return Generator<object|null>
+     * @return Generator<object|null> [ key => item ]
      */
     public function mScanObjects($keys, string $expected = null, bool $nullish = false): Generator
     {
@@ -695,7 +690,7 @@ abstract class Rdb
      * Bulk set an array of object.
      *
      * @param object[] $items
-     * @return int[] object sizes in bytes
+     * @return int[] [ key => int ] object sizes in bytes
      */
     public function mSetObjects(array $items): array
     {
@@ -704,9 +699,9 @@ abstract class Rdb
         $sizes = [];
 
         /** @var string[] $items */
-        foreach ($items as &$item) {
+        foreach ($items as $key => &$item) {
             $item = serialize($item);
-            $sizes[] = strlen($item);
+            $sizes[$key] = strlen($item);
         }
 
         if (!$this->mSet($items)) {

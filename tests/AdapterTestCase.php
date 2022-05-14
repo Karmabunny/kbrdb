@@ -183,13 +183,11 @@ abstract class AdapterTestCase extends TestCase
             'multi:3' => (object) ['xyz' => 'abc', 'def' => [1,2,3,4]],
         ];
 
+        $expected = array_map(function($item) {
+            return strlen(serialize($item));
+        }, $objects);
+
         $actual = $this->rdb->mSetObjects($objects);
-
-        // TODO sizes result should be keyed.
-        $expected = array_values($objects);
-        $expected = array_map('serialize', $expected);
-        $expected = array_map('strlen', $expected);
-
         $this->assertEquals($expected, $actual);
 
         $keys = [
@@ -200,22 +198,20 @@ abstract class AdapterTestCase extends TestCase
         ];
 
         // Fetch all, the null key is filtered out.
-        $expected = array_values($objects);
-
         $actual = $this->rdb->mGetObjects($keys);
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($objects, $actual);
 
         $actual = $this->rdb->mScanObjects($keys);
         $this->assertInstanceOf(Traversable::class, $actual);
         $actual = iterator_to_array($actual);
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($objects, $actual);
 
         // Fetch all, _including_ the null key.
         $expected = [
-            $objects['multi:1'],
-            $objects['multi:2'],
-            null,
-            $objects['multi:3'],
+            'multi:1' => $objects['multi:1'],
+            'multi:2' => $objects['multi:2'],
+            'multi:null' => null,
+            'multi:3' => $objects['multi:3'],
         ];
 
         $actual = $this->rdb->mGetObjects($keys, null, true);
@@ -228,8 +224,8 @@ abstract class AdapterTestCase extends TestCase
 
         // Fetch just the 'randoboject' keys.
         $expected = [
-            $objects['multi:1'],
-            $objects['multi:2'],
+            'multi:1' => $objects['multi:1'],
+            'multi:2' => $objects['multi:2'],
         ];
 
         $actual = $this->rdb->mGetObjects($keys, RandoObject::class);
@@ -242,10 +238,10 @@ abstract class AdapterTestCase extends TestCase
 
         // Fetch just the 'randoboject' keys, invalid/missing are null.
         $expected = [
-            $objects['multi:1'],
-            $objects['multi:2'],
-            null,
-            null,
+            'multi:1' => $objects['multi:1'],
+            'multi:2' => $objects['multi:2'],
+            'multi:null' => null,
+            'multi:3' => null,
         ];
 
         $actual = $this->rdb->mGetObjects($keys, RandoObject::class, true);
