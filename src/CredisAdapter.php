@@ -211,9 +211,39 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function sRem(string $key, ...$values): int
     {
+        $values = self::flattenArrays($values);
         if (empty($values)) return 0;
+
         $key = $this->config->prefix . $key;
         return $this->credis->sRem($key, $values);
+    }
+
+
+    /** @inheritdoc */
+    public function sCard(string $key): int
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->sCard($key);
+    }
+
+
+    /** @inheritdoc */
+    public function sIsMember(string $key, string $value): bool
+    {
+        $key = $this->config->prefix . $key;
+        $ok = (bool) @$this->credis->sIsMember($key, $value);
+        return $ok;
+    }
+
+
+    /** @inheritdoc */
+    public function sMove(string $src, string $dst, string $value): bool
+    {
+        $src = $this->config->prefix . $src;
+        $dst = $this->config->prefix . $dst;
+
+        $ok = (bool) $this->credis->sMove($src, $dst, $value);
+        return $ok;
     }
 
 

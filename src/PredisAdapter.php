@@ -160,6 +160,30 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function sIsMember(string $key, string $value): bool
+    {
+        $ok = (bool) $this->predis->sismember($key, $value);
+        return $ok;
+    }
+
+
+    /** @inheritdoc */
+    public function sCard(string $key): int
+    {
+        return $this->predis->scard($key);
+    }
+
+
+    /** @inheritdoc */
+    public function sMove(string $src, string $dst, string $value): bool
+    {
+        $ok = (bool) $this->predis->smove($src, $dst, $value);
+        return $ok;
+    }
+
+
+
+    /** @inheritdoc */
     public function incr(string $key, int $amount = 1): int
     {
         return $this->predis->incrby($key, $amount);

@@ -187,9 +187,31 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function sRem(string $key, ...$values): int
     {
-        if (empty($values)) return 0;
         $values = self::flattenArrays($values);
+        if (empty($values)) return 0;
+
         return $this->redis->sRem($key, ...$values);
+    }
+
+
+    /** @inheritdoc */
+    public function sIsMember(string $key, string $value): bool
+    {
+        return $this->redis->sIsMember($key, $value);
+    }
+
+
+    /** @inheritdoc */
+    public function sCard(string $key): int
+    {
+        return $this->redis->sCard($key);
+    }
+
+
+    /** @inheritdoc */
+    public function sMove(string $src, string $dst, string $value): bool
+    {
+        return $this->redis->sMove($src, $dst, $value);
     }
 
 

@@ -272,6 +272,36 @@ abstract class Rdb
 
 
     /**
+     * Get the cardinality (size) of a set.
+     *
+     * @param string $key
+     * @return int number of items in the set
+     */
+    public abstract function sCard(string $key): int;
+
+
+    /**
+     * Test if an item is a member of a set.
+     *
+     * @param string $key
+     * @param string $value
+     * @return bool
+     */
+    public abstract function sIsMember(string $key, string $value): bool;
+
+
+    /**
+     * Move an item from one set to another.
+     *
+     * @param string $src
+     * @param string $dst
+     * @param string $value
+     * @return bool true if moved, or false if not a member
+     */
+    public abstract function sMove(string $src, string $dst, string $value): bool;
+
+
+    /**
      * Increment a value by X.
      *
      * @param string $key
