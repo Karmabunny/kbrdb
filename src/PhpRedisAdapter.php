@@ -248,7 +248,10 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function lRange(string $key, int $start = 0, int $stop = -1): array
     {
-        return $this->redis->lRange($key, $start, $stop);
+        /** @var array|false $range */
+        $range = $this->redis->lRange($key, $start, $stop);
+        if ($range === false) return [];
+        return $range;
     }
 
 
