@@ -67,6 +67,41 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function ttl(string $key)
+    {
+        return $this->predis->ttl($key);
+    }
+
+
+    /** @inheritdoc */
+    public function expire(string $key, $ttl = 0): bool
+    {
+        return (bool) $this->predis->pexpire($key, $ttl);
+    }
+
+
+    /** @inheritdoc */
+    public function expireAt(string $key, $ttl = 0): bool
+    {
+        return (bool) $this->predis->pexpireat($key, $ttl);
+    }
+
+
+    /** @inheritdoc */
+    public function rename(string $src, string $dst): bool
+    {
+        return (bool) $this->predis->rename($src, $dst);
+    }
+
+
+    /** @inheritdoc */
+    public function type(string $key)
+    {
+        return $this->predis->type($key);
+    }
+
+
+    /** @inheritdoc */
     public function set(string $key, $value, $ttl = 0, $flags = [])
     {
         $flags = self::parseFlags($flags);

@@ -91,6 +91,56 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function ttl(string $key)
+    {
+        $value = $this->redis->pttl($key);
+        if ($value === false) return null;
+        return $value;
+    }
+
+
+    /** @inheritdoc */
+    public function expire(string $key, $ttl = 0): bool
+    {
+        return $this->redis->pExpire($key, $ttl);
+    }
+
+
+    /** @inheritdoc */
+    public function expireAt(string $key, $ttl = 0): bool
+    {
+        return $this->redis->pExpireAt($key, $ttl);
+    }
+
+
+    /** @inheritdoc */
+    public function rename(string $src, string $dst): bool
+    {
+        return $this->redis->rename($src, $dst);
+    }
+
+
+    /** @inheritdoc */
+    public function type(string $key)
+    {
+        $type = $this->redis->type($key);
+        switch ($type) {
+            case Redis::REDIS_STRING:
+                return 'string';
+            case Redis::REDIS_LIST:
+                return 'list';
+            case Redis::REDIS_SET:
+                return 'set';
+            case Redis::REDIS_ZSET:
+                return 'zset';
+            case Redis::REDIS_HASH:
+                return 'hash';
+        }
+        return null;
+    }
+
+
+    /** @inheritdoc */
     public function set(string $key, string $value, $ttl = 0, $flags = [])
     {
         $flags = self::parseFlags($flags);

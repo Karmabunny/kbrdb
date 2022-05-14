@@ -176,6 +176,60 @@ abstract class Rdb
 
 
     /**
+     * Get the TTL for a key.
+     *
+     * @param string $key
+     * @return int|null milliseconds
+     */
+    public abstract function ttl(string $key);
+
+
+    /**
+     * Set the expiry/TLL for a key.
+     *
+     * @param string $key
+     * @param int $ttl milliseconds
+     * @return bool
+     */
+    public abstract function expire(string $key, $ttl = 0): bool;
+
+
+    /**
+     * Set the expiry in unix time for a key.
+     *
+     * @param string $key
+     * @param int $ttl milliseconds
+     * @return bool
+     */
+    public abstract function expireAt(string $key, $ttl = 0): bool;
+
+
+    /**
+     * Rename a key.
+     *
+     * @param string $src
+     * @param string $dst
+     * @return bool
+     */
+    public abstract function rename(string $src, string $dst): bool;
+
+
+    /**
+     * Get the type of a key.
+     *
+     * @param string $key
+     * @return string|null one of:
+     * - string
+     * - list
+     * - set
+     * - zset
+     * - hash
+     * - `null` - unknown or missing
+     */
+    public abstract function type(string $key);
+
+
+    /**
      * Store a value at a key.
      *
      * Optionally specify a TTL that will cause the key to automatically
