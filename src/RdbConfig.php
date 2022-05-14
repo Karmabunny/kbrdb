@@ -14,12 +14,13 @@ namespace karmabunny\rdb;
  * - host
  * - prefix
  * - adapter
- * - chunk_size
- * - options (adapter specific)
  *
  * Also:
+ * - chunk_size
+ * - timeout
  * - lock_sleep
  * - scan_keys
+ * - options (adapter specific)
  *
  * @package karmabunny\rdb
  */
@@ -41,7 +42,7 @@ class RdbConfig
     /** @var string RdbConfig::TYPE */
     public $adapter = self::TYPE_PREDIS;
 
-    /** @var int */
+    /** @var int for scan, mscan, and friends */
     public $chunk_size = 50;
 
     /** @var int in seconds - connection timeout */
@@ -49,9 +50,6 @@ class RdbConfig
 
     /** @var int in milliseconds */
     public $lock_sleep = 5;
-
-    /** @var array */
-    public $options = [];
 
     /**
      * Replace keys() with a scan().
@@ -68,6 +66,8 @@ class RdbConfig
      */
     public $scan_keys = false;
 
+    /** @var array */
+    public $options = [];
 
     /**
      * Create a new config object.
