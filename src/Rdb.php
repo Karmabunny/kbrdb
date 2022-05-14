@@ -580,15 +580,12 @@ abstract class Rdb
         if ($value === false) return null;
         if (!is_object($value)) return null;
 
-        if ($expected) {
-            if (
-                // Checker doesn't like string classes.
-                // Or I'm dumb. One of those.
-                // @phpstan-ignore-next-line
-                get_class($value) !== $expected and
-                !is_subclass_of($value, $expected, false)
-            ) return null;
-        }
+        if (
+            // @phpstan-ignore-next-line : doesn't like string classes.
+            $expected and
+            get_class($value) !== $expected and
+            !is_subclass_of($value, $expected, false)
+        ) return null;
 
         return $value;
     }
@@ -636,7 +633,8 @@ abstract class Rdb
             if (!is_object($item)) continue;
 
             if (
-                // @phpstan-ignore-next-line : Not sure about this one.
+                // @phpstan-ignore-next-line : doesn't like string classes.
+                $expected and
                 get_class($item) !== $expected and
                 !is_subclass_of($item, $expected, false)
             ) continue;
