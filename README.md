@@ -23,9 +23,9 @@ composer require karmabunny/rdb
 - predis (composer package)
 - credis (composer package)
 
-This library doesn't implement a redis client itself, only wraps existing client. After much effort trying to normalise the responses from all these client, it might  seem like a good idea to just write our own that isn't an inconsistent mess like these others.
+This library doesn't implement a redis client itself, only wraps existing clients. After much effort trying to normalise the responses from all these client, it might  seem like a good idea to just write our own that isn't so inconsistent.
 
-But consider that we only _know_ how horribly inconsistent these libraries are because we've spent so much time trying to make them all behave the same. For example, client 'A' might do 'B' well but 'C' badly. Then client 'D' does 'B' badly but 'C' really well.
+But consider that we only _know_ how inconsistent these libraries are because we've spent so much time trying to make them all behave the same. For example, client 'A' might do 'B' well but 'C' badly. Then client 'D' does 'B' badly but 'C' really well.
 
 So as I sit here and scoff at their feeble attempts, I am reminded of a few things:
 
@@ -49,6 +49,7 @@ For example, `BRPOPLPUSH` is deprecated in v6.2 and might be removed in the dist
 - `host` - server name + port
 - `prefix` - key prefix
 - `adapter` - 'predis' (default), 'php-redis', 'credis'
+- `timeout` - connection timeout, in seconds (default: 5)
 - `chunk_size` - max key size for scan methods (default: 50)
 - `lock_sleep` - tick size for locking, in milliseconds (default: 5)
 - `scan_keys` - replace keys() with scan() (default: false)
