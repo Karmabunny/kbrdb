@@ -97,7 +97,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function type(string $key): ?string
     {
-        $type = $this->predis->type($key);
+        $type = (string) $this->predis->type($key);
         if ($type === 'none') return null;
         return $type;
     }
