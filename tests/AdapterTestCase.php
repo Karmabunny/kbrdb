@@ -63,8 +63,64 @@ abstract class AdapterTestCase extends TestCase
     }
 
 
-    public function testKeysExists()
+    public function testExistsTypes()
     {
+        // Empty, no type.
+        $actual = $this->rdb->exists('exists:123');
+        $this->assertEquals(0, $actual);
+
+        $actual = $this->rdb->type('exists:123');
+        $this->assertNull($actual);
+
+        // String types.
+        $actual = $this->rdb->exists('string:123');
+        $this->assertEquals(0, $actual);
+
+        $ok = $this->rdb->set('string:123', 1000);
+        $this->assertTrue($ok);
+
+        $actual = $this->rdb->exists('string:123');
+        $this->assertEquals(1, $actual);
+
+        $expected = 'string';
+        $actual = $this->rdb->type('string:123');
+        $this->assertEquals($expected, $actual);
+
+        // Set types.
+        $actual = $this->rdb->exists('set:123');
+        $this->assertEquals(0, $actual);
+
+        $ok = $this->rdb->sAdd('set:123', 'abc');
+        $this->assertEquals(1, $ok);
+
+        $actual = $this->rdb->exists('set:123');
+        $this->assertEquals(1, $actual);
+
+        $expected = 'set';
+        $actual = $this->rdb->type('set:123');
+        $this->assertEquals($expected, $actual);
+
+        // List types.
+        $actual = $this->rdb->exists('list:123');
+        $this->assertEquals(0, $actual);
+
+        $ok = $this->rdb->lPush('list:123', 'abc');
+        $this->assertEquals(1, $ok);
+
+        $actual = $this->rdb->exists('list:123');
+        $this->assertEquals(1, $actual);
+
+        $expected = 'list';
+        $actual = $this->rdb->type('list:123');
+        $this->assertEquals($expected, $actual);
+
+        // Multi exists.
+        $actual = $this->rdb->exists('string:123', 'set:123', 'list:123', 'does:not:exist');
+        $this->assertEquals(3, $actual);
+
+        // Array flattening.
+        $actual = $this->rdb->exists(['string:123', 'set:123'], 'list:123');
+        $this->assertEquals(3, $actual);
     }
 
 
