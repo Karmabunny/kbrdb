@@ -136,6 +136,45 @@ abstract class AdapterTestCase extends TestCase
 
     public function testSets()
     {
+        $expected = [];
+        $actual = $this->rdb->sMembers('yes:a:set');
+        $this->assertArraySameAs($expected, $actual);
+
+        // Adding to a set.
+        $expected = 2;
+        $actual = $this->rdb->sAdd('yes:a:set', 'abc', 'def');
+        $this->assertEquals($expected, $actual);
+
+        $expected = 0;
+        $actual = $this->rdb->sAdd('yes:a:set', 'def');
+        $this->assertEquals($expected, $actual);
+
+        $expected = 1;
+        $actual = $this->rdb->sAdd('yes:a:set', 'def', 'ghi');
+        $this->assertEquals($expected, $actual);
+
+        // Check.
+        $expected = ['abc', 'def', 'ghi'];
+        $actual = $this->rdb->sMembers('yes:a:set');
+        $this->assertArraySameAs($expected, $actual);
+
+        // Removing from a set.
+        $expected = 0;
+        $actual = $this->rdb->sRem('yes:a:set', 'blah');
+        $this->assertEquals($expected, $actual);
+
+        $expected = 1;
+        $actual = $this->rdb->sRem('yes:a:set', 'def', 'blah');
+        $this->assertEquals($expected, $actual);
+
+        $expected = 2;
+        $actual = $this->rdb->sRem('yes:a:set', 'abc', 'ghi');
+        $this->assertEquals($expected, $actual);
+
+        // Check.
+        $expected = [];
+        $actual = $this->rdb->sMembers('yes:a:set');
+        $this->assertArraySameAs($expected, $actual);
     }
 
 
