@@ -178,7 +178,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function sAdd(string $key, ...$values): int
+    public function sAdd(string $key, ...$values): ?int
     {
         $values = self::flattenArrays($values);
         if (empty($values)) return 0;
@@ -188,14 +188,14 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function sMembers(string $key): array
+    public function sMembers(string $key): ?array
     {
         return $this->predis->smembers($key);
     }
 
 
     /** @inheritdoc */
-    public function sRem(string $key, ...$values): int
+    public function sRem(string $key, ...$values): ?int
     {
         $values = self::flattenArrays($values);
         if (empty($values)) return 0;
@@ -205,25 +205,29 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function sIsMember(string $key, string $value): bool
+    public function sIsMember(string $key, string $value): ?bool
     {
-        $ok = (bool) $this->predis->sismember($key, $value);
-        return $ok;
+        $ok = $this->predis->sismember($key, $value);
+        /** @var int|null $ok */
+        if ($ok === null) return null;
+        return (bool) $ok;
     }
 
 
     /** @inheritdoc */
-    public function sCard(string $key): int
+    public function sCard(string $key): ?int
     {
         return $this->predis->scard($key);
     }
 
 
     /** @inheritdoc */
-    public function sMove(string $src, string $dst, string $value): bool
+    public function sMove(string $src, string $dst, string $value): ?bool
     {
-        $ok = (bool) $this->predis->smove($src, $dst, $value);
-        return $ok;
+        $ok = $this->predis->smove($src, $dst, $value);
+        /** @var int|null $ok - kinda weird typing here. */
+        if ($ok === null) return null;
+        return (bool) $ok;
     }
 
 
@@ -246,7 +250,6 @@ class PredisAdapter extends Rdb
     public function lPush(string $key, ...$items): ?int
     {
         $count = $this->predis->lpush($key, $items);
-        if ($count <= 0) return null;
         return $count;
     }
 
@@ -255,7 +258,6 @@ class PredisAdapter extends Rdb
     public function rPush(string $key, ...$items): ?int
     {
         $count = $this->predis->rpush($key, $items);
-        if ($count <= 0) return null;
         return $count;
     }
 
@@ -282,34 +284,31 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lRange(string $key, int $start = 0, int $stop = -1): array
+    public function lRange(string $key, int $start = 0, int $stop = -1): ?array
     {
         $range = $this->predis->lrange($key, $start, $stop);
-        if ($range === null) return [];
         return $range;
     }
 
 
     /** @inheritdoc */
-    public function lTrim(string $key, int $start = 0, int $stop = -1): bool
+    public function lTrim(string $key, int $start = 0, int $stop = -1): ?bool
     {
-        return (bool) $this->predis->ltrim($key, $start, $stop);
+        return $this->predis->ltrim($key, $start, $stop);
     }
 
 
     /** @inheritdoc */
     public function lLen(string $key): ?int
     {
-        $count = $this->predis->llen($key);
-        if ($count < 0) return null;
-        return $count;
+        return $this->predis->llen($key);
     }
 
 
     /** @inheritdoc */
-    public function lSet(string $key, int $index, string $item): bool
+    public function lSet(string $key, int $index, string $item): ?bool
     {
-        return (bool) $this->predis->lset($key, $index, $item);
+        return $this->predis->lset($key, $index, $item);
     }
 
 
@@ -321,7 +320,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lRem(string $key, string $item, int $count = 0): int
+    public function lRem(string $key, string $item, int $count = 0): ?int
     {
         // Args item/count are swapped.
         return $this->predis->lrem($key, $count, $item);

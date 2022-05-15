@@ -244,7 +244,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function sMembers(string $key): array
+    public function sMembers(string $key): ?array
     {
         $key = $this->config->prefix . $key;
         return $this->credis->sMembers($key);
@@ -252,7 +252,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function sRem(string $key, ...$values): int
+    public function sRem(string $key, ...$values): ?int
     {
         $values = self::flattenArrays($values);
         if (empty($values)) return 0;
@@ -263,7 +263,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function sCard(string $key): int
+    public function sCard(string $key): ?int
     {
         $key = $this->config->prefix . $key;
         return $this->credis->sCard($key);
@@ -271,22 +271,26 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function sIsMember(string $key, string $value): bool
+    public function sIsMember(string $key, string $value): ?bool
     {
         $key = $this->config->prefix . $key;
-        $ok = (bool) @$this->credis->sIsMember($key, $value);
-        return $ok;
+        $ok = $this->credis->sIsMember($key, $value);
+        /** @var int|null $ok - another funky typing. */
+        if ($ok === null) return null;
+        return (bool) $ok;
     }
 
 
     /** @inheritdoc */
-    public function sMove(string $src, string $dst, string $value): bool
+    public function sMove(string $src, string $dst, string $value): ?bool
     {
         $src = $this->config->prefix . $src;
         $dst = $this->config->prefix . $dst;
 
-        $ok = (bool) $this->credis->sMove($src, $dst, $value);
-        return $ok;
+        $ok = $this->credis->sMove($src, $dst, $value);
+        /** @var int|null $ok - another funky typing. */
+        if ($ok === null) return null;
+        return (bool) $ok;
     }
 
 
@@ -353,7 +357,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lRange(string $key, int $start = 0, int $stop = -1): array
+    public function lRange(string $key, int $start = 0, int $stop = -1): ?array
     {
         $key = $this->config->prefix . $key;
         return $this->credis->lRange($key, $start, $stop);
@@ -361,7 +365,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lTrim(string $key, int $start = 0, int $stop = -1): bool
+    public function lTrim(string $key, int $start = 0, int $stop = -1): ?bool
     {
         $key = $this->config->prefix . $key;
         return $this->credis->lTrim($key, $start, $stop);
@@ -379,7 +383,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lSet(string $key, int $index, string $item): bool
+    public function lSet(string $key, int $index, string $item): ?bool
     {
         $key = $this->config->prefix . $key;
         return $this->credis->lSet($key, $index, $item);
@@ -395,7 +399,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lRem(string $key, string $item, int $count = 0): int
+    public function lRem(string $key, string $item, int $count = 0): ?int
     {
         // Args item/count are swapped.
         $key = $this->config->prefix . $key;

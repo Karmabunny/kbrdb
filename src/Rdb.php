@@ -329,9 +329,9 @@ abstract class Rdb
      *
      * @param string $key
      * @param mixed $values
-     * @return int number of new items added
+     * @return int number of new items added, `null` if not a set
      */
-    public abstract function sAdd(string $key, ...$values): int;
+    public abstract function sAdd(string $key, ...$values): ?int;
 
 
     /**
@@ -340,9 +340,9 @@ abstract class Rdb
      * All results will be unique.
      *
      * @param string $key
-     * @return array
+     * @return string[] set members, null if not a set
      */
-    public abstract function sMembers(string $key): array;
+    public abstract function sMembers(string $key): ?array;
 
 
     /**
@@ -350,18 +350,18 @@ abstract class Rdb
      *
      * @param string $key
      * @param mixed $values
-     * @return int number of items removed
+     * @return int number of items removed, null if not a set
      */
-    public abstract function sRem(string $key, ...$values): int;
+    public abstract function sRem(string $key, ...$values): ?int;
 
 
     /**
      * Get the cardinality (size) of a set.
      *
      * @param string $key
-     * @return int number of items in the set
+     * @return int number of items in the set, null if not a set
      */
-    public abstract function sCard(string $key): int;
+    public abstract function sCard(string $key): ?int;
 
 
     /**
@@ -369,9 +369,9 @@ abstract class Rdb
      *
      * @param string $key
      * @param string $value
-     * @return bool
+     * @return bool true if a member, null if not a set
      */
-    public abstract function sIsMember(string $key, string $value): bool;
+    public abstract function sIsMember(string $key, string $value): ?bool;
 
 
     /**
@@ -380,9 +380,9 @@ abstract class Rdb
      * @param string $src
      * @param string $dst
      * @param string $value
-     * @return bool true if moved, or false if not a member
+     * @return bool true if moved, or false if not a member, null if not a set
      */
-    public abstract function sMove(string $src, string $dst, string $value): bool;
+    public abstract function sMove(string $src, string $dst, string $value): ?bool;
 
 
     /**
@@ -438,7 +438,7 @@ abstract class Rdb
      * - aka: shift()
      *
      * @param string $key
-     * @return string|null the item or `null` if empty
+     * @return string|null the item or `null` if empty or not a list
      */
     public abstract function lPop(string $key): ?string;
 
@@ -450,7 +450,7 @@ abstract class Rdb
      * - aka: pop()
      *
      * @param string $key
-     * @return string|null the item or `null` if empty
+     * @return string|null the item or `null` if empty or not a list
      */
     public abstract function rPop(string $key): ?string;
 
@@ -462,6 +462,8 @@ abstract class Rdb
      *
      * Note, although this is deprecated in redis 6.2 it will indefinitely be
      * supported here, if removed, with a polyfill via `LMOVE`.
+     *
+     * Also note, if either key isn't a list it will also return `null`.
      *
      * @param string $src
      * @param string $dst
@@ -475,14 +477,18 @@ abstract class Rdb
      *
      * aka: LIST RANGE
      *
-     * Note, start/stop can be negative - they behave circularly.
+     * Negative indexes are circular and wrap around to the end of the list.
+     * E.g. `[1,2,3] => -1 is 3`
+     *
+     * Out of range indexes are _not_ errors. A too-large index is treated as
+     * and 'end of list' index, aka `-1`.
      *
      * @param string $key
      * @param int $start
      * @param int $stop
-     * @return string[]
+     * @return string[]|null range items or `null` if not a list.
      */
-    public abstract function lRange(string $key, int $start = 0, int $stop = -1): array;
+    public abstract function lRange(string $key, int $start = 0, int $stop = -1): ?array;
 
 
     /**
@@ -490,14 +496,18 @@ abstract class Rdb
      *
      * aka: LIST TRIM
      *
-     * Note, start/stop can be negative - they behave circularly.
+     * Negative indexes are circular and wrap around to the end of the list.
+     * E.g. `[1,2,3] => -1 is 3`
+     *
+     * Out of range indexes are _not_ errors. A too-large index is treated as
+     * and 'end of list' index, aka `-1`.
      *
      * @param string $key
      * @param int $start
      * @param int $stop
-     * @return bool
+     * @return bool|null
      */
-    public abstract function lTrim(string $key, int $start = 0, int $stop = -1): bool;
+    public abstract function lTrim(string $key, int $start = 0, int $stop = -1): ?bool;
 
 
     /**
@@ -519,9 +529,9 @@ abstract class Rdb
      * @param string $key
      * @param int $index
      * @param string $item
-     * @return bool
+     * @return bool|null true if set, false if out of range, null if not a list
      */
-    public abstract function lSet(string $key, int $index, string $item): bool;
+    public abstract function lSet(string $key, int $index, string $item): ?bool;
 
 
     /**
@@ -550,9 +560,9 @@ abstract class Rdb
      * @param string $key
      * @param string $item
      * @param int $count
-     * @return int number of removed items
+     * @return int|null number of removed items, or `null` if not a list
      */
-    public abstract function lRem(string $key, string $item, int $count = 0): int;
+    public abstract function lRem(string $key, string $item, int $count = 0): ?int;
 
 
     /**

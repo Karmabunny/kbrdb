@@ -57,6 +57,27 @@ class PhpRedisAdapter extends Rdb
     }
 
 
+    /**
+     * Although php-redis is reasonably consistent with returning 'false'
+     * for WRONGTYPE errors, that can't account for those boolean responses
+     * that have a valid 'false' return. Lucky for us, they've stored that in
+     * the 'script error' helper.
+     *
+     * @return bool
+     */
+    protected function hasWrongType(): bool
+    {
+        $error = $this->redis->getLastError();
+
+        if ($error and strpos($error, 'WRONGTYPE') === 0) {
+            $this->redis->clearLastError();
+            return true;
+        }
+
+        return false;
+    }
+
+
     /** @inheritdoc */
     public function keys(string $pattern): array
     {
@@ -221,62 +242,70 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function sAdd(string $key, ...$values): int
+    public function sAdd(string $key, ...$values): ?int
     {
         $values = self::flattenArrays($values);
         if (empty($values)) return 0;
 
         $res = $this->redis->sAdd($key, ...$values);
 
-        // A bit backwards, but this is 'value exists'.
-        // Not sure how it works for multiple values.
-        if ($res === false) return 0;
-
-        // This means 'not a set'.
-        // if ($res === 0) return null;
+        // The docs are wrong - false is when it's 'not a set'.
+        // Whereas 'value exists' is still an integer, because of being able to
+        // add multiple values.
+        if ($res === false) return null;
 
         return $res;
     }
 
 
     /** @inheritdoc */
-    public function sMembers(string $key): array
+    public function sMembers(string $key): ?array
     {
         /** @var array|false $items - typings are LYING */
         $items = $this->redis->sMembers($key);
-        if ($items === false) return [];
+        if ($items === false) return null;
         return $items;
     }
 
 
     /** @inheritdoc */
-    public function sRem(string $key, ...$values): int
+    public function sRem(string $key, ...$values): ?int
     {
         $values = self::flattenArrays($values);
         if (empty($values)) return 0;
 
-        return $this->redis->sRem($key, ...$values);
+        /** @var int|false $count */
+        $count = $this->redis->sRem($key, ...$values);
+        if ($count === false) return null;
+        return $count;
     }
 
 
     /** @inheritdoc */
-    public function sIsMember(string $key, string $value): bool
+    public function sIsMember(string $key, string $value): ?bool
     {
-        return $this->redis->sIsMember($key, $value);
+        $ok = $this->redis->sIsMember($key, $value);
+        if ($this->hasWrongType()) return null;
+        return $ok;
     }
 
 
     /** @inheritdoc */
-    public function sCard(string $key): int
+    public function sCard(string $key): ?int
     {
-        return $this->redis->sCard($key);
+        /** @var int|false $ok */
+        $ok = $this->redis->sCard($key);
+        if ($ok === false) return null;
+        return $ok;
     }
 
 
     /** @inheritdoc */
-    public function sMove(string $src, string $dst, string $value): bool
+    public function sMove(string $src, string $dst, string $value): ?bool
     {
-        return $this->redis->sMove($src, $dst, $value);
+        $ok = $this->redis->sMove($src, $dst, $value);
+        if ($this->hasWrongType()) return null;
+        return $ok;
     }
 
 
@@ -343,19 +372,21 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lRange(string $key, int $start = 0, int $stop = -1): array
+    public function lRange(string $key, int $start = 0, int $stop = -1): ?array
     {
         /** @var array|false $range */
         $range = $this->redis->lRange($key, $start, $stop);
-        if ($range === false) return [];
+        if ($range === false) return null;
         return $range;
     }
 
 
     /** @inheritdoc */
-    public function lTrim(string $key, int $start = 0, int $stop = -1): bool
+    public function lTrim(string $key, int $start = 0, int $stop = -1): ?bool
     {
-        return $this->redis->lTrim($key, $start, $stop);
+        $items = $this->redis->lTrim($key, $start, $stop);
+        if ($items === false) return null;
+        return (bool) $items;
     }
 
 
@@ -369,9 +400,11 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lSet(string $key, int $index, string $item): bool
+    public function lSet(string $key, int $index, string $item): ?bool
     {
-        return $this->redis->lSet($key, $index, $item);
+        $ok = $this->redis->lSet($key, $index, $item);
+        if (!$ok and $this->hasWrongType()) return null;
+        return $ok;
     }
 
 
@@ -385,10 +418,12 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lRem(string $key, string $item, int $count = 0): int
+    public function lRem(string $key, string $item, int $count = 0): ?int
     {
         // Args item/count are NOT swapped.
-        return $this->redis->lRem($key, $item, $count);
+        $count = $this->redis->lRem($key, $item, $count);
+        if ($count === false) return null;
+        return $count;
     }
 
 
