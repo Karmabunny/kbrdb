@@ -16,11 +16,23 @@ Add as a dependency:
 composer require karmabunny/rdb
 ```
 
+
 ### Adapters
 
 - php-redis (binary extension)
 - predis (composer package)
 - credis (composer package)
+
+This library doesn't implement a redis client itself, only wraps existing client. After much effort trying to normalise the responses from all these client, it might  seem like a good idea to just write our own that isn't an inconsistent mess like these others.
+
+But consider that we only _know_ how horribly inconsistent these libraries are because we've spent so much time trying to make them all behave the same. For example, client 'A' might do 'B' well but 'C' badly. Then client 'D' does 'B' badly but 'C' really well.
+
+So as I sit here and scoff at their feeble attempts, I am reminded of a few things:
+
+1. I've already introduced so many of my own bugs during this journey.
+2. Unit testing is a gift from heaven.
+3. Normalising these inconsistencies has improved our own consistency, something probably not as achievable when writing a new client from scratch.
+4. also this: https://xkcd.com/927
 
 
 ### Version support
@@ -184,23 +196,10 @@ TODO: more
 
 sets:
 - sScan
-- sCard
-- sIsMember
 - sRandMember
-- sMove
 - sDiff (+ store)
 - sInter (+ store)
 - sUnion (+ store)
-
-generic:
-- type
-- touch
-- rename
-
-ttls:
-- getTtl (+ expireTime)
-- expire
-- persist
 
 
 #### Extended Methods
