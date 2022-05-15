@@ -175,6 +175,45 @@ abstract class AdapterTestCase extends TestCase
         $expected = [];
         $actual = $this->rdb->sMembers('yes:a:set');
         $this->assertArraySameAs($expected, $actual);
+
+        // Testing bad types.
+        $this->rdb->lPush('not:a:set', 'abc');
+        $actual = $this->rdb->type('not:a:set');
+        $this->assertEquals('list', $actual);
+
+        // Push set onto list, should fail.
+        $actual = $this->rdb->sAdd('not:a:set', 'abc');
+        $this->assertNull($actual);
+
+        // Get members from a list, should fail.
+        $actual = $this->rdb->sMembers('not:a:set');
+        $this->assertNull($actual);
+
+        // Test members on a list, should fail.
+        $actual = $this->rdb->sIsMember('not:a:set', 'abc');
+        $this->assertNull($actual);
+
+        // Test cardinality on a list, should fail.
+        $actual = $this->rdb->sCard('not:a:set');
+        $this->assertNull($actual);
+
+        // // Remove from from a list, should fail.
+        $actual = $this->rdb->sRem('not:a:set', 'abc');
+        $this->assertNull($actual);
+
+        // Test move on a list to a set, should fail.
+        $actual = $this->rdb->sMove('not:a:set', 'yes:a:set', 'abc');
+        $this->assertNull($actual);
+
+        // Test move on a list to a set, a bit different.
+        $actual = $this->rdb->sMove('yes:a:set', 'not:a:set', 'abc');
+        $this->assertFalse($actual);
+
+        // But if the set _HAS_ values, not-a-set errors come after.
+        $this->rdb->sAdd('yes:a:set', 'abc', 'def');
+
+        $actual = $this->rdb->sMove('yes:a:set', 'not:a:set', 'abc');
+        $this->assertNull($actual);
     }
 
 
