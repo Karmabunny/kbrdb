@@ -224,8 +224,18 @@ class PhpRedisAdapter extends Rdb
     public function sAdd(string $key, ...$values): int
     {
         if (empty($values)) return 0;
+
         $values = self::flattenArrays($values);
-        return $this->redis->sAdd($key, ...$values);
+        $res = $this->redis->sAdd($key, ...$values);
+
+        // A bit backwards, but this is 'value exists'.
+        // Not sure how it works for multiple values.
+        if ($res === false) return 0;
+
+        // This means 'not a set'.
+        // if ($res === 0) return null;
+
+        return $res;
     }
 
 
