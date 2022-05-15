@@ -223,9 +223,9 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function sAdd(string $key, ...$values): int
     {
+        $values = self::flattenArrays($values);
         if (empty($values)) return 0;
 
-        $values = self::flattenArrays($values);
         $res = $this->redis->sAdd($key, ...$values);
 
         // A bit backwards, but this is 'value exists'.
@@ -447,6 +447,7 @@ class PhpRedisAdapter extends Rdb
     {
         $keys = self::flattenArrays($keys);
         if (empty($keys)) return 0;
+
         return $this->redis->exists($keys);
     }
 
@@ -456,6 +457,7 @@ class PhpRedisAdapter extends Rdb
     {
         $keys = self::flattenArrays($keys);
         if (empty($keys)) return 0;
+
         return $this->redis->del($keys);
     }
 

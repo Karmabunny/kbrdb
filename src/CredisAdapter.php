@@ -55,6 +55,7 @@ class CredisAdapter extends Rdb
     protected function prefixKeys(iterable $keys): array
     {
         $keys = self::flattenArrays($keys);
+        if (empty($keys)) return [];
 
         if ($this->config->prefix) {
             $keys = self::prefix($this->config->prefix, $keys);
@@ -411,6 +412,10 @@ class CredisAdapter extends Rdb
         }
         else {
             $keys = $this->prefixKeys($keys);
+            // TODO it's not a timeout though.
+            // But an empty array is less clear - null is only better because
+            // it might prevent an infinite loop.
+            if (empty($keys)) return null;
         }
 
         if ($timeout === null) {

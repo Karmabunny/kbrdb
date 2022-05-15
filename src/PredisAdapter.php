@@ -179,6 +179,7 @@ class PredisAdapter extends Rdb
     {
         $values = self::flattenArrays($values);
         if (empty($values)) return 0;
+
         return $this->predis->sadd($key, $values);
     }
 
@@ -195,6 +196,7 @@ class PredisAdapter extends Rdb
     {
         $values = self::flattenArrays($values);
         if (empty($values)) return 0;
+
         return $this->predis->srem($key, $values);
     }
 
@@ -382,6 +384,7 @@ class PredisAdapter extends Rdb
     {
         $keys = self::flattenArrays($keys);
         if (empty($keys)) return 0;
+
         return $this->predis->exists(...$keys);
     }
 
@@ -391,6 +394,7 @@ class PredisAdapter extends Rdb
     {
         $keys = self::flattenArrays($keys);
         if (empty($keys)) return 0;
+
         return $this->predis->del($keys);
     }
 
