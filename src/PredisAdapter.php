@@ -67,7 +67,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function ttl(string $key)
+    public function ttl(string $key): ?int
     {
         return $this->predis->ttl($key);
     }
@@ -95,7 +95,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function type(string $key)
+    public function type(string $key): ?string
     {
         return $this->predis->type($key);
     }
@@ -145,7 +145,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function get(string $key)
+    public function get(string $key): ?string
     {
         return $this->predis->get($key);
     }
@@ -238,7 +238,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lPush(string $key, ...$items)
+    public function lPush(string $key, ...$items): ?int
     {
         $count = $this->predis->lpush($key, $items);
         if ($count <= 0) return null;
@@ -247,7 +247,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function rPush(string $key, ...$items)
+    public function rPush(string $key, ...$items): ?int
     {
         $count = $this->predis->rpush($key, $items);
         if ($count <= 0) return null;
@@ -256,21 +256,21 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lPop(string $key)
+    public function lPop(string $key): ?string
     {
         return $this->predis->lpop($key);
     }
 
 
     /** @inheritdoc */
-    public function rPop(string $key)
+    public function rPop(string $key): ?string
     {
         return $this->predis->rpop($key);
     }
 
 
     /** @inheritdoc */
-    public function rPoplPush(string $src, string $dst)
+    public function rPoplPush(string $src, string $dst): ?string
     {
         return $this->predis->rpoplpush($src, $dst);
     }
@@ -300,7 +300,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lLen(string $key)
+    public function lLen(string $key): ?int
     {
         $count = $this->predis->llen($key);
         if ($count < 0) return null;
@@ -316,7 +316,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lIndex(string $key, int $index)
+    public function lIndex(string $key, int $index): ?string
     {
         return $this->predis->lindex($key, $index);
     }
@@ -331,7 +331,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function blPop($keys, int $timeout = null)
+    public function blPop($keys, int $timeout = null): ?array
     {
         if (is_scalar($keys)) {
             $keys = [$keys];
@@ -349,7 +349,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPop($keys, int $timeout = null)
+    public function brPop($keys, int $timeout = null): ?array
     {
         if (is_scalar($keys)) {
             $keys = [$keys];
@@ -367,7 +367,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPoplPush(string $src, string $dst, int $timeout = null)
+    public function brPoplPush(string $src, string $dst, int $timeout = null): ?string
     {
         if ($timeout === null) {
             $timeout = $this->config->timeout;

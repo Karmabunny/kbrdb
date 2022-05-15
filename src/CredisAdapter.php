@@ -104,7 +104,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function ttl(string $key)
+    public function ttl(string $key): ?int
     {
         $key = $this->config->prefix . $key;
         $value = $this->credis->__call('pttl', [$key]);
@@ -139,7 +139,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function type(string $key)
+    public function type(string $key): ?string
     {
         $key = $this->config->prefix . $key;
         $type = $this->credis->type($key);
@@ -191,7 +191,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function get(string $key)
+    public function get(string $key): ?string
     {
         $key = $this->config->prefix . $key;
         $result = $this->credis->get($key);
@@ -306,7 +306,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lPush(string $key, ...$items)
+    public function lPush(string $key, ...$items): ?int
     {
         $key = $this->config->prefix . $key;
         $count = $this->credis->lPush($key, ...$items);
@@ -316,7 +316,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function rPush(string $key, ...$items)
+    public function rPush(string $key, ...$items): ?int
     {
         $key = $this->config->prefix . $key;
         $count = $this->credis->rPush($key, ...$items);
@@ -326,7 +326,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lPop(string $key)
+    public function lPop(string $key): ?string
     {
         $key = $this->config->prefix . $key;
         return $this->credis->lPop($key);
@@ -334,7 +334,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function rPop(string $key)
+    public function rPop(string $key): ?string
     {
         $key = $this->config->prefix . $key;
         return $this->credis->rPop($key);
@@ -342,7 +342,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function rPoplPush(string $src, string $dst)
+    public function rPoplPush(string $src, string $dst): ?string
     {
         $src = $this->config->prefix . $src;
         $dst = $this->config->prefix . $dst;
@@ -368,7 +368,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lLen(string $key)
+    public function lLen(string $key): ?int
     {
         $key = $this->config->prefix . $key;
         $count = $this->credis->lLen($key);
@@ -386,7 +386,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lIndex(string $key, int $index)
+    public function lIndex(string $key, int $index): ?string
     {
         $key = $this->config->prefix . $key;
         return $this->credis->lIndex($key, $index);
@@ -403,7 +403,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function blPop($keys, int $timeout = null)
+    public function blPop($keys, int $timeout = null): ?array
     {
         if (is_scalar($keys)) {
             $keys = $this->config->prefix . $keys;
@@ -428,7 +428,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPop($keys, int $timeout = null)
+    public function brPop($keys, int $timeout = null): ?array
     {
         if (is_scalar($keys)) {
             $keys = $this->config->prefix . $keys;
@@ -453,7 +453,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPoplPush(string $src, string $dst, int $timeout = null)
+    public function brPoplPush(string $src, string $dst, int $timeout = null): ?string
     {
         $src = $this->config->prefix . $src;
         $dst = $this->config->prefix . $dst;

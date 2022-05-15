@@ -211,7 +211,7 @@ abstract class Rdb
      * @param string $key
      * @return int|null milliseconds
      */
-    public abstract function ttl(string $key);
+    public abstract function ttl(string $key): ?int;
 
 
     /**
@@ -256,7 +256,7 @@ abstract class Rdb
      * - hash
      * - `null` - unknown or missing
      */
-    public abstract function type(string $key);
+    public abstract function type(string $key): ?string;
 
 
     /**
@@ -296,7 +296,7 @@ abstract class Rdb
      * @param string $key
      * @return string|null
      */
-    public abstract function get(string $key);
+    public abstract function get(string $key): ?string;
 
 
     /**
@@ -415,7 +415,7 @@ abstract class Rdb
      * @param string $items
      * @return int|null the list length after after pushing
      */
-    public abstract function lPush(string $key, ...$items);
+    public abstract function lPush(string $key, ...$items): ?int;
 
 
     /**
@@ -428,7 +428,7 @@ abstract class Rdb
      * @param string $items
      * @return int|null the list length after after pushing
      */
-    public abstract function rPush(string $key, ...$items);
+    public abstract function rPush(string $key, ...$items): ?int;
 
 
     /**
@@ -440,7 +440,7 @@ abstract class Rdb
      * @param string $key
      * @return string|null the item or `null` if empty
      */
-    public abstract function lPop(string $key);
+    public abstract function lPop(string $key): ?string;
 
 
     /**
@@ -452,7 +452,7 @@ abstract class Rdb
      * @param string $key
      * @return string|null the item or `null` if empty
      */
-    public abstract function rPop(string $key);
+    public abstract function rPop(string $key): ?string;
 
 
     /**
@@ -467,7 +467,7 @@ abstract class Rdb
      * @param string $dst
      * @return string|null item being moved or `null` if src list is empty
      */
-    public abstract function rPoplPush(string $src, string $dst);
+    public abstract function rPoplPush(string $src, string $dst): ?string;
 
 
     /**
@@ -508,7 +508,7 @@ abstract class Rdb
      * @param string $key
      * @return int|null list length or `null` if not a list.
      */
-    public abstract function lLen(string $key);
+    public abstract function lLen(string $key): ?int;
 
 
     /**
@@ -535,7 +535,7 @@ abstract class Rdb
      * @param int $index
      * @return string|null the item or `null` if out-of-range
      */
-    public abstract function lIndex(string $key, int $index);
+    public abstract function lIndex(string $key, int $index): ?string;
 
 
     /**
@@ -565,7 +565,7 @@ abstract class Rdb
      * @param int $timeout in seconds - if unset, the config/connection timeout
      * @return string[]|null [key, item] or `null` if the timeout occurs
      */
-    public abstract function blPop($keys, int $timeout = null);
+    public abstract function blPop($keys, int $timeout = null): ?array;
 
 
     /**
@@ -578,7 +578,7 @@ abstract class Rdb
      * @param int $timeout in seconds - if unset, the config/connection timeout
      * @return string[]|null [key, item] or `null` if the timeout occurs
      */
-    public abstract function brPop($keys, int $timeout = null);
+    public abstract function brPop($keys, int $timeout = null): ?array;
 
 
     /**
@@ -595,7 +595,7 @@ abstract class Rdb
      * @param int $timeout in seconds - if unset, the config/connection timeout
      * @return string|null item being moved or `null` if the timeout occurs
      */
-    public abstract function brPoplPush(string $src, string $dst, int $timeout = null);
+    public abstract function brPoplPush(string $src, string $dst, int $timeout = null): ?string;
 
 
     /**
@@ -865,7 +865,7 @@ abstract class Rdb
      * @param string $key
      * @return array|null
      */
-    public function getJson(string $key)
+    public function getJson(string $key): ?array
     {
         $out = json_decode($this->get($key) ?? 'null', true);
 
@@ -893,7 +893,7 @@ abstract class Rdb
      * @param int $ttl milliseconds (default 1 minute)
      * @return RdbLock|null
      */
-    public function lock(string $key, int $wait = 0, int $ttl = 60000)
+    public function lock(string $key, int $wait = 0, int $ttl = 60000): ?RdbLock
     {
         return RdbLock::acquire($this, $key, (int) $wait, (int) $ttl);
     }

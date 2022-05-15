@@ -91,7 +91,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function ttl(string $key)
+    public function ttl(string $key): ?int
     {
         $value = $this->redis->pttl($key);
         if ($value === false) return null;
@@ -121,7 +121,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function type(string $key)
+    public function type(string $key): ?string
     {
         $type = $this->redis->type($key);
         switch ($type) {
@@ -182,7 +182,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function get(string $key)
+    public function get(string $key): ?string
     {
         $result = $this->redis->get($key);
         if ($result === false) return null;
@@ -285,7 +285,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lPush(string $key, ...$items)
+    public function lPush(string $key, ...$items): ?int
     {
         $count = $this->redis->lPush($key, ...$items);
         if ($count === false) return null;
@@ -294,7 +294,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function rPush(string $key, ...$items)
+    public function rPush(string $key, ...$items): ?int
     {
         $count = $this->redis->rPush($key, ...$items);
         if ($count === false) return null;
@@ -303,7 +303,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lPop(string $key)
+    public function lPop(string $key): ?string
     {
         /** @var mixed $value */
         $value = $this->redis->lPop($key);
@@ -313,7 +313,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function rPop(string $key)
+    public function rPop(string $key): ?string
     {
         /** @var mixed $value */
         $value = $this->redis->rPop($key);
@@ -323,7 +323,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function rPoplPush(string $src, string $dst)
+    public function rPoplPush(string $src, string $dst): ?string
     {
         /** @var string|false $value */
         $value = $this->redis->rPoplPush($src, $dst);
@@ -350,7 +350,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lLen(string $key)
+    public function lLen(string $key): ?int
     {
         $count = $this->redis->lLen($key);
         if ($count === false) return null;
@@ -366,7 +366,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function lIndex(string $key, int $index)
+    public function lIndex(string $key, int $index): ?string
     {
         $item = $this->redis->lIndex($key, $index);
         if ($item === false) return null;
@@ -383,7 +383,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function blPop($keys, int $timeout = null)
+    public function blPop($keys, int $timeout = null): ?array
     {
         if (is_scalar($keys)) {
             $keys = [$keys];
@@ -403,7 +403,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPop($keys, int $timeout = null)
+    public function brPop($keys, int $timeout = null): ?array
     {
         if (!is_scalar($keys)) {
             $keys = self::normalizeIterable($keys, false);
@@ -420,7 +420,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPoplPush(string $src, string $dst, int $timeout = null)
+    public function brPoplPush(string $src, string $dst, int $timeout = null): ?string
     {
         if ($timeout === null) {
             $timeout = $this->config->timeout;
