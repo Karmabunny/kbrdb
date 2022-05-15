@@ -106,6 +106,7 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function ttl(string $key)
     {
+        $key = $this->config->prefix . $key;
         $value = $this->credis->__call('pttl', [$key]);
         if (!is_numeric($value))  return null;
         return $value;
@@ -115,6 +116,7 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function expire(string $key, $ttl = 0): bool
     {
+        $key = $this->config->prefix . $key;
         return (bool) $this->credis->__call('pexpire', [$key, $ttl]);
     }
 
@@ -122,6 +124,7 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function expireAt(string $key, $ttl = 0): bool
     {
+        $key = $this->config->prefix . $key;
         return (bool) $this->credis->__call('pexpireat', [$key, $ttl]);
     }
 
@@ -129,6 +132,8 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function rename(string $src, string $dst): bool
     {
+        $src = $this->config->prefix . $src;
+        $dst = $this->config->prefix . $dst;
         return (bool) $this->credis->rename($src, $dst);
     }
 
@@ -136,7 +141,10 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function type(string $key)
     {
-        return $this->credis->type($key);
+        $key = $this->config->prefix . $key;
+        $type = $this->credis->type($key);
+        if ($type === 'none') return null;
+        return $type;
     }
 
 
