@@ -7,6 +7,7 @@
 namespace karmabunny\rdb;
 
 use Generator;
+use karmabunny\rdb\Wrappers\Predis;
 use Predis\Client;
 use Predis\Collection\Iterator\Keyspace;
 use Predis\Response\ServerException;
@@ -34,7 +35,7 @@ class PredisAdapter extends Rdb
         $options['prefix'] = $config->prefix;
         $options['timeout'] = $config->timeout;
 
-        $this->predis = new Client($config->getHost(true), $options);
+        $this->predis = new Predis($config->getHost(true), $options);
         $this->predis->connect();
     }
 

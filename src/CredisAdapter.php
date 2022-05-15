@@ -8,7 +8,7 @@ namespace karmabunny\rdb;
 
 use Credis_Client;
 use Generator;
-
+use karmabunny\rdb\Wrappers\Credis;
 
 /**
  * Rdb using the credis library, which conditionally wraps php-redis.
@@ -30,7 +30,7 @@ class CredisAdapter extends Rdb
 
         $standalone = $config->options['standalone'] ?? false;
 
-        $this->credis = new Credis_Client(
+        $this->credis = new Credis(
             $config->getHost(false),
             $config->getPort(),
             $config->timeout
@@ -235,7 +235,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function sAdd(string $key, ...$values): int
+    public function sAdd(string $key, ...$values): ?int
     {
         if (empty($values)) return 0;
         $key = $this->config->prefix . $key;
