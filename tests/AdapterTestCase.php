@@ -21,8 +21,7 @@ abstract class AdapterTestCase extends TestCase
 
     public function assertArraySameAs($expected, $actual)
     {
-        $actual = array_intersect($expected, $actual);
-        $this->assertEquals($expected, $actual);
+        $this->assertEmpty(array_diff($expected, $actual));
     }
 
 
