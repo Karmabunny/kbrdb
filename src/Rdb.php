@@ -206,6 +206,17 @@ abstract class Rdb
 
 
     /**
+     * Install a session handler.
+     *
+     * Some adapters may not support session handlers in certain conditions.
+     *
+     * @param string $prefix
+     * @return bool true on a successful install
+     */
+    public abstract function registerSessionHandler(string $prefix = 'session:'): bool;
+
+
+    /**
      * Get the TTL for a key.
      *
      * @param string $key

@@ -13,6 +13,17 @@ use CredisException;
 class Credis extends Credis_Client
 {
 
+    /**
+     * Are we using the binary php-redis or not?
+     *
+     * @return bool true if no binary, false if ising php-redis
+     */
+    public function isStandalone(): bool
+    {
+        return $this->standalone;
+    }
+
+
     /** @inheritdoc */
     public function __call($name, $args)
     {

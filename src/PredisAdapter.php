@@ -10,8 +10,8 @@ use Generator;
 use karmabunny\rdb\Wrappers\Predis;
 use Predis\Client;
 use Predis\Collection\Iterator\Keyspace;
-use Predis\Response\ServerException;
 use Predis\Response\Status;
+use Predis\Session\Handler;
 
 /**
  * Rdb using the predis library.
@@ -29,14 +29,28 @@ class PredisAdapter extends Rdb
     protected function __construct($config)
     {
         parent::__construct($config);
-        $config = $this->config;
 
-        $options = $config->options;
-        $options['prefix'] = $config->prefix;
-        $options['timeout'] = $config->timeout;
+        $options = $this->config->options;
+        $options['prefix'] = $this->config->prefix;
+        $options['timeout'] = $this->config->timeout;
 
-        $this->predis = new Predis($config->getHost(true), $options);
+        $this->predis = new Predis($this->config->getHost(true), $options);
         $this->predis->connect();
+    }
+
+
+    /** @inheritdoc */
+    public function registerSessionHandler(string $prefix = 'session:'): bool
+    {
+        // We're creating a new client here, but with a modified prefix.
+        $options = $this->config->options;
+        $options['prefix'] = $this->config->prefix . $prefix;
+        $options['timeout'] = $this->config->timeout;
+
+        $predis = new Predis($this->config->getHost(true), $options);
+        $handler = new Handler($predis);
+
+        return session_set_save_handler($handler, true);
     }
 
 

@@ -68,6 +68,8 @@ namespace karmabunny\rdb;
  * @method static RdbLock|null lock(string $key, float $wait, float $ttl = 300)
  *
  * @method static RdbBucket getBucket(array|string $config)
+ *
+ * @method static bool registerSessionHandler(string $prefix = 'session:')
  */
 abstract class StaticRdb
 {

@@ -6,7 +6,6 @@
 
 namespace karmabunny\rdb;
 
-use Credis_Client;
 use Generator;
 use karmabunny\rdb\Wrappers\Credis;
 
@@ -18,7 +17,7 @@ use karmabunny\rdb\Wrappers\Credis;
 class CredisAdapter extends Rdb
 {
 
-    /** @var Credis_Client */
+    /** @var Credis */
     public $credis;
 
 
@@ -63,6 +62,27 @@ class CredisAdapter extends Rdb
         }
 
         return $keys;
+    }
+
+
+    /** @inheritdoc */
+    public function registerSessionHandler(string $prefix = 'session:'): bool
+    {
+        if ($this->credis->isStandalone()) {
+            // TODO Figure this one out.
+            return false;
+        }
+        else {
+            ini_set('session.save_handler', 'redis');
+            ini_set('session.save_path', sprintf('tcp://%s:%s?prefix=%s', [
+                $this->config->getHost(false),
+                $this->config->getPort(),
+                $prefix,
+            ]));
+
+            // Assume it worked..?
+            return true;
+        }
     }
 
 
