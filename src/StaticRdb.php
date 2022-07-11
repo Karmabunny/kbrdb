@@ -9,7 +9,7 @@ namespace karmabunny\rdb;
 /**
  * Static version of Rdb.
  *
- * Extend this and implement the getInstance() method.
+ * Extend this and implement the getConfig() method.
  *
  * @method static Generator<string> prefix(string $prefix, iterable<string> $items)
  *
@@ -72,7 +72,24 @@ namespace karmabunny\rdb;
 abstract class StaticRdb
 {
 
-    public static abstract function getInstance(): Rdb;
+    /**
+     * Create an Rdb configuration.
+     *
+     * @return RdbConfig
+     */
+    public static abstract function getConfig(): RdbConfig;
+
+
+    /**
+     * Get a singleton instance of the Rdb helper.
+     *
+     * @return Rdb
+     */
+    public static function getInstance(): Rdb
+    {
+        static $rdb;
+        return $rdb ?? Rdb::create(static::getConfig());
+    }
 
 
     /**
