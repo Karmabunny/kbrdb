@@ -620,6 +620,49 @@ abstract class Rdb
 
 
     /**
+     * TODO
+     *
+     * @param string $key
+     * @param array $members
+     * @return int
+     */
+    public abstract function zAdd(string $key, ...$members): int;
+
+
+    /**
+     * TODO
+     *
+     * @param string $key
+     * @param float $value
+     * @param string $member
+     * @return float
+     */
+    public abstract function zIncrBy(string $key, float $value, string $member): float;
+
+
+    /**
+     * TODO
+     *
+     * @param string $key
+     * @param int $start
+     * @param int $stop
+     * @param bool $withscores
+     * @return null|array
+     */
+    public abstract function zRange(string $key, int $start, int $stop, bool $withscores = false): ?array;
+
+
+    /**
+     * TODO
+     *
+     * @param string $key
+     * @param string $members
+     * @return int
+     */
+    public abstract function zRem(string $key, ...$members): int;
+
+
+    /**
      * Do these keys exist?
      *
      * @param string|iterable<string> $keys
