@@ -41,7 +41,7 @@ This wrapper doesn't try to polyfill any missing features. It targets Redis serv
 
 This library wouldn't ever try to _hide_ features behind target versions, but perhaps it could help smooth out any differences. Lua scripting could polyfill a lot of things tbh.
 
-For example, `BRPOPLPUSH` is deprecated in v6.2 and might be removed in the distance future. In this case, the library would be able to dynamically replace (based on the server version) this with `BLMOVE`.
+For example, `BRPOPLPUSH` is deprecated in v6.2 and might be removed in the distant future. In this case, the library would be able to dynamically replace (based on the server version) this with `BLMOVE`.
 
 
 ### Config
