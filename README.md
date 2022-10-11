@@ -164,6 +164,16 @@ $bucket->writeHeaders();
 ```
 
 
+### Contributing
+
+Submit a PR if you like. But before you do, please do the following:
+
+1. Run `composer analyse` and fix any complaints there
+2. Run `composer compat` and fix those too
+3. Write some tests and run `composer tests`
+4. Document the methods here
+
+
 ### Methods
 
 #### Core Methods
