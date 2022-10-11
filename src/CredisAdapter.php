@@ -519,14 +519,19 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zAdd(string $key, ...$members): int
+    public function zAdd(string $key, array $members): int
     {
         $key = $this->config->prefix . $key;
 
-        $args = $members;
-        array_unshift($args, $key);
+        $args = [];
+        $args[] = $key;
 
-        $res = $this->credis->__call('zadd', $members);
+        foreach ($members as $member => $score) {
+            $args[] = $score;
+            $args[] = $member;
+        }
+
+        $res = $this->credis->__call('zadd', $args);
         return (int) $res;
     }
 

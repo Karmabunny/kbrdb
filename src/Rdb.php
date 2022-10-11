@@ -623,10 +623,10 @@ abstract class Rdb
      * TODO
      *
      * @param string $key
-     * @param array $members
+     * @param float[] $members [ member => score ]
      * @return int
      */
-    public abstract function zAdd(string $key, ...$members): int;
+    public abstract function zAdd(string $key, array $members): int;
 
 
     /**

@@ -397,7 +397,7 @@ abstract class AdapterTestCase extends TestCase
     {
 
         // zAdd.
-        $actual = $this->rdb->zAdd('zrange:123', 1, 'a');
+        $actual = $this->rdb->zAdd('zrange:123', ['a' => 1]);
         $this->assertEquals(1, $actual);
 
         // zIncrby.

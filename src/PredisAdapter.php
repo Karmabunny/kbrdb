@@ -409,7 +409,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zAdd(string $key, ...$members): int
+    public function zAdd(string $key, array $members): int
     {
         return $this->predis->zadd($key, $members);
     }

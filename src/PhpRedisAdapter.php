@@ -512,9 +512,17 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zAdd(string $key, ...$members): int
+    public function zAdd(string $key, array $members): int
     {
-        return $this->redis->zAdd($key, ...$members);
+        $args = [];
+        $args[] = $key;
+
+        foreach ($members as $member => $score) {
+            $args[] = $score;
+            $args[] = $member;
+        }
+
+        return (int) @call_user_func_array([$this->redis, 'zAdd'], $args);
     }
 
 
