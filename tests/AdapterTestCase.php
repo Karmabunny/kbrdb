@@ -390,6 +390,28 @@ abstract class AdapterTestCase extends TestCase
     public function testJson()
     {
     }
+
+
+
+    public function testSortedSets()
+    {
+
+        // zAdd.
+        $actual = $this->rdb->zAdd('zrange:123', 1, 'a');
+        $this->assertEquals(1, $actual);
+
+        // zIncrby.
+        $actual = $this->rdb->zIncrby('zrange:123', 3, 'a');
+        $this->assertEquals(4, $actual);
+
+        // zRange.
+        $actual = $this->rdb->zRange('zrange:123', 0, -1, true);
+        $this->assertEquals(['a' => 4], $actual);
+
+        // zRem.
+        $actual = $this->rdb->zRem('zrange:123', 'a');
+        $this->assertEquals(1, $actual);
+    }
 }
 
 
