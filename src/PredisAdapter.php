@@ -34,7 +34,7 @@ class PredisAdapter extends Rdb
         $options['prefix'] = $this->config->prefix;
         $options['timeout'] = $this->config->timeout;
 
-        $this->predis = new Predis($this->config->getHost(true), $options);
+        $this->predis = new Predis(['host' => $this->config->getHost(true)], $options);
         $this->predis->connect();
     }
 
@@ -405,6 +405,36 @@ class PredisAdapter extends Rdb
         if (empty($keys)) return 0;
 
         return $this->predis->del($keys);
+    }
+
+
+    /** @inheritdoc */
+    public function zAdd(string $key, ...$members): int
+    {
+        return $this->predis->zadd($key, ...$members);
+    }
+
+
+    /** @inheritdoc */
+    public function zIncrby(string $key, ...$members): int
+    {
+        return $this->predis->zincrby($key, ...$members);
+    }
+
+
+    /** @inheritdoc */
+    public function zRange(string $key, int $start, int $stop, bool $withscores = false): ?array
+    {
+        $range = $this->predis->zrange($key, $start, $stop, $withscores ? 'WITHSCORES' : null);
+        if ($range === false) return null;
+        return $range;
+    }
+
+
+    /** @inheritdoc */
+    public function zRem(string $key, $member): int
+    {
+        return $this->predis->zrem($key, $member);
     }
 
 }

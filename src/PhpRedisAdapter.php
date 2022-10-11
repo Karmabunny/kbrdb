@@ -510,4 +510,34 @@ class PhpRedisAdapter extends Rdb
         return $this->redis->del($keys);
     }
 
+
+    /** @inheritdoc */
+    public function zAdd(string $key, ...$members): int
+    {
+        return $this->redis->zadd($key, ...$members);
+    }
+
+
+    /** @inheritdoc */
+    public function zIncrby(string $key, ...$members): int
+    {
+        return $this->redis->zincrby($key, ...$members);
+    }
+
+
+    /** @inheritdoc */
+    public function zRange(string $key, int $start, int $stop, bool $withscores = false): ?array
+    {
+        $range = $this->redis->zrange($key, $start, $stop, $withscores);
+        if ($range === false) return null;
+        return $range;
+    }
+
+
+    /** @inheritdoc */
+    public function zRem(string $key, $member): int
+    {
+        return $this->redis->zrem($key, $member);
+    }
+
 }

@@ -517,4 +517,35 @@ class CredisAdapter extends Rdb
         return $this->credis->del(...$keys);
     }
 
+
+    /** @inheritdoc */
+    public function zAdd(string $key, ...$members): int
+    {
+        $res = $this->credis->zadd($key, ...$members);
+        return $res;
+    }
+
+
+    /** @inheritdoc */
+    public function zIncrby(string $key, ...$members): int
+    {
+        return $this->credis->zincrby($key, ...$members);
+    }
+
+
+    /** @inheritdoc */
+    public function zRange(string $key, int $start, int $stop, bool $withscores = false): ?array
+    {
+        $range = $this->credis->zrange($key, $start, $stop, $withscores ? ['withscores' => 1] : null);
+        if ($range === false) return null;
+        return $range;
+    }
+
+
+    /** @inheritdoc */
+    public function zRem(string $key, $member): int
+    {
+        return $this->credis->zrem($key, $member);
+    }
+
 }
