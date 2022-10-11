@@ -514,20 +514,21 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function zAdd(string $key, ...$members): int
     {
-        return $this->redis->zadd($key, ...$members);
+        return $this->redis->zAdd($key, ...$members);
     }
 
 
     /** @inheritdoc */
-    public function zIncrby(string $key, ...$members): int
+    public function zIncrBy(string $key, float $value, string $member): float
     {
-        return $this->redis->zincrby($key, ...$members);
+        return $this->redis->zIncrBy($key, $value, $member);
     }
 
 
     /** @inheritdoc */
     public function zRange(string $key, int $start, int $stop, bool $withscores = false): ?array
     {
+        /** @var array|false $range */
         $range = $this->redis->zrange($key, $start, $stop, $withscores);
         if ($range === false) return null;
         return $range;
@@ -535,9 +536,9 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zRem(string $key, $member): int
+    public function zRem(string $key, ...$members): int
     {
-        return $this->redis->zrem($key, $member);
+        return $this->redis->zRem($key, ...$members);
     }
 
 }

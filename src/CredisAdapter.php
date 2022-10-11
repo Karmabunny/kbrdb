@@ -521,31 +521,46 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function zAdd(string $key, ...$members): int
     {
-        $res = $this->credis->zadd($key, ...$members);
-        return $res;
+        $key = $this->config->prefix . $key;
+
+        $args = $members;
+        array_unshift($args, $key);
+
+        $res = $this->credis->__call('zadd', $members);
+        return (int) $res;
     }
 
 
     /** @inheritdoc */
-    public function zIncrby(string $key, ...$members): int
+    public function zIncrBy(string $key, float $value, string $member): float
     {
-        return $this->credis->zincrby($key, ...$members);
+        $key = $this->config->prefix . $key;
+        return (float) $this->credis->zIncrBy($key, $value, $member);
     }
 
 
     /** @inheritdoc */
     public function zRange(string $key, int $start, int $stop, bool $withscores = false): ?array
     {
-        $range = $this->credis->zrange($key, $start, $stop, $withscores ? ['withscores' => 1] : null);
+        $key = $this->config->prefix . $key;
+
+        /** @var array|false $range */
+        $range = $this->credis->zRange($key, $start, $stop, $withscores ? ['withscores' => 1] : null);
         if ($range === false) return null;
         return $range;
     }
 
 
     /** @inheritdoc */
-    public function zRem(string $key, $member): int
+    public function zRem(string $key, ...$members): int
     {
-        return $this->credis->zrem($key, $member);
+        $key = $this->config->prefix . $key;
+
+        $args = self::flattenArrays($members);
+        array_unshift($args, $key);
+
+        $value = $this->credis->__call('zrem', $args);
+        return (int) $value;
     }
 
 }

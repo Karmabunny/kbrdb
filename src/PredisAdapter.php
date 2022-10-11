@@ -411,30 +411,36 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function zAdd(string $key, ...$members): int
     {
-        return $this->predis->zadd($key, ...$members);
+        return $this->predis->zadd($key, $members);
     }
 
 
     /** @inheritdoc */
-    public function zIncrby(string $key, ...$members): int
+    public function zIncrBy(string $key, float $value, string $member): float
     {
-        return $this->predis->zincrby($key, ...$members);
+        return (float) $this->predis->zincrby($key, $value, $member);
     }
 
 
     /** @inheritdoc */
     public function zRange(string $key, int $start, int $stop, bool $withscores = false): ?array
     {
-        $range = $this->predis->zrange($key, $start, $stop, $withscores ? 'WITHSCORES' : null);
-        if ($range === false) return null;
+        $options = [
+            'WITHSCORES' => $withscores,
+        ];
+
+        $range = $this->predis->zrange($key, $start, $stop, $options);
         return $range;
     }
 
 
     /** @inheritdoc */
-    public function zRem(string $key, $member): int
+    public function zRem(string $key, ...$members): int
     {
-        return $this->predis->zrem($key, $member);
+        $args = self::flattenArrays($members);
+        array_unshift($args, $key);
+
+        return (int) @call_user_func_array([$this->predis, 'zrem'], $args);
     }
 
 }
