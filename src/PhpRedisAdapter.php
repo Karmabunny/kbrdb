@@ -17,6 +17,7 @@ use RedisException;
  * Adapter options:
  * - `retry_interval`
  * - `retry_timeout`
+ * - `use_native_session`
  *
  * @package karmabunny\rdb
  */
