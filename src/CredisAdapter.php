@@ -14,6 +14,7 @@ use karmabunny\rdb\Wrappers\Credis;
  *
  * Adapter options:
  * - `standalone` : force non-binary mode
+ * - `use_native_session` : prefer use of the native session handler
  *
  * Note, the 'native session' handler is only available in binary mode.
  *
