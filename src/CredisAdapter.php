@@ -74,7 +74,7 @@ class CredisAdapter extends Rdb
         }
         else {
             ini_set('session.save_handler', 'redis');
-            ini_set('session.save_path', sprintf('tcp://%s:%s?prefix=%s', [
+            ini_set('session.save_path', vsprintf('tcp://%s:%s?prefix=%s', [
                 $this->config->getHost(false),
                 $this->config->getPort(),
                 $prefix,
