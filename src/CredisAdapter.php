@@ -113,11 +113,10 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function registerSessionHandler(string $prefix = 'session:'): bool
     {
-        if ($this->credis->isStandalone()) {
-            // TODO Figure this one out.
-            return false;
-        }
-        else {
+        if (
+            !$this->credis->isStandalone()
+            and !empty($this->config->options['use_native_session'])
+        ) {
             ini_set('session.save_handler', 'redis');
             ini_set('session.save_path', vsprintf('tcp://%s:%s?prefix=%s', [
                 $this->config->getHost(false),
@@ -127,6 +126,9 @@ class CredisAdapter extends Rdb
 
             // Assume it worked..?
             return true;
+        }
+        else {
+            return parent::registerSessionHandler($prefix);
         }
     }
 

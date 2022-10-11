@@ -82,21 +82,6 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function registerSessionHandler(string $prefix = 'session:'): bool
-    {
-        // We're creating a new client here, but with a modified prefix.
-        $options = $this->config->options;
-        $options['prefix'] = $this->config->prefix . $prefix;
-        $options['timeout'] = $this->config->timeout;
-
-        $predis = new Predis($this->config->getHost(true), $options);
-        $handler = new Handler($predis);
-
-        return session_set_save_handler($handler, true);
-    }
-
-
-    /** @inheritdoc */
     public function keys(string $pattern): array
     {
         if ($this->config->scan_keys) {
