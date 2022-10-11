@@ -32,12 +32,9 @@
     },
     "license": "MIT",
     "scripts": {
-        "register-phpcs": "phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility",
-        "post-install-cmd": "@register-phpcs",
-        "post-update-cmd": "@register-phpcs",
-        "tests": "phpunit --testdox tests",
-        "analyse": "phpstan analyse --level 5 src",
+        "tests": "phpunit --testdox --configuration phpunit.xml tests",
+        "analyse": "phpstan analyse -c phpstan.neon",
         "publish": "bash scripts/publish.sh",
-        "compat": "phpcs -p --standard=PHPCompatibility --colors --extensions=php --runtime-set testVersion 7.1 src"
+        "compat": "phpcs -p --standard=phpcs.xml --colors --extensions=php"
     }
 }

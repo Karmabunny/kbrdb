@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<ruleset name="kb">
+    <description>KB PHP Compat</description>
+
+    <config name="installed_paths" value="vendor/phpcompatibility/php-compatibility" />
+
+    <!-- Test these directories. -->
+    <file>src</file>
+
+    <!-- Test this PHP version. -->
+    <config name="testVersion" value="7.1"/>
+
+    <!-- Extend this ruleset. -->
+    <rule ref="PHPCompatibility">
+        <!-- Put exclusions in here. -->
+        <!-- <exclude name="PHPCompatibility.xxx"/> -->
+    </rule>
+</ruleset>
