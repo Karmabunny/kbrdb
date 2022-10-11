@@ -298,7 +298,7 @@ abstract class Rdb
      *    - string|null if the GET flag is set
      *    - bool for everything else
      */
-    public abstract function set(string $key, string $value, $ttl = 0, $flags = []);
+    public abstract function set(string $key, string $value, int $ttl = 0, array $flags = []);
 
 
     /**
