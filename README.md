@@ -212,6 +212,19 @@ sets:
 - sInter (+ store)
 - sUnion (+ store)
 
+sorted sets:
+- zCount
+- zRank
+- zCard
+- zScore
+- zRandMember
+
+maybe:
+- zScan
+- zRangeByScore
+- zRangeByLex
+- zLexCount
+
 
 #### Extended Methods
 
