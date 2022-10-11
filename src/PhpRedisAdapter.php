@@ -14,6 +14,10 @@ use RedisException;
 /**
  * Rdb using the php-redis binary extension.
  *
+ * Adapter options:
+ * - `retry_interval`
+ * - `retry_timeout`
+ *
  * @package karmabunny\rdb
  */
 class PhpRedisAdapter extends Rdb

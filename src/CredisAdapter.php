@@ -12,6 +12,11 @@ use karmabunny\rdb\Wrappers\Credis;
 /**
  * Rdb using the credis library, which conditionally wraps php-redis.
  *
+ * Adapter options:
+ * - `standalone` : force non-binary mode
+ *
+ * Note, the 'native session' handler is only available in binary mode.
+ *
  * @package karmabunny\rdb
  */
 class CredisAdapter extends Rdb

@@ -16,6 +16,9 @@ use Predis\Session\Handler;
 /**
  * Rdb using the predis library.
  *
+ * Adapter options are documented in predis. Rdb will naturally clobber
+ * the `prefix` and `timeout` parameters.
+ *
  * @package karmabunny\rdb
  */
 class PredisAdapter extends Rdb
