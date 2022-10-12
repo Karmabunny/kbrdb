@@ -546,6 +546,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function zRem(string $key, ...$members): int
     {
+        $members = self::flattenArrays($members);
         return $this->redis->zRem($key, ...$members);
     }
 

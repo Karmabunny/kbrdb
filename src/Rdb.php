@@ -680,7 +680,7 @@ abstract class Rdb
      * Remove members from a set.
      *
      * @param string $key
-     * @param string $members
+     * @param string[]|string $members
      * @return int number of removed items
      */
     public abstract function zRem(string $key, ...$members): int;
