@@ -401,7 +401,7 @@ abstract class AdapterTestCase extends TestCase
         $this->assertEquals(1, $actual);
 
         // zIncrby.
-        $actual = $this->rdb->zIncrby('zrange:123', 3, 'a');
+        $actual = $this->rdb->zIncrBy('zrange:123', 3, 'a');
         $this->assertEquals(4, $actual);
 
         // zRange.
@@ -412,6 +412,23 @@ abstract class AdapterTestCase extends TestCase
         $actual = $this->rdb->zRem('zrange:123', 'a');
         $this->assertEquals(1, $actual);
 
+        // Null sets.
+        $this->rdb->set('zrange:hello', 'not-a-sorted-set');
+        $actual = $this->rdb->zRange('zrange:hello');
+        $this->assertNull($actual);
+
+        // missing set.
+        $this->rdb->del('zrange:hello');
+        $actual = $this->rdb->zRange('zrange:hello');
+        $this->assertEquals([], $actual);
+
+        // zIncrBy creates a set.
+        $this->rdb->del('zrange:hello');
+        $actual = $this->rdb->zIncrBy('zrange:hello', 10, 'a');
+        $this->assertEquals(10, $actual);
+
+        $actual = $this->rdb->zRange('zrange:hello');
+        $this->assertEquals(['a'], $actual);
 
         // zAdd, multiple.
         $expected = 3;
