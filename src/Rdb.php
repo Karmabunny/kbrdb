@@ -620,44 +620,68 @@ abstract class Rdb
 
 
     /**
-     * TODO
+     * Add items to a sorted set.
+     *
+     * One must indicate a score for each member, the format looks like:
+     *
+     * ```
+     * [
+     *   'a' => 5,
+     *   'b' => 1,
+     *   'c' => 10,
+     * ]
+     * ```
+     *
+     * If the set exists, the member values are updated - these updated members
+     * are excluded from the return count. Otherwise this will create a new
+     * sorted set.
      *
      * @param string $key
      * @param float[] $members [ member => score ]
-     * @return int
+     * @return int number of elements added
      */
     public abstract function zAdd(string $key, array $members): int;
 
 
     /**
-     * TODO
+     * Increment a member's score in a sorted set.
+     *
+     * This will create a new sorted set if it doesn't exist.
      *
      * @param string $key
-     * @param float $value
+     * @param float $value an amount to update by, can be negative
      * @param string $member
-     * @return float
+     * @return float the value after updated
      */
     public abstract function zIncrBy(string $key, float $value, string $member): float;
 
 
     /**
-     * TODO
+     * Get members from a sorted set.
+     *
+     * The default the start/stop range will return all members.
+     *
+     * Note, if the set does not exist it will return an empty array. This
+     * returns null only if the key is not a sorted set.
      *
      * @param string $key
      * @param int $start
-     * @param int $stop
-     * @param bool $withscores
-     * @return null|array
+     * @param int $stop negative numbers are circular
+     * @param bool $withscores return a keyed array [ member => score ]
+     * @return null|array members are either:
+     *  - a numeric list, ordered by their score
+     *  - a keyed array like `[ member => score ]`
+     *  - `null` if the key is not a sorted set
      */
     public abstract function zRange(string $key, int $start = 0, int $stop = -1, bool $withscores = false): ?array;
 
 
     /**
-     * TODO
+     * Remove members from a set.
      *
      * @param string $key
      * @param string $members
-     * @return int
+     * @return int number of removed items
      */
     public abstract function zRem(string $key, ...$members): int;
 
