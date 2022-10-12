@@ -411,6 +411,39 @@ abstract class AdapterTestCase extends TestCase
         // zRem.
         $actual = $this->rdb->zRem('zrange:123', 'a');
         $this->assertEquals(1, $actual);
+
+
+        // zAdd, multiple.
+        $expected = 3;
+        $actual = $this->rdb->zAdd('zrange:123', [
+            'a' => 10,
+            'b' => 3,
+            'c' => 5,
+        ]);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, no scores - but results are ordered.
+        $expected = ['b', 'c', 'a'];
+        $actual = $this->rdb->zRange('zrange:123');
+        $this->assertEquals($expected, $actual);
+
+        // zRange, no scores, just the first.
+        $expected = ['b'];
+        $actual = $this->rdb->zRange('zrange:123', 0, 0, false);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, with scores, just the first.
+        $expected = [ 'b' => 3 ];
+        $actual = $this->rdb->zRange('zrange:123', 0, 0, true);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, with scores, truncated.
+        $expected = [
+            'b' => 3,
+            'c' => 5,
+        ];
+        $actual = $this->rdb->zRange('zrange:123', 0, 1, true);
+        $this->assertEquals($expected, $actual);
     }
 }
 
