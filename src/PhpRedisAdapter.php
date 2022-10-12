@@ -534,7 +534,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zRange(string $key, int $start, int $stop, bool $withscores = false): ?array
+    public function zRange(string $key, int $start = 0, int $stop = -1, bool $withscores = false): ?array
     {
         /** @var array|false $range */
         $range = $this->redis->zrange($key, $start, $stop, $withscores);

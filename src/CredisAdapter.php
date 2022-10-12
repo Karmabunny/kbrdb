@@ -545,7 +545,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zRange(string $key, int $start, int $stop, bool $withscores = false): ?array
+    public function zRange(string $key, int $start = 0, int $stop = -1, bool $withscores = false): ?array
     {
         $key = $this->config->prefix . $key;
 

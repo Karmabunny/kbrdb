@@ -649,7 +649,7 @@ abstract class Rdb
      * @param bool $withscores
      * @return null|array
      */
-    public abstract function zRange(string $key, int $start, int $stop, bool $withscores = false): ?array;
+    public abstract function zRange(string $key, int $start = 0, int $stop = -1, bool $withscores = false): ?array;
 
 
     /**
