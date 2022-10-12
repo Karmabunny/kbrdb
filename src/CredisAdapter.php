@@ -549,8 +549,14 @@ class CredisAdapter extends Rdb
     {
         $key = $this->config->prefix . $key;
 
+        $args = [];
+
+        if ($withscores) {
+            $args['withscores'] = true;
+        }
+
         /** @var array|false $range */
-        $range = $this->credis->zRange($key, $start, $stop, $withscores ? ['withscores' => 1] : null);
+        $range = $this->credis->zRange($key, $start, $stop, $args);
         if ($range === false) return null;
         return $range;
     }
