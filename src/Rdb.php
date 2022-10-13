@@ -170,7 +170,7 @@ abstract class Rdb
      * @param array $flags
      * @return array
      */
-    protected static function parseFlags(array $flags): array
+    protected static function parseSetFlags(array $flags): array
     {
         // Defaults.
         $output = [

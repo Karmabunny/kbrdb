@@ -121,7 +121,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function set(string $key, string $value, int $ttl = 0, array $flags = [])
     {
-        $flags = self::parseFlags($flags);
+        $flags = self::parseSetFlags($flags);
 
         $args = [];
         $args[] = $key;
