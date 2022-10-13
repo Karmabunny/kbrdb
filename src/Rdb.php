@@ -221,6 +221,7 @@ abstract class Rdb
             'limit' => null,
         ];
 
+        // Normalise things.
         foreach ($flags as $key => $value) {
             if (is_numeric($key)) {
                 $flags[strtolower($value)] = true;
@@ -246,13 +247,16 @@ abstract class Rdb
             $output['rev'] = true;
         }
 
+        // Parse limit into a keyed array.
         if (
             !empty($flags['limit'])
             and is_array($flags['limit'])
             and count($flags['limit']) >= 2
         ) {
+            // Numeric version.
             [$offset, $count] = $flags['limit'] ?? [0, -1];
 
+            // Keyed version.
             if (isset($flags['limit']['offset'])) {
                 $offset = $flags['limit']['offset'];
             }
@@ -725,6 +729,18 @@ abstract class Rdb
     /**
      * Get members from a sorted set.
      *
+     * This supports all alternate flags:
+     *
+     * | Mode    | Flags                  |
+     * |---------|------------------------|
+     * | --      | rev, withscores        |
+     * | byscore | rev, limit, withscores |
+     * | bylex   | rev, limit             |
+     *
+     * The limit option can be specified as either:
+     * - numeric: `[0, 10]`
+     * - keyed: `['offset' => 0, 'count' => 10]`
+     *
      * The default the start/stop range will return all members.
      *
      * Note, if the set does not exist it will return an empty array. This
@@ -734,9 +750,15 @@ abstract class Rdb
      * @param int $start
      * @param int $stop negative numbers are circular
      * @param array $flags
+     *  - withscores: include the score with each member (not available for bylex)
+     *  - rev: reverse the order
+     *  - limit: limit the results (only for byscore + bylex)
+     *  - byscore: sort by score
+     *  - bylex: sort by lexicographical order
+     *
      * @return null|array members are either:
      *  - a numeric list, ordered by their score
-     *  - a keyed array like `[ member => score ]`
+     *  - a keyed array like `[ member => score ]` (withscores)
      *  - `null` if the key is not a sorted set
      */
     public abstract function zRange(string $key, int $start = 0, int $stop = -1, array $flags = []): ?array;
