@@ -534,10 +534,50 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zRange(string $key, int $start = 0, int $stop = -1, bool $withscores = false): ?array
+    public function zRange(string $key, int $start = 0, int $stop = -1, array $flags = []): ?array
     {
+        $flags = self::parseRangeFlags($flags);
+
+        if ($flags['limit']) {
+            $limit = [ $flags['offset'], $flags['count'] ];
+        }
+        else {
+            $limit = null;
+        }
+
+        if ($flags['rev']) {
+            if ($flags['byscore']) {
+                $this->redis->zRevRangeByScore($key, $start, $stop, [
+                    'withscores' => $flags['withscores'],
+                    'limit' => $limit,
+                ]);
+            }
+            else if ($flags['bylex']) {
+                [$offset, $count] = $limit;
+                $range = $this->redis->zRevRangeByLex($key, $start, $stop, $offset, $count);
+            }
+            else {
+                $range = $this->redis->zRevRange($key, $start, $stop, $flags['withscores']);
+            }
+        }
+        else {
+            if ($flags['byscore']) {
+                $this->redis->zRangeByScore($key, $start, $stop, [
+                    'withscores' => $flags['withscores'],
+                    'limit' => $limit,
+                ]);
+            }
+            else if ($flags['bylex']) {
+                [$offset, $count] = $limit;
+                $range = $this->redis->zRangeByLex($key, $start, $stop, $offset, $count);
+            }
+            else {
+                $range = $this->redis->zrange($key, $start, $stop, $flags['withscores']);
+            }
+        }
+
         /** @var array|false $range */
-        $range = $this->redis->zrange($key, $start, $stop, $withscores);
+        $range = $this->redis->zrange($key, $start, $stop, $flags);
         if ($range === false) return null;
         return $range;
     }

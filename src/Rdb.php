@@ -206,6 +206,72 @@ abstract class Rdb
 
 
     /**
+     * Parse + normalise zrange() flags.
+     *
+     * @param array $flags
+     * @return array
+     */
+    protected static function parseRangeFlags(array $flags): array
+    {
+        $output = [
+            'withscores' => false,
+            'byscore' => false,
+            'bylex' => false,
+            'rev' => false,
+            'limit' => null,
+        ];
+
+        foreach ($flags as $key => $value) {
+            if (is_numeric($key)) {
+                $flags[strtolower($value)] = true;
+            }
+            else {
+                $flags[strtolower($key)] = $value;
+            }
+        }
+
+        if (!empty($flags['with_scores']) or !empty($flags['withscores'])) {
+            $output['withscores'] = true;
+        }
+
+        if (!empty($flags['by_score']) or !empty($flags['byscore'])) {
+            $output['byscore'] = true;
+        }
+
+        if (!empty($flags['by_lex']) or !empty($flags['bylex'])) {
+            $output['bylex'] = true;
+        }
+
+        if (!empty($flags['reverse']) or !empty($flags['rev'])) {
+            $output['rev'] = true;
+        }
+
+        if (
+            !empty($flags['limit'])
+            and is_array($flags['limit'])
+            and count($flags['limit']) >= 2
+        ) {
+            [$offset, $count] = $flags['limit'] ?? [0, -1];
+
+            if (isset($flags['limit']['offset'])) {
+                $offset = $flags['limit']['offset'];
+            }
+
+            if (isset($flags['limit']['count'])) {
+                $count = $flags['limit']['count'];
+            }
+
+            $output['limit'] = [
+                'offset' => $offset,
+                'count' => $count,
+            ];
+        }
+
+        return $output;
+    }
+
+
+    /**
      * Install a session handler.
      *
      * Some adapters may not support session handlers in certain conditions.
@@ -667,13 +733,13 @@ abstract class Rdb
      * @param string $key
      * @param int $start
      * @param int $stop negative numbers are circular
-     * @param bool $withscores return a keyed array [ member => score ]
+     * @param array $flags
      * @return null|array members are either:
      *  - a numeric list, ordered by their score
      *  - a keyed array like `[ member => score ]`
      *  - `null` if the key is not a sorted set
      */
-    public abstract function zRange(string $key, int $start = 0, int $stop = -1, bool $withscores = false): ?array;
+    public abstract function zRange(string $key, int $start = 0, int $stop = -1, array $flags = []): ?array;
 
 
     /**

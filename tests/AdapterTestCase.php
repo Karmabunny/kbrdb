@@ -405,7 +405,7 @@ abstract class AdapterTestCase extends TestCase
         $this->assertEquals(4, $actual);
 
         // zRange.
-        $actual = $this->rdb->zRange('zrange:123', 0, -1, true);
+        $actual = $this->rdb->zRange('zrange:123', 0, -1, ['withscores' => true]);
         $this->assertEquals(['a' => 4], $actual);
 
         // zRem.
@@ -446,12 +446,12 @@ abstract class AdapterTestCase extends TestCase
 
         // zRange, no scores, just the first.
         $expected = ['b'];
-        $actual = $this->rdb->zRange('zrange:123', 0, 0, false);
+        $actual = $this->rdb->zRange('zrange:123', 0, 0);
         $this->assertEquals($expected, $actual);
 
         // zRange, with scores, just the first.
         $expected = [ 'b' => 3 ];
-        $actual = $this->rdb->zRange('zrange:123', 0, 0, true);
+        $actual = $this->rdb->zRange('zrange:123', 0, 0, ['withscores' => true]);
         $this->assertEquals($expected, $actual);
 
         // zRange, with scores, truncated.
@@ -459,7 +459,7 @@ abstract class AdapterTestCase extends TestCase
             'b' => 3,
             'c' => 5,
         ];
-        $actual = $this->rdb->zRange('zrange:123', 0, 1, true);
+        $actual = $this->rdb->zRange('zrange:123', 0, 1, ['withscores' => true]);
         $this->assertEquals($expected, $actual);
     }
 }

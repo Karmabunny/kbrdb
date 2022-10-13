@@ -423,13 +423,25 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zRange(string $key, int $start = 0, int $stop = -1, bool $withscores = false): ?array
+    public function zRange(string $key, int $start = 0, int $stop = -1, array $flags = []): ?array
     {
-        $options = [
-            'WITHSCORES' => $withscores,
+        $flags = self::parseRangeFlags($flags);
+
+        $cmd = $flags['rev'] ? 'zRevRange' : 'zRange';
+
+        if ($flags['bylex']) {
+            $cmd .= 'ByLex';
+        }
+        else if ($flags['byscore']) {
+            $cmd .= 'ByScore';
+        }
+
+        $args = [
+            'WITHSCORES' => $flags['withscores'],
+            'LIMIT' => $flags['limit'],
         ];
 
-        $range = $this->predis->zrange($key, $start, $stop, $options);
+        $range = $this->predis->$cmd($key, $start, $stop, $args);
         return $range;
     }
 
