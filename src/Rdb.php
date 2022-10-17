@@ -253,8 +253,13 @@ abstract class Rdb
             and is_array($flags['limit'])
             and count($flags['limit']) >= 2
         ) {
+            $offset = 0;
+            $count = -1;
+
             // Numeric version.
-            [$offset, $count] = $flags['limit'] ?? [0, -1];
+            if (isset($flags['limit'][0]) and isset($flags['limit'][1])) {
+                [$offset, $count] = $flags['limit'];
+            }
 
             // Keyed version.
             if (isset($flags['limit']['offset'])) {
