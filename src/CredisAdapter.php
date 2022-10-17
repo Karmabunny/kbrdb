@@ -608,4 +608,45 @@ class CredisAdapter extends Rdb
         return (int) $value;
     }
 
+
+    /** @inheritdoc */
+    public function zCard(string $key): ?int
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->zCard($key);
+    }
+
+
+    /** @inheritdoc */
+    public function zCount(string $key, float $min, float $max): ?int
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->zCount($key, $min, $max);
+    }
+
+
+    /** @inheritdoc */
+    public function zScore(string $key, string $member): ?float
+    {
+        $key = $this->config->prefix . $key;
+        $score = $this->credis->__call('zscore', [$key, $member]);
+        if (!is_numeric($score)) return null;
+        return (float) $score;
+    }
+
+
+    /** @inheritdoc */
+    public function zRank(string $key, string $member): ?int
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->zRank($key, $member);
+    }
+
+
+    /** @inheritdoc */
+    public function zRevRank(string $key, string $member): ?int
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->zRevRank($key, $member);
+    }
 }

@@ -455,4 +455,40 @@ class PredisAdapter extends Rdb
         return (int) @call_user_func_array([$this->predis, 'zrem'], $args);
     }
 
+
+    /** @inheritdoc */
+    public function zCard(string $key): ?int
+    {
+        return $this->predis->zcard($key);
+    }
+
+
+    /** @inheritdoc */
+    public function zCount(string $key, float $min, float $max): ?int
+    {
+        return $this->predis->zcount($key, $min, $max);
+    }
+
+
+    /** @inheritdoc */
+    public function zScore(string $key, string $member): ?float
+    {
+        $score = $this->predis->zscore($key, $member);
+        if ($score === null) return null;
+        return (float) $score;
+    }
+
+
+    /** @inheritdoc */
+    public function zRank(string $key, string $member): ?int
+    {
+        return $this->predis->zrank($key, $member);
+    }
+
+
+    /** @inheritdoc */
+    public function zRevRank(string $key, string $member): ?int
+    {
+        return $this->predis->zrevrank($key, $member);
+    }
 }

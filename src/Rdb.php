@@ -765,13 +765,65 @@ abstract class Rdb
 
 
     /**
-     * Remove members from a set.
+     * Remove members from a sorted set.
      *
      * @param string $key
      * @param string[]|string $members
      * @return int number of removed items
      */
     public abstract function zRem(string $key, ...$members): int;
+
+
+    /**
+     * Get the number of members in a sorted set.
+     *
+     * @param string $key
+     * @return int|null number of items
+     */
+    public abstract function zCard(string $key): ?int;
+
+
+    /**
+     * Get the number of members within a range of scores within a sorted set.
+     *
+     * This has the same semantics as zRange 'by score'.
+     *
+     * @param string $key
+     * @param float $min
+     * @param float $max
+     * @return int|null number of items
+     */
+    public abstract function zCount(string $key, float $min, float $max): ?int;
+
+
+    /**
+     * Get the score of a member in a sorted set.
+     *
+     * @param string $key
+     * @param string $member
+     * @return float|null score
+     */
+    public abstract function zScore(string $key, string $member): ?float;
+
+
+    /**
+     * Get the rank of a member in a sorted set.
+     *
+     * @param string $key
+     * @param string $member
+     * @return int|null rank, 0-indexed
+     */
+    public abstract function zRank(string $key, string $member): ?int;
+
+
+    /**
+     * Get the reversed rank of a member in a sorted set.
+     *
+     * @param string $key
+     * @param string $member
+     * @return int|null rank, 0-indexed
+     */
+    public abstract function zRevRank(string $key, string $member): ?int;
 
 
     /**

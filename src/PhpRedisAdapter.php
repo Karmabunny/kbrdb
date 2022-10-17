@@ -590,4 +590,51 @@ class PhpRedisAdapter extends Rdb
         return $this->redis->zRem($key, ...$members);
     }
 
+
+    /** @inheritdoc */
+    public function zCard(string $key): ?int
+    {
+        /** @var int|false $res */
+        $res = $this->redis->zCard($key);
+        if ($res === false) return null;
+        return $res;
+    }
+
+
+    /** @inheritdoc */
+    public function zCount(string $key, float $min, float $max): ?int
+    {
+        /** @var int|false $res */
+        $res = $this->redis->zCount($key, $min, $max);
+        if ($res === false) return null;
+        return $res;
+    }
+
+
+    /** @inheritdoc */
+    public function zScore(string $key, string $member): ?float
+    {
+        $res = $this->redis->zScore($key, $member);
+        if ($res === false) return null;
+        return $res;
+    }
+
+
+    /** @inheritdoc */
+    public function zRank(string $key, string $member): ?int
+    {
+        $res = $this->redis->zRank($key, $member);
+        if ($res === false) return null;
+        return $res;
+    }
+
+
+    /** @inheritdoc */
+    public function zRevRank(string $key, string $member): ?int
+    {
+        $ok = $this->redis->zRevRank($key, $member);
+        if ($ok === false) return null;
+        return $ok;
+    }
+
 }
