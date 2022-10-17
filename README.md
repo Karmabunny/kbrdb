@@ -201,6 +201,15 @@ Submit a PR if you like. But before you do, please do the following:
 - rPop
 - brPop
 - brPoplPush
+- zAdd
+- zIncrBy
+- zRange
+- zRem
+- zCard
+- zCount
+- zScore
+- zRank
+- zRevRank
 
 
 TODO: more
@@ -211,19 +220,6 @@ sets:
 - sDiff (+ store)
 - sInter (+ store)
 - sUnion (+ store)
-
-sorted sets:
-- zCount
-- zRank
-- zCard
-- zScore
-- zRandMember
-
-maybe:
-- zScan
-- zRangeByScore
-- zRangeByLex
-- zLexCount
 
 
 #### Extended Methods
