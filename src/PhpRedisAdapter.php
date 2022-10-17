@@ -603,6 +603,7 @@ class PhpRedisAdapter extends Rdb
     public function zCount(string $key, float $min, float $max): ?int
     {
         /** @var int|false $res */
+        // @phpstan-ignore-next-line
         $res = $this->redis->zCount($key, $min, $max);
         if ($res === false) return null;
         return $res;
@@ -621,6 +622,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function zRank(string $key, string $member): ?int
     {
+        /** @var int|false $res */
         $res = $this->redis->zRank($key, $member);
         if ($res === false) return null;
         return $res;
@@ -630,6 +632,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function zRevRank(string $key, string $member): ?int
     {
+        /** @var int|false $ok */
         $ok = $this->redis->zRevRank($key, $member);
         if ($ok === false) return null;
         return $ok;

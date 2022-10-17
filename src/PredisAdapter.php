@@ -466,7 +466,9 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function zCount(string $key, float $min, float $max): ?int
     {
-        return $this->predis->zcount($key, $min, $max);
+        $count = $this->predis->zcount($key, $min, $max);
+        if (!is_numeric($count)) return null;
+        return (int) $count;
     }
 
 
