@@ -547,7 +547,7 @@ class PhpRedisAdapter extends Rdb
 
         if ($flags['rev']) {
             if ($flags['byscore']) {
-                $this->redis->zRevRangeByScore($key, $start, $stop, [
+                $range = $this->redis->zRevRangeByScore($key, $start, $stop, [
                     'withscores' => $flags['withscores'],
                     'limit' => $limit,
                 ]);
@@ -562,7 +562,7 @@ class PhpRedisAdapter extends Rdb
         }
         else {
             if ($flags['byscore']) {
-                $this->redis->zRangeByScore($key, $start, $stop, [
+                $range = $this->redis->zRangeByScore($key, $start, $stop, [
                     'withscores' => $flags['withscores'],
                     'limit' => $limit,
                 ]);
@@ -576,8 +576,6 @@ class PhpRedisAdapter extends Rdb
             }
         }
 
-        /** @var array|false $range */
-        $range = $this->redis->zrange($key, $start, $stop, $flags);
         if ($range === false) return null;
         return $range;
     }
