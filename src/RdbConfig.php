@@ -90,18 +90,20 @@ class RdbConfig
      */
     public function getHost($port = false): string
     {
-        // No scheme/port, just a plain old hostname.
-        if (strpos($this->host, ':') === false) {
-            return $this->host;
+        $host = $this->host;
+
+        // Throw in a default scheme.
+        if (strpos($host, '://') === false) {
+            $host = 'tcp://' . $host;
         }
 
         $url = '';
 
-        if ($scheme = parse_url($this->host, PHP_URL_SCHEME)) {
+        if ($scheme = parse_url($host, PHP_URL_SCHEME)) {
             $url .= $scheme . '://';
         }
 
-        $url .= parse_url($this->host, PHP_URL_HOST);
+        $url .= parse_url($host, PHP_URL_HOST);
 
         if ($port) {
             $url .= ':' . $this->getPort();
@@ -120,10 +122,15 @@ class RdbConfig
      */
     public function getPort(): int
     {
-        if (strpos($this->host, ':') !== false) {
-            $port = parse_url($this->host, PHP_URL_PORT);
-            if ($port) return $port;
+        $host = $this->host;
+
+        // Throw in a default scheme.
+        if (strpos($host, '://') === false) {
+            $host = 'tcp://' . $host;
         }
+
+        $port = parse_url($host, PHP_URL_PORT);
+        if ($port) return $port;
 
         return 6379;
     }

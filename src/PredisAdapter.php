@@ -10,6 +10,7 @@ use Generator;
 use karmabunny\rdb\Wrappers\Predis;
 use Predis\Client;
 use Predis\Collection\Iterator\Keyspace;
+use Predis\Connection\Parameters;
 use Predis\Response\Status;
 use Predis\Session\Handler;
 
@@ -37,7 +38,14 @@ class PredisAdapter extends Rdb
         $options['prefix'] = $this->config->prefix;
         $options['timeout'] = $this->config->timeout;
 
-        $this->predis = new Predis(['host' => $this->config->getHost(true)], $options);
+        // Just to be clear about what parameters we're using.
+        $host = $this->config->getHost(false);
+
+        $parameters = Parameters::parse($host);
+        $parameters['port'] = $this->config->getPort();
+        $parameters = new Parameters($parameters);
+
+        $this->predis = new Predis($parameters, $options);
         $this->predis->connect();
     }
 
