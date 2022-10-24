@@ -748,24 +748,27 @@ abstract class Rdb
      *
      * The default the start/stop range will return all members.
      *
+     * For `bylex` the start/stop is inclusive by default unless overridden
+     * with the `[ or (` syntax.
+     *
      * Note, if the set does not exist it will return an empty array. This
      * returns null only if the key is not a sorted set.
      *
      * @param string $key
      * @param int|string|null $start defaults:
-     *   - natural: `0`
+     *   - rank: `0`
      *   - byscore: `-inf`
      *   - bylex: `-` (inf)
      * @param int|string|null $stop defaults:
-     *   - natural: `-1` (circular, meaning end-of-set)
+     *   - rank: `-1` (circular, meaning end-of-set)
      *   - byscore: `+inf`
      *   - bylex: `+` (inf)
      * @param array $flags
      *  - withscores: include the score with each member (not available for bylex)
      *  - rev: reverse the order
      *  - limit: limit the results (only for byscore + bylex)
-     *  - byscore: sort by score
-     *  - bylex: sort by lexicographical order
+     *  - byscore: filter by score
+     *  - bylex: filter by lexicographical order
      *
      * @return null|array members are either:
      *  - a numeric list, ordered by their score
