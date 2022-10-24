@@ -182,7 +182,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function set(string $key, string $value, int $ttl = 0, array $flags = [])
     {
-        $flags = self::parseFlags($flags);
+        $flags = self::parseSetFlags($flags);
 
         $options = [];
 
@@ -516,32 +516,173 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zAdd(string $key, ...$members): int
+    public function zAdd(string $key, array $members): int
     {
-        return $this->redis->zadd($key, ...$members);
+        $args = [];
+        $args[] = $key;
+
+        foreach ($members as $member => $score) {
+            $args[] = $score;
+            $args[] = $member;
+        }
+
+        return (int) @call_user_func_array([$this->redis, 'zAdd'], $args);
     }
 
 
     /** @inheritdoc */
-    public function zIncrby(string $key, ...$members): int
+    public function zIncrBy(string $key, float $value, string $member): float
     {
-        return $this->redis->zincrby($key, ...$members);
+        return $this->redis->zIncrBy($key, $value, $member);
     }
 
 
     /** @inheritdoc */
-    public function zRange(string $key, int $start, int $stop, bool $withscores = false): ?array
+    public function zRange(string $key, $start = null, $stop = null, array $flags = []): ?array
     {
-        $range = $this->redis->zrange($key, $start, $stop, $withscores);
+        $flags = self::parseRangeFlags($flags);
+
+        if ($flags['limit']) {
+            $limit = [ $flags['offset'], $flags['count'] ];
+        }
+        else {
+            $limit = null;
+        }
+
+        if ($flags['rev']) {
+            if ($flags['byscore']) {
+                $start = $start ?? '-inf';
+                $stop = $stop ?? '+inf';
+
+                $range = $this->redis->zRevRangeByScore($key, $start, $stop, [
+                    'withscores' => $flags['withscores'],
+                    'limit' => $limit,
+                ]);
+            }
+            else if ($flags['bylex']) {
+
+                if ($start and !preg_match('/^\[|^\(/', $start)) {
+                    $start = '[' . $start;
+                }
+                if ($stop and !preg_match('/^\[|^\(/', $stop)) {
+                    $stop = '[' . $stop;
+                }
+                $start = $start ?? '-';
+                $stop = $stop ?? '+';
+
+                if ($limit) {
+                    [$offset, $count] = $limit;
+                    $range = $this->redis->zRevRangeByLex($key, $start, $stop, $offset, $count);
+                }
+                else {
+                    $range = $this->redis->zRevRangeByLex($key, $start, $stop);
+                }
+            }
+            else {
+                $start = $start ?? 0;
+                $stop = $stop ?? -1;
+
+                $range = $this->redis->zRevRange($key, $start, $stop, $flags['withscores']);
+            }
+        }
+        else {
+            if ($flags['byscore']) {
+                $start = $start ?? '-inf';
+                $stop = $stop ?? '+inf';
+
+                $range = $this->redis->zRangeByScore($key, $start, $stop, [
+                    'withscores' => $flags['withscores'],
+                    'limit' => $limit,
+                ]);
+            }
+            else if ($flags['bylex']) {
+
+                if ($start and !preg_match('/^\[|^\(/', $start)) {
+                    $start = '[' . $start;
+                }
+                if ($stop and !preg_match('/^\[|^\(/', $stop)) {
+                    $stop = '[' . $stop;
+                }
+
+                $start = $start ?? '-';
+                $stop = $stop ?? '+';
+
+                if ($limit) {
+                    [$offset, $count] = $limit;
+                    $range = $this->redis->zRangeByLex($key, $start, $stop, $offset, $count);
+                }
+                else {
+                    $range = $this->redis->zRangeByLex($key, $start, $stop);
+                }
+            }
+            else {
+                $start = $start ?? 0;
+                $stop = $stop ?? -1;
+
+                $range = $this->redis->zrange($key, $start, $stop, $flags['withscores']);
+            }
+        }
+
         if ($range === false) return null;
         return $range;
     }
 
 
     /** @inheritdoc */
-    public function zRem(string $key, $member): int
+    public function zRem(string $key, ...$members): int
     {
-        return $this->redis->zrem($key, $member);
+        $members = self::flattenArrays($members);
+        return $this->redis->zRem($key, ...$members);
+    }
+
+
+    /** @inheritdoc */
+    public function zCard(string $key): ?int
+    {
+        /** @var int|false $res */
+        $res = $this->redis->zCard($key);
+        if ($res === false) return null;
+        return $res;
+    }
+
+
+    /** @inheritdoc */
+    public function zCount(string $key, float $min, float $max): ?int
+    {
+        /** @var int|false $res */
+        // @phpstan-ignore-next-line
+        $res = $this->redis->zCount($key, $min, $max);
+        if ($res === false) return null;
+        return $res;
+    }
+
+
+    /** @inheritdoc */
+    public function zScore(string $key, string $member): ?float
+    {
+        $res = $this->redis->zScore($key, $member);
+        if ($res === false) return null;
+        return $res;
+    }
+
+
+    /** @inheritdoc */
+    public function zRank(string $key, string $member): ?int
+    {
+        /** @var int|false $res */
+        $res = $this->redis->zRank($key, $member);
+        if ($res === false) return null;
+        return $res;
+    }
+
+
+    /** @inheritdoc */
+    public function zRevRank(string $key, string $member): ?int
+    {
+        /** @var int|false $ok */
+        $ok = $this->redis->zRevRank($key, $member);
+        if ($ok === false) return null;
+        return $ok;
     }
 
 }

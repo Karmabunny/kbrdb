@@ -201,6 +201,15 @@ Submit a PR if you like. But before you do, please do the following:
 - rPop
 - brPop
 - brPoplPush
+- zAdd
+- zIncrBy
+- zRange
+- zRem
+- zCard
+- zCount
+- zScore
+- zRank
+- zRevRank
 
 
 TODO: more

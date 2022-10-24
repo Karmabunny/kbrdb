@@ -132,7 +132,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function set(string $key, string $value, int $ttl = 0, array $flags = [])
     {
-        $flags = self::parseFlags($flags);
+        $flags = self::parseSetFlags($flags);
 
         $args = [];
         $args[] = $key;
@@ -420,32 +420,105 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zAdd(string $key, ...$members): int
+    public function zAdd(string $key, array $members): int
     {
-        return $this->predis->zadd($key, ...$members);
+        return $this->predis->zadd($key, $members);
     }
 
 
     /** @inheritdoc */
-    public function zIncrby(string $key, ...$members): int
+    public function zIncrBy(string $key, float $value, string $member): float
     {
-        return $this->predis->zincrby($key, ...$members);
+        return (float) $this->predis->zincrby($key, $value, $member);
     }
 
 
     /** @inheritdoc */
-    public function zRange(string $key, int $start, int $stop, bool $withscores = false): ?array
+    public function zRange(string $key, $start = null, $stop = null, array $flags = []): ?array
     {
-        $range = $this->predis->zrange($key, $start, $stop, $withscores ? 'WITHSCORES' : null);
-        if ($range === false) return null;
+        $flags = self::parseRangeFlags($flags);
+
+        $cmd = $flags['rev'] ? 'zRevRange' : 'zRange';
+
+        if ($flags['bylex']) {
+            $cmd .= 'ByLex';
+
+            if ($start and !preg_match('/^\[|^\(/', $start)) {
+                $start = '[' . $start;
+            }
+            if ($stop and !preg_match('/^\[|^\(/', $stop)) {
+                $stop = '[' . $stop;
+            }
+
+            $start = $start ?? '-';
+            $stop = $stop ?? '+';
+        }
+        else if ($flags['byscore']) {
+            $cmd .= 'ByScore';
+
+            $start = $start ?? '-inf';
+            $stop = $stop ?? '+inf';
+        }
+        else {
+            $start = $start ?? 0;
+            $stop = $stop ?? -1;
+        }
+
+        $args = [
+            'WITHSCORES' => $flags['withscores'],
+            'LIMIT' => $flags['limit'],
+        ];
+
+        $range = $this->predis->$cmd($key, $start, $stop, $args);
         return $range;
     }
 
 
     /** @inheritdoc */
-    public function zRem(string $key, $member): int
+    public function zRem(string $key, ...$members): int
     {
-        return $this->predis->zrem($key, $member);
+        $args = self::flattenArrays($members);
+        array_unshift($args, $key);
+
+        return (int) @call_user_func_array([$this->predis, 'zrem'], $args);
     }
 
+
+    /** @inheritdoc */
+    public function zCard(string $key): ?int
+    {
+        return $this->predis->zcard($key);
+    }
+
+
+    /** @inheritdoc */
+    public function zCount(string $key, float $min, float $max): ?int
+    {
+        $count = $this->predis->zcount($key, $min, $max);
+        if (!is_numeric($count)) return null;
+        return (int) $count;
+    }
+
+
+    /** @inheritdoc */
+    public function zScore(string $key, string $member): ?float
+    {
+        $score = $this->predis->zscore($key, $member);
+        if ($score === null) return null;
+        return (float) $score;
+    }
+
+
+    /** @inheritdoc */
+    public function zRank(string $key, string $member): ?int
+    {
+        return $this->predis->zrank($key, $member);
+    }
+
+
+    /** @inheritdoc */
+    public function zRevRank(string $key, string $member): ?int
+    {
+        return $this->predis->zrevrank($key, $member);
+    }
 }

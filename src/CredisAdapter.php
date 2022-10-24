@@ -177,7 +177,7 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function set(string $key, string $value, int $ttl = 0, array $flags = [])
     {
-        $flags = self::parseFlags($flags);
+        $flags = self::parseSetFlags($flags);
 
         $options = [];
 
@@ -524,33 +524,154 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zAdd(string $key, ...$members): int
+    public function zAdd(string $key, array $members): int
     {
-        $res = $this->credis->zadd($key, ...$members);
-        return $res;
+        $key = $this->config->prefix . $key;
+
+        $args = [];
+        $args[] = $key;
+
+        foreach ($members as $member => $score) {
+            $args[] = $score;
+            $args[] = $member;
+        }
+
+        $res = $this->credis->__call('zadd', $args);
+        return (int) $res;
     }
 
 
     /** @inheritdoc */
-    public function zIncrby(string $key, ...$members): int
+    public function zIncrBy(string $key, float $value, string $member): float
     {
-        return $this->credis->zincrby($key, ...$members);
+        $key = $this->config->prefix . $key;
+        return (float) $this->credis->zIncrBy($key, $value, $member);
     }
 
 
     /** @inheritdoc */
-    public function zRange(string $key, int $start, int $stop, bool $withscores = false): ?array
+    public function zRange(string $key, $start = null, $stop = null, array $flags = []): ?array
     {
-        $range = $this->credis->zrange($key, $start, $stop, $withscores ? ['withscores' => 1] : null);
+        $key = $this->config->prefix . $key;
+
+        $flags = self::parseRangeFlags($flags);
+
+        $cmd = $flags['rev'] ? 'zRevRange' : 'zRange';
+        $args = [];
+        $args[] = $key;
+
+        $options = [];
+
+        if ($flags['bylex']) {
+            $cmd .= 'ByLex';
+
+            if ($start and !preg_match('/^\[|^\(/', $start)) {
+                $start = '[' . $start;
+            }
+            if ($stop and !preg_match('/^\[|^\(/', $stop)) {
+                $stop = '[' . $stop;
+            }
+
+            $start = $start ?? '-';
+            $stop = $stop ?? '+';
+
+            $args[] = $start;
+            $args[] = $stop;
+
+            if ($flags['limit']) {
+                $args[] = 'LIMIT';
+                $args[] = $flags['limit']['offset'];
+                $args[] = $flags['limit']['count'];
+            }
+        }
+        else if ($flags['byscore']) {
+            $cmd .= 'ByScore';
+
+            $args[] = $start ?? '-inf';
+            $args[] = $stop ?? '+inf';
+
+            if ($flags['withscores']) {
+                $options['withscores'] = true;
+            }
+
+            if ($flags['limit']) {
+                $options['limit'] = [
+                    $flags['limit']['offset'],
+                    $flags['limit']['count'],
+                ];
+            }
+        }
+        else {
+            $args[] = $start ?? 0;
+            $args[] = $stop ?? -1;
+
+            if ($flags['withscores']) {
+                $options['withscores'] = true;
+            }
+        }
+
+        if ($options) {
+            $args[] = $options;
+        }
+
+        /** @var array|false $range */
+        $range = $this->credis->__call($cmd, $args);
         if ($range === false) return null;
         return $range;
     }
 
 
     /** @inheritdoc */
-    public function zRem(string $key, $member): int
+    public function zRem(string $key, ...$members): int
     {
-        return $this->credis->zrem($key, $member);
+        $key = $this->config->prefix . $key;
+
+        $args = self::flattenArrays($members);
+        array_unshift($args, $key);
+
+        $value = $this->credis->__call('zrem', $args);
+        return (int) $value;
     }
 
+
+    /** @inheritdoc */
+    public function zCard(string $key): ?int
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->zCard($key);
+    }
+
+
+    /** @inheritdoc */
+    public function zCount(string $key, float $min, float $max): ?int
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->zCount($key, $min, $max);
+    }
+
+
+    /** @inheritdoc */
+    public function zScore(string $key, string $member): ?float
+    {
+        $key = $this->config->prefix . $key;
+        $score = $this->credis->__call('zscore', [$key, $member]);
+        if (!is_numeric($score)) return null;
+        return (float) $score;
+    }
+
+
+    /** @inheritdoc */
+    public function zRank(string $key, string $member): ?int
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->zRank($key, $member);
+    }
+
+
+    /** @inheritdoc */
+    public function zRevRank(string $key, string $member): ?int
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->zRevRank($key, $member);
+    }
 }

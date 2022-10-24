@@ -397,20 +397,150 @@ abstract class AdapterTestCase extends TestCase
     {
 
         // zAdd.
-        $actual = $this->rdb->zAdd('zrange:123', 1, 'a');
+        $actual = $this->rdb->zAdd('zrange:123', ['a' => 1]);
         $this->assertEquals(1, $actual);
 
         // zIncrby.
-        $actual = $this->rdb->zIncrby('zrange:123', 3, 'a');
+        $actual = $this->rdb->zIncrBy('zrange:123', 3, 'a');
         $this->assertEquals(4, $actual);
 
         // zRange.
-        $actual = $this->rdb->zRange('zrange:123', 0, -1, true);
+        $actual = $this->rdb->zRange('zrange:123', 0, -1, ['withscores' => true]);
         $this->assertEquals(['a' => 4], $actual);
 
         // zRem.
         $actual = $this->rdb->zRem('zrange:123', 'a');
         $this->assertEquals(1, $actual);
+
+        // Null sets.
+        $this->rdb->set('zrange:hello', 'not-a-sorted-set');
+        $actual = $this->rdb->zRange('zrange:hello');
+        $this->assertNull($actual);
+
+        // missing set.
+        $this->rdb->del('zrange:hello');
+        $actual = $this->rdb->zRange('zrange:hello');
+        $this->assertEquals([], $actual);
+
+        // zIncrBy creates a set.
+        $this->rdb->del('zrange:hello');
+        $actual = $this->rdb->zIncrBy('zrange:hello', 10, 'a');
+        $this->assertEquals(10, $actual);
+
+        $actual = $this->rdb->zRange('zrange:hello');
+        $this->assertEquals(['a'], $actual);
+
+        // zAdd, multiple.
+        $expected = 6;
+        $actual = $this->rdb->zAdd('zrange:123', [
+            'a' => 10,
+            'b' => 3,
+            'c' => 5,
+            'e' => 5,
+            'd' => 5,
+            'f' => 5,
+        ]);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, no scores - but results are ordered.
+        $expected = ['b', 'c', 'd', 'e', 'f', 'a'];
+        $actual = $this->rdb->zRange('zrange:123');
+        $this->assertEquals($expected, $actual);
+
+        // zRange, no scores, just the first.
+        $expected = ['b'];
+        $actual = $this->rdb->zRange('zrange:123', 0, 0);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, with scores, just the first.
+        $expected = [ 'b' => 3 ];
+        $actual = $this->rdb->zRange('zrange:123', 0, 0, ['withscores' => true]);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, with scores, truncated.
+        $expected = [
+            'b' => 3,
+            'c' => 5,
+        ];
+        $actual = $this->rdb->zRange('zrange:123', 0, 1, ['withscores' => true]);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, by lex (with defaults).
+        $expected = [ 'b', 'c', 'd', 'e', 'f', 'a' ];
+        $actual = $this->rdb->zRange('zrange:123', null, null, ['bylex']);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, by lex with inclusive defaults.
+        $expected = [ 'b', 'c', 'd' ];
+        $actual = $this->rdb->zRange('zrange:123', 'a', 'd', ['bylex']);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, by lex with exclusive options.
+        $expected = [ 'b', 'c' ];
+        $actual = $this->rdb->zRange('zrange:123', '-', '(d', ['bylex']);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, by score (defaults).
+        $expected = [ 'b', 'c', 'd', 'e', 'f', 'a' ];
+        $actual = $this->rdb->zRange('zrange:123', null, null, ['byscore']);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, with filters.
+        $expected = [];
+        $actual = $this->rdb->zRange('zrange:123', 0, 1, ['byscore']);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, with proper filters.
+        $expected = ['b', 'c', 'd', 'e', 'f'];
+        $actual = $this->rdb->zRange('zrange:123', 3, 5, ['byscore']);
+        $this->assertEquals($expected, $actual);
+
+        // Testing: zCard, zCount, zScore, zRank, zRevRank.
+        $this->rdb->zAdd('ztest', [
+            'a' => 1,
+            'c' => 10,
+            'b' => 5,
+        ]);
+
+        $expected = 3;
+        $actual = $this->rdb->zCard('ztest');
+        $this->assertEquals($expected, $actual);
+
+        $expected = 3;
+        $actual = $this->rdb->zCount('ztest', 0, INF);
+        $this->assertEquals($expected, $actual);
+
+        $expected = 2;
+        $actual = $this->rdb->zCount('ztest', 5, INF);
+        $this->assertEquals($expected, $actual);
+
+        $expected = 1;
+        $actual = $this->rdb->zCount('ztest', 6, INF);
+        $this->assertEquals($expected, $actual);
+
+        $expected = 1;
+        $actual = $this->rdb->zCount('ztest', 3, 7);
+        $this->assertEquals($expected, $actual);
+
+        $expected = 10;
+        $actual = $this->rdb->zScore('ztest', 'c');
+        $this->assertEquals($expected, $actual);
+
+        $expected = 2;
+        $actual = $this->rdb->zRank('ztest', 'c');
+        $this->assertEquals($expected, $actual);
+
+        $expected = 1;
+        $actual = $this->rdb->zRank('ztest', 'b');
+        $this->assertEquals($expected, $actual);
+
+        $expected = 0;
+        $actual = $this->rdb->zRevRank('ztest', 'c');
+        $this->assertEquals($expected, $actual);
+
+        $expected = 1;
+        $actual = $this->rdb->zRevRank('ztest', 'b');
+        $this->assertEquals($expected, $actual);
     }
 }
 

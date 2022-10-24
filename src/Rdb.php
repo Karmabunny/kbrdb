@@ -170,7 +170,7 @@ abstract class Rdb
      * @param array $flags
      * @return array
      */
-    protected static function parseFlags(array $flags): array
+    protected static function parseSetFlags(array $flags): array
     {
         // Defaults.
         $output = [
@@ -199,6 +199,81 @@ abstract class Rdb
         }
         else if (!is_bool($output['replace'])) {
             $output['replace'] = null;
+        }
+
+        return $output;
+    }
+
+
+    /**
+     * Parse + normalise zrange() flags.
+     *
+     * @param array $flags
+     * @return array
+     */
+    protected static function parseRangeFlags(array $flags): array
+    {
+        $output = [
+            'withscores' => false,
+            'byscore' => false,
+            'bylex' => false,
+            'rev' => false,
+            'limit' => null,
+        ];
+
+        // Normalise things.
+        foreach ($flags as $key => $value) {
+            if (is_numeric($key)) {
+                $flags[strtolower($value)] = true;
+            }
+            else {
+                $flags[strtolower($key)] = $value;
+            }
+        }
+
+        if (!empty($flags['with_scores']) or !empty($flags['withscores'])) {
+            $output['withscores'] = true;
+        }
+
+        if (!empty($flags['by_score']) or !empty($flags['byscore'])) {
+            $output['byscore'] = true;
+        }
+
+        if (!empty($flags['by_lex']) or !empty($flags['bylex'])) {
+            $output['bylex'] = true;
+        }
+
+        if (!empty($flags['reverse']) or !empty($flags['rev'])) {
+            $output['rev'] = true;
+        }
+
+        // Parse limit into a keyed array.
+        if (
+            !empty($flags['limit'])
+            and is_array($flags['limit'])
+            and count($flags['limit']) >= 2
+        ) {
+            $offset = 0;
+            $count = -1;
+
+            // Numeric version.
+            if (isset($flags['limit'][0]) and isset($flags['limit'][1])) {
+                [$offset, $count] = $flags['limit'];
+            }
+
+            // Keyed version.
+            if (isset($flags['limit']['offset'])) {
+                $offset = $flags['limit']['offset'];
+            }
+
+            if (isset($flags['limit']['count'])) {
+                $count = $flags['limit']['count'];
+            }
+
+            $output['limit'] = [
+                'offset' => $offset,
+                'count' => $count,
+            ];
         }
 
         return $output;
@@ -617,6 +692,152 @@ abstract class Rdb
      * @return string|null item being moved or `null` if the timeout occurs
      */
     public abstract function brPoplPush(string $src, string $dst, int $timeout = null): ?string;
+
+
+    /**
+     * Add items to a sorted set.
+     *
+     * One must indicate a score for each member, the format looks like:
+     *
+     * ```
+     * [
+     *   'a' => 5,
+     *   'b' => 1,
+     *   'c' => 10,
+     * ]
+     * ```
+     *
+     * If the set exists, the member values are updated - these updated members
+     * are excluded from the return count. Otherwise this will create a new
+     * sorted set.
+     *
+     * @param string $key
+     * @param float[] $members [ member => score ]
+     * @return int number of elements added
+     */
+    public abstract function zAdd(string $key, array $members): int;
+
+
+    /**
+     * Increment a member's score in a sorted set.
+     *
+     * This will create a new sorted set if it doesn't exist.
+     *
+     * @param string $key
+     * @param float $value an amount to update by, can be negative
+     * @param string $member
+     * @return float the value after updated
+     */
+    public abstract function zIncrBy(string $key, float $value, string $member): float;
+
+
+    /**
+     * Get members from a sorted set.
+     *
+     * This supports all alternate flags:
+     *
+     * | Mode    | Flags                  |
+     * |---------|------------------------|
+     * | --      | rev, withscores        |
+     * | byscore | rev, limit, withscores |
+     * | bylex   | rev, limit             |
+     *
+     * The limit option can be specified as either:
+     * - numeric: `[0, 10]`
+     * - keyed: `['offset' => 0, 'count' => 10]`
+     *
+     * The default the start/stop range will return all members.
+     *
+     * For `bylex` the start/stop is inclusive by default unless overridden
+     * with the `[ or (` syntax.
+     *
+     * Note, if the set does not exist it will return an empty array. This
+     * returns null only if the key is not a sorted set.
+     *
+     * @param string $key
+     * @param int|string|null $start defaults:
+     *   - rank: `0`
+     *   - byscore: `-inf`
+     *   - bylex: `-` (inf)
+     * @param int|string|null $stop defaults:
+     *   - rank: `-1` (circular, meaning end-of-set)
+     *   - byscore: `+inf`
+     *   - bylex: `+` (inf)
+     * @param array $flags
+     *  - withscores: include the score with each member (not available for bylex)
+     *  - rev: reverse the order
+     *  - limit: limit the results (only for byscore + bylex)
+     *  - byscore: filter by score
+     *  - bylex: filter by lexicographical order
+     *
+     * @return null|array members are either:
+     *  - a numeric list, ordered by their score
+     *  - a keyed array like `[ member => score ]` (withscores)
+     *  - `null` if the key is not a sorted set
+     */
+    public abstract function zRange(string $key, $start = null, $stop = null, array $flags = []): ?array;
+
+
+    /**
+     * Remove members from a sorted set.
+     *
+     * @param string $key
+     * @param string[]|string $members
+     * @return int number of removed items
+     */
+    public abstract function zRem(string $key, ...$members): int;
+
+
+    /**
+     * Get the number of members in a sorted set.
+     *
+     * @param string $key
+     * @return int|null number of items
+     */
+    public abstract function zCard(string $key): ?int;
+
+
+    /**
+     * Get the number of members within a range of scores within a sorted set.
+     *
+     * This has the same semantics as zRange 'by score'.
+     *
+     * @param string $key
+     * @param float $min
+     * @param float $max
+     * @return int|null number of items
+     */
+    public abstract function zCount(string $key, float $min, float $max): ?int;
+
+
+    /**
+     * Get the score of a member in a sorted set.
+     *
+     * @param string $key
+     * @param string $member
+     * @return float|null score
+     */
+    public abstract function zScore(string $key, string $member): ?float;
+
+
+    /**
+     * Get the rank of a member in a sorted set.
+     *
+     * @param string $key
+     * @param string $member
+     * @return int|null rank, 0-indexed
+     */
+    public abstract function zRank(string $key, string $member): ?int;
+
+
+    /**
+     * Get the reversed rank of a member in a sorted set.
+     *
+     * @param string $key
+     * @param string $member
+     * @return int|null rank, 0-indexed
+     */
+    public abstract function zRevRank(string $key, string $member): ?int;
 
 
     /**
