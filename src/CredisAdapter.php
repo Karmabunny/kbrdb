@@ -545,19 +545,33 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zRange(string $key, int $start = 0, int $stop = -1, array $flags = []): ?array
+    public function zRange(string $key, $start = null, $stop = null, array $flags = []): ?array
     {
         $key = $this->config->prefix . $key;
 
         $flags = self::parseRangeFlags($flags);
 
         $cmd = $flags['rev'] ? 'zRevRange' : 'zRange';
-        $args = [$key, $start, $stop];
+        $args = [];
+        $args[] = $key;
 
         $options = [];
 
         if ($flags['bylex']) {
             $cmd .= 'ByLex';
+
+            if ($start and !preg_match('/^\[|^\(/', $start)) {
+                $start = '[' . $start;
+            }
+            if ($stop and !preg_match('/^\[|^\(/', $stop)) {
+                $stop = '[' . $stop;
+            }
+
+            $start = $start ?? '-';
+            $stop = $stop ?? '+';
+
+            $args[] = $start;
+            $args[] = $stop;
 
             if ($flags['limit']) {
                 $args[] = 'LIMIT';
@@ -567,6 +581,9 @@ class CredisAdapter extends Rdb
         }
         else if ($flags['byscore']) {
             $cmd .= 'ByScore';
+
+            $args[] = $start ?? '-inf';
+            $args[] = $stop ?? '+inf';
 
             if ($flags['withscores']) {
                 $options['withscores'] = true;
@@ -580,6 +597,9 @@ class CredisAdapter extends Rdb
             }
         }
         else {
+            $args[] = $start ?? 0;
+            $args[] = $stop ?? -1;
+
             if ($flags['withscores']) {
                 $options['withscores'] = true;
             }

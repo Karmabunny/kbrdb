@@ -752,8 +752,14 @@ abstract class Rdb
      * returns null only if the key is not a sorted set.
      *
      * @param string $key
-     * @param int $start
-     * @param int $stop negative numbers are circular
+     * @param int|string|null $start defaults:
+     *   - natural: `0`
+     *   - byscore: `-inf`
+     *   - bylex: `-` (inf)
+     * @param int|string|null $stop defaults:
+     *   - natural: `-1` (circular, meaning end-of-set)
+     *   - byscore: `+inf`
+     *   - bylex: `+` (inf)
      * @param array $flags
      *  - withscores: include the score with each member (not available for bylex)
      *  - rev: reverse the order
@@ -766,7 +772,7 @@ abstract class Rdb
      *  - a keyed array like `[ member => score ]` (withscores)
      *  - `null` if the key is not a sorted set
      */
-    public abstract function zRange(string $key, int $start = 0, int $stop = -1, array $flags = []): ?array;
+    public abstract function zRange(string $key, $start = null, $stop = null, array $flags = []): ?array;
 
 
     /**

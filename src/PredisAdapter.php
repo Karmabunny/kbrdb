@@ -423,7 +423,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zRange(string $key, int $start = 0, int $stop = -1, array $flags = []): ?array
+    public function zRange(string $key, $start = null, $stop = null, array $flags = []): ?array
     {
         $flags = self::parseRangeFlags($flags);
 
@@ -431,9 +431,26 @@ class PredisAdapter extends Rdb
 
         if ($flags['bylex']) {
             $cmd .= 'ByLex';
+
+            if ($start and !preg_match('/^\[|^\(/', $start)) {
+                $start = '[' . $start;
+            }
+            if ($stop and !preg_match('/^\[|^\(/', $stop)) {
+                $stop = '[' . $stop;
+            }
+
+            $start = $start ?? '-';
+            $stop = $stop ?? '+';
         }
         else if ($flags['byscore']) {
             $cmd .= 'ByScore';
+
+            $start = $start ?? '-inf';
+            $stop = $stop ?? '+inf';
+        }
+        else {
+            $start = $start ?? 0;
+            $stop = $stop ?? -1;
         }
 
         $args = [

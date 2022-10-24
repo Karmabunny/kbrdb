@@ -534,7 +534,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zRange(string $key, int $start = 0, int $stop = -1, array $flags = []): ?array
+    public function zRange(string $key, $start = null, $stop = null, array $flags = []): ?array
     {
         $flags = self::parseRangeFlags($flags);
 
@@ -547,31 +547,74 @@ class PhpRedisAdapter extends Rdb
 
         if ($flags['rev']) {
             if ($flags['byscore']) {
+                $start = $start ?? '-inf';
+                $stop = $stop ?? '+inf';
+
                 $range = $this->redis->zRevRangeByScore($key, $start, $stop, [
                     'withscores' => $flags['withscores'],
                     'limit' => $limit,
                 ]);
             }
             else if ($flags['bylex']) {
-                [$offset, $count] = $limit;
-                $range = $this->redis->zRevRangeByLex($key, $start, $stop, $offset, $count);
+
+                if ($start and !preg_match('/^\[|^\(/', $start)) {
+                    $start = '[' . $start;
+                }
+                if ($stop and !preg_match('/^\[|^\(/', $stop)) {
+                    $stop = '[' . $stop;
+                }
+                $start = $start ?? '-';
+                $stop = $stop ?? '+';
+
+                if ($limit) {
+                    [$offset, $count] = $limit;
+                    $range = $this->redis->zRevRangeByLex($key, $start, $stop, $offset, $count);
+                }
+                else {
+                    $range = $this->redis->zRevRangeByLex($key, $start, $stop);
+                }
             }
             else {
+                $start = $start ?? 0;
+                $stop = $stop ?? -1;
+
                 $range = $this->redis->zRevRange($key, $start, $stop, $flags['withscores']);
             }
         }
         else {
             if ($flags['byscore']) {
+                $start = $start ?? '-inf';
+                $stop = $stop ?? '+inf';
+
                 $range = $this->redis->zRangeByScore($key, $start, $stop, [
                     'withscores' => $flags['withscores'],
                     'limit' => $limit,
                 ]);
             }
             else if ($flags['bylex']) {
-                [$offset, $count] = $limit;
-                $range = $this->redis->zRangeByLex($key, $start, $stop, $offset, $count);
+
+                if ($start and !preg_match('/^\[|^\(/', $start)) {
+                    $start = '[' . $start;
+                }
+                if ($stop and !preg_match('/^\[|^\(/', $stop)) {
+                    $stop = '[' . $stop;
+                }
+
+                $start = $start ?? '-';
+                $stop = $stop ?? '+';
+
+                if ($limit) {
+                    [$offset, $count] = $limit;
+                    $range = $this->redis->zRangeByLex($key, $start, $stop, $offset, $count);
+                }
+                else {
+                    $range = $this->redis->zRangeByLex($key, $start, $stop);
+                }
             }
             else {
+                $start = $start ?? 0;
+                $stop = $stop ?? -1;
+
                 $range = $this->redis->zrange($key, $start, $stop, $flags['withscores']);
             }
         }
