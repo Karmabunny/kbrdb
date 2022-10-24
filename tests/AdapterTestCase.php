@@ -431,16 +431,19 @@ abstract class AdapterTestCase extends TestCase
         $this->assertEquals(['a'], $actual);
 
         // zAdd, multiple.
-        $expected = 3;
+        $expected = 6;
         $actual = $this->rdb->zAdd('zrange:123', [
             'a' => 10,
             'b' => 3,
             'c' => 5,
+            'e' => 5,
+            'd' => 5,
+            'f' => 5,
         ]);
         $this->assertEquals($expected, $actual);
 
         // zRange, no scores - but results are ordered.
-        $expected = ['b', 'c', 'a'];
+        $expected = ['b', 'c', 'd', 'e', 'f', 'a'];
         $actual = $this->rdb->zRange('zrange:123');
         $this->assertEquals($expected, $actual);
 
@@ -460,6 +463,36 @@ abstract class AdapterTestCase extends TestCase
             'c' => 5,
         ];
         $actual = $this->rdb->zRange('zrange:123', 0, 1, ['withscores' => true]);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, by lex (with defaults).
+        $expected = [ 'b', 'c', 'd', 'e', 'f', 'a' ];
+        $actual = $this->rdb->zRange('zrange:123', null, null, ['bylex']);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, by lex with inclusive defaults.
+        $expected = [ 'b', 'c', 'd' ];
+        $actual = $this->rdb->zRange('zrange:123', 'a', 'd', ['bylex']);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, by lex with exclusive options.
+        $expected = [ 'b', 'c' ];
+        $actual = $this->rdb->zRange('zrange:123', '-', '(d', ['bylex']);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, by score (defaults).
+        $expected = [ 'b', 'c', 'd', 'e', 'f', 'a' ];
+        $actual = $this->rdb->zRange('zrange:123', null, null, ['byscore']);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, with filters.
+        $expected = [];
+        $actual = $this->rdb->zRange('zrange:123', 0, 1, ['byscore']);
+        $this->assertEquals($expected, $actual);
+
+        // zRange, with proper filters.
+        $expected = ['b', 'c', 'd', 'e', 'f'];
+        $actual = $this->rdb->zRange('zrange:123', 3, 5, ['byscore']);
         $this->assertEquals($expected, $actual);
 
         // Testing: zCard, zCount, zScore, zRank, zRevRank.
