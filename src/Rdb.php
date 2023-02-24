@@ -10,7 +10,6 @@ use Generator;
 use InvalidArgumentException;
 use JsonException;
 use JsonSerializable;
-use Traversable;
 
 /**
  * Rdb is a wrapper around other popular redis libraries.
@@ -31,6 +30,9 @@ use Traversable;
  */
 abstract class Rdb
 {
+    use RdbHelperTrait;
+
+
     const ADAPTERS = [
         RdbConfig::TYPE_PHP_REDIS => PhpRedisAdapter::class,
         RdbConfig::TYPE_PREDIS => PredisAdapter::class,
@@ -115,185 +117,6 @@ abstract class Rdb
         else {
             return $key;
         }
-    }
-
-
-    /**
-     * Flatten an array input.
-     *
-     * This also discards keys.
-     *
-     * Largely ripped from karmabunny/kb.
-     *
-     * @param iterable $items
-     * @param int $depth
-     * @return array
-     */
-    protected static function flattenArrays(iterable $items, int $depth = 25): array
-    {
-        $output = [];
-
-        foreach ($items as $value) {
-            if (is_iterable($value)) {
-                if ($depth <= 1) {
-                    continue;
-                }
-
-                $value = self::flattenArrays($value, false, $depth - 1);
-                foreach ($value as $sub) {
-                    $output[] = $sub;
-                }
-            }
-            else {
-                $output[] = $value;
-            }
-        }
-
-        return $output;
-    }
-
-
-    /**
-     * Normalize values into an array.
-     *
-     * - converts iterators to arrays
-     * - discards keys (optionally)
-     *
-     * @param iterable $items
-     * @param bool $preserve_keys (default false) strip keys if false
-     * @return array
-     */
-    protected static function normalizeIterable($items, $preserve_keys = false): array
-    {
-        // Iterables.
-        if (is_object($items) and $items instanceof Traversable) {
-            return iterator_to_array($items, $preserve_keys);
-        }
-
-        /** @var array $items */
-
-        // Strip the keys.
-        if (!$preserve_keys) {
-            return array_values($items);
-        }
-
-        return $items;
-    }
-
-
-    /**
-     * Parse + normalise set() flags.
-     *
-     * @param array $flags
-     * @return array
-     */
-    protected static function parseSetFlags(array $flags): array
-    {
-        // Defaults.
-        $output = [
-            'keep_ttl' => null,
-            'time_at' => null,
-            'get_set' => null,
-            'replace' => null,
-        ];
-
-        // Normalise.
-        foreach ($flags as $key => $value) {
-            if (is_numeric($key)) {
-                $output[strtolower($value)] = true;
-            }
-            else {
-                $output[strtolower($key)] = $value;
-            }
-        }
-
-        // For those smarty pants that write 'replace => NX/XX'.
-        if ($output['replace'] === 'NX') {
-            $output['replace'] = false;
-        }
-        else if ($output['replace'] === 'XX') {
-            $output['replace'] = true;
-        }
-        else if (!is_bool($output['replace'])) {
-            $output['replace'] = null;
-        }
-
-        return $output;
-    }
-
-
-    /**
-     * Parse + normalise zrange() flags.
-     *
-     * @param array $flags
-     * @return array
-     */
-    protected static function parseRangeFlags(array $flags): array
-    {
-        $output = [
-            'withscores' => false,
-            'byscore' => false,
-            'bylex' => false,
-            'rev' => false,
-            'limit' => null,
-        ];
-
-        // Normalise things.
-        foreach ($flags as $key => $value) {
-            if (is_numeric($key)) {
-                $flags[strtolower($value)] = true;
-            }
-            else {
-                $flags[strtolower($key)] = $value;
-            }
-        }
-
-        if (!empty($flags['with_scores']) or !empty($flags['withscores'])) {
-            $output['withscores'] = true;
-        }
-
-        if (!empty($flags['by_score']) or !empty($flags['byscore'])) {
-            $output['byscore'] = true;
-        }
-
-        if (!empty($flags['by_lex']) or !empty($flags['bylex'])) {
-            $output['bylex'] = true;
-        }
-
-        if (!empty($flags['reverse']) or !empty($flags['rev'])) {
-            $output['rev'] = true;
-        }
-
-        // Parse limit into a keyed array.
-        if (
-            !empty($flags['limit'])
-            and is_array($flags['limit'])
-            and count($flags['limit']) >= 2
-        ) {
-            $offset = 0;
-            $count = -1;
-
-            // Numeric version.
-            if (isset($flags['limit'][0]) and isset($flags['limit'][1])) {
-                [$offset, $count] = $flags['limit'];
-            }
-
-            // Keyed version.
-            if (isset($flags['limit']['offset'])) {
-                $offset = $flags['limit']['offset'];
-            }
-
-            if (isset($flags['limit']['count'])) {
-                $count = $flags['limit']['count'];
-            }
-
-            $output['limit'] = [
-                'offset' => $offset,
-                'count' => $count,
-            ];
-        }
-
-        return $output;
     }
 
 
