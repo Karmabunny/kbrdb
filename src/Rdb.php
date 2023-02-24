@@ -123,15 +123,32 @@ abstract class Rdb
      *
      * This also discards keys.
      *
+     * Largely ripped from karmabunny/kb.
+     *
      * @param iterable $items
+     * @param int $depth
      * @return array
      */
-    protected static function flattenArrays(iterable $items): array
+    protected static function flattenArrays(iterable $items, int $depth = 25): array
     {
         $output = [];
-        array_walk_recursive($items, function($item) use (&$output) {
-            $output[] = $item;
-        });
+
+        foreach ($items as $value) {
+            if (is_iterable($value)) {
+                if ($depth <= 1) {
+                    continue;
+                }
+
+                $value = self::flattenArrays($value, false, $depth - 1);
+                foreach ($value as $sub) {
+                    $output[] = $sub;
+                }
+            }
+            else {
+                $output[] = $value;
+            }
+        }
+
         return $output;
     }
 
