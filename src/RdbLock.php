@@ -55,11 +55,26 @@ class RdbLock
 
     /**
      * A new lock!
+
+     * This will block for `$wait` milliseconds until the lock is released.
+     * It returns an instance if successful, otherwise null.
+     *
+     * ```
+     * $lock = $rdb->lock($key, 1000);
+     *
+     * if ($lock) {
+     *    // use resource.
+     *    $lock->release();
+     * }
+     * else {
+     *    // resource is busy.
+     * }
      *
      * @param Rdb $rdb
      * @param string $key
      * @param int $wait milliseconds
      * @param int $timeout milliseconds
+     * @return static|null
      */
     public static function acquire(Rdb $rdb, string $key, int $wait = 0, int $timeout = 60000)
     {
