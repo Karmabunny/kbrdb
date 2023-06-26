@@ -221,9 +221,26 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function append(string $key, string $value): int
+    {
+        return (int) $this->redis->append($key, $value);
+    }
+
+
+    /** @inheritdoc */
     public function get(string $key): ?string
     {
         $result = $this->redis->get($key);
+        if ($result === false) return null;
+        return $result;
+    }
+
+
+    /** @inheritdoc */
+    public function getRange(string $key, int $from = 0, int $to = -1): ?string
+    {
+        /** @var string|false $result */
+        $result = $this->redis->getRange($key, $from, $to);
         if ($result === false) return null;
         return $result;
     }

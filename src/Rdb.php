@@ -217,12 +217,36 @@ abstract class Rdb
 
 
     /**
+     * Append a value to a key.
+     *
+     * @param string $key
+     * @param string $value
+     * @return int string length after append
+     */
+    public abstract function append(string $key, string $value): int;
+
+
+    /**
      * Get a value. Null if missing.
      *
      * @param string $key
      * @return string|null
      */
     public abstract function get(string $key): ?string;
+
+
+    /**
+     * Get a substring of a value. Null if missing.
+     *
+     * Note, the second parameter is _not_ a 'length' like PHP's `substr`
+     * and is an _inclusive_ index.
+     *
+     * @param string $key
+     * @param int $from
+     * @param int $to
+     * @return string|null
+     */
+    public abstract function getRange(string $key, int $from = 0, int $to = -1): ?string;
 
 
     /**
@@ -719,6 +743,35 @@ abstract class Rdb
      */
     public abstract function scan(string $pattern): Generator;
 
+
+    /**
+     * A wrapper around getRange because it's spooky.
+     *
+     * This behaves the same as PHP's `substr()`.
+     *
+     * @param string $key
+     * @param int $from
+     * @param int $length
+     * @return null|string
+     */
+    public function substr(string $key, int $from, int $length = -1): ?string
+    {
+        if ($length == 0) {
+            return $this->exists($key) ? '' : null;
+        }
+
+        $to = $length;
+
+        if ($length !== -1) {
+            $to -= 1;
+        }
+
+        if ($length > 0) {
+            $to += $from;
+        }
+
+        return $this->getRange($key, $from, $to);
+    }
 
 
     /**

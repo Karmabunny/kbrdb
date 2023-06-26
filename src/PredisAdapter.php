@@ -173,9 +173,23 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function append(string $key, string $value): int
+    {
+        return (int) $this->predis->append($key, $value);
+    }
+
+
+    /** @inheritdoc */
     public function get(string $key): ?string
     {
         return $this->predis->get($key);
+    }
+
+
+    /** @inheritdoc */
+    public function getRange(string $key, int $from = 0, int $to = -1): ?string
+    {
+        return $this->predis->getrange($key, $from, $to);
     }
 
 

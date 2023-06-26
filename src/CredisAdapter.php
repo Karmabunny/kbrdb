@@ -217,10 +217,28 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function append(string $key, string $value): int
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->append($key, $value);
+    }
+
+
+    /** @inheritdoc */
     public function get(string $key): ?string
     {
         $key = $this->config->prefix . $key;
         $result = $this->credis->get($key);
+        if (!is_string($result)) return null;
+        return $result;
+    }
+
+
+    /** @inheritdoc */
+    public function getRange(string $key, int $from = 0, int $to = -1): ?string
+    {
+        $key = $this->config->prefix . $key;
+        $result = $this->credis->getRange($key, $from, $to);
         if (!is_string($result)) return null;
         return $result;
     }

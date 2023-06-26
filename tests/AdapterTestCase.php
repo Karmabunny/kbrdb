@@ -123,6 +123,73 @@ abstract class AdapterTestCase extends TestCase
     }
 
 
+    public function testAppend()
+    {
+        // No exist.
+        $thing = $this->rdb->get('string:append');
+        $this->assertNull($thing);
+
+        // append to empty, creates a record.
+        $expected = 'abc';
+        $length = $this->rdb->append('string:append', $expected);
+        $this->assertEquals(strlen($expected), $length);
+
+        // append some more.
+        $expected .= '-more';
+        $length = $this->rdb->append('string:append', '-more');
+        $this->assertEquals(strlen($expected), $length);
+
+        $actual = $this->rdb->get('string:append');
+        $this->assertEquals($expected, $actual);
+    }
+
+
+    public function testGetRange()
+    {
+        // No exist.
+        $thing = $this->rdb->get('string:range');
+        $this->assertNull($thing);
+
+        $string = 'one:two:333';
+
+        // Sample data.
+        $ok = $this->rdb->set('string:range', $string);
+        $this->assertTrue($ok);
+
+        // Whole string with defaults.
+        $expected = $string;
+        $actual = $this->rdb->getRange('string:range');
+        $this->assertEquals($expected, $actual);
+
+        $actual = $this->rdb->substr('string:range', 0);
+        $this->assertEquals($expected, $actual);
+
+        // Offsets.
+        $expected = substr($string, 4);
+        $actual = $this->rdb->getRange('string:range', 4);
+        $this->assertEquals($expected, $actual);
+
+        $actual = $this->rdb->substr('string:range', 4);
+        $this->assertEquals($expected, $actual);
+
+        // Offsets and lengths.
+        $expected = substr($string, 4, 3);
+        $actual = $this->rdb->getRange('string:range', 4, 6);
+        $this->assertEquals($expected, $actual);
+
+        $actual = $this->rdb->substr('string:range', 4, 3);
+        $this->assertEquals($expected, $actual);
+
+        // Negative lengths.
+        $expected = substr($string, 4, -4);
+        $actual = $this->rdb->getRange('string:range', 4, -5);
+        $this->assertEquals($expected, $actual);
+
+        $actual = $this->rdb->substr('string:range', 4, -4);
+        $this->assertEquals($expected, $actual);
+    }
+
+
     public function testSetExpire()
     {
     }
