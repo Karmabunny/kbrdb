@@ -44,6 +44,13 @@ This library wouldn't ever try to _hide_ features behind target versions, but pe
 For example, `BRPOPLPUSH` is deprecated in v6.2 and might be removed in the distant future. In this case, the library would be able to dynamically replace (based on the server version) this with `BLMOVE`.
 
 
+### Plans for v2
+
+There is a preference for the millisecond version of a command, particularly TTL parameters. This is clearly misleading and already wildly inconsistent. Ideally this changes so that a 'float' is converted to the millisecond version and integer remains unchanged. Thus the input is always 'seconds'.
+
+Type errors are currently (hopefully) always a `null` return. This can quite confusing at times, or helpful in others. Version 2 will likely permit both, defaulting to emitting exceptions.
+
+
 ### Config
 
 - `host` - server name + port
