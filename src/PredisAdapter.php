@@ -95,7 +95,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function ttl(string $key): ?int
     {
-        return $this->predis->ttl($key);
+        return $this->predis->pttl($key);
     }
 
 
