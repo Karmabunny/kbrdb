@@ -35,8 +35,8 @@ class PhpRedisAdapter extends Rdb
 
         $this->redis = new Redis();
 
-        $retry_interval = $config->options['retry_interval'] ?? null;
-        $retry_timeout = $config->options['retry_timeout'] ?? null;
+        $retry_interval = $config->options['retry_interval'] ?? 0;
+        $retry_timeout = $config->options['retry_timeout'] ?? 0;
 
         $success = $this->redis->connect(
             $config->getHost(),
