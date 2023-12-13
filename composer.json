@@ -23,7 +23,7 @@
     "require": {
         "predis/predis": "^2.2",
         "colinmollenhour/credis": "^1",
-        "php": ">=7.1"
+        "php": ">=7.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^9",

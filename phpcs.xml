@@ -8,7 +8,7 @@
     <file>src</file>
 
     <!-- Test this PHP version. -->
-    <config name="testVersion" value="7.1"/>
+    <config name="testVersion" value="7.2-"/>
 
     <!-- Extend this ruleset. -->
     <rule ref="PHPCompatibility">
