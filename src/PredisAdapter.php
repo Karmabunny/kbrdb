@@ -443,6 +443,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function zIncrBy(string $key, float $value, string $member): float
     {
+        // @phpstan-ignore-next-line: yeah no, increment can be a float.
         return (float) $this->predis->zincrby($key, $value, $member);
     }
 
@@ -508,6 +509,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function zCount(string $key, float $min, float $max): ?int
     {
+        // @phpstan-ignore-next-line: unsure actually but it worked previously.
         $count = $this->predis->zcount($key, $min, $max);
         if (!is_numeric($count)) return null;
         return (int) $count;

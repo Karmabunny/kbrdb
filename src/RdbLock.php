@@ -74,7 +74,7 @@ class RdbLock
      * @param string $key
      * @param int $wait milliseconds
      * @param int $timeout milliseconds
-     * @return static|null
+     * @return self|null
      */
     public static function acquire(Rdb $rdb, string $key, int $wait = 0, int $timeout = 60000)
     {
