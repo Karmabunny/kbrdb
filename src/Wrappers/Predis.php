@@ -22,18 +22,15 @@ class Predis extends Client
     /** @inheritdoc */
     public function onErrorResponse(CommandInterface $command, ErrorInterface $response)
     {
-        $this->options->exceptions = false;
-
-        $response = parent::onErrorResponse($command, $response);
-
-        if ($response instanceof ErrorInterface) {
-            if (strpos($response->getMessage(), 'WRONGTYPE') === 0) {
+        try {
+            return parent::onErrorResponse($command, $response);
+        }
+        catch (ServerException $exception) {
+            if (strpos($exception->getMessage(), 'WRONGTYPE') === 0) {
                 return null;
             }
 
-            throw new ServerException($response->getMessage());
+            throw $exception;
         }
-
-        return $response;
     }
 }
