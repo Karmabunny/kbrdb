@@ -90,7 +90,8 @@ abstract class StaticRdb
     public static function getInstance(): Rdb
     {
         static $rdb;
-        return $rdb ?? Rdb::create(static::getConfig());
+        $rdb = $rdb ?? Rdb::create(static::getConfig());
+        return $rdb;
     }
 
 
