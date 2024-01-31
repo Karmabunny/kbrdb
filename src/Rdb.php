@@ -9,7 +9,6 @@ namespace karmabunny\rdb;
 use Generator;
 use InvalidArgumentException;
 use JsonException;
-use JsonSerializable;
 
 /**
  * Rdb is a wrapper around other popular redis libraries.
@@ -982,7 +981,7 @@ abstract class Rdb
      * Store a JSON document in a key.
      *
      * @param string $key
-     * @param array|JsonSerializable $value
+     * @param mixed $value
      * @param int $ttl milliseconds
      * @return int
      */
@@ -998,18 +997,23 @@ abstract class Rdb
      * Get a JSON document from this key.
      *
      * @param string $key
-     * @return array|null
+     * @return mixed|null
      */
-    public function getJson(string $key): ?array
+    public function getJson(string $key)
     {
-        $out = json_decode($this->get($key) ?? 'null', true);
+        $value = $this->get($key);
+        if ($value === null) {
+            return null;
+        }
+
+        $value = json_decode($value, true);
 
         $error = json_last_error();
         if ($error !== JSON_ERROR_NONE) {
             throw new JsonException(json_last_error_msg(), $error);
         }
 
-        return $out;
+        return $value;
     }
 
 
