@@ -9,7 +9,7 @@ use CredisException;
  * This wraps up some error handling. We're just going for simple nulls here.
  *
  * @method string|null dump(string $key)
- * @method bool restore(string $key, int $ttl, string $value, array $flags)
+ * @method bool restore(string $key, int $ttl, string $value, string ...$flags)
  *
  * @package karmabunny\rdb\Wrappers
  */

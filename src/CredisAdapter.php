@@ -132,6 +132,7 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function dump(string $key): ?string
     {
+        $key = $this->config->prefix . $key;
         return $this->credis->dump($key) ?: null;
     }
 
@@ -139,6 +140,7 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function restore(string $key, int $ttl, string $value, array $flags = []): bool
     {
+        $key = $this->config->prefix . $key;
         $flags = $this->parseRestoreFlags($flags);
         $options = [];
 
@@ -146,7 +148,7 @@ class CredisAdapter extends Rdb
             $options[] = 'REPLACE';
         }
 
-        $ok = $this->credis->restore($key, $ttl, $value, $options);
+        $ok = $this->credis->restore($key, $ttl, $value, ...$options);
         return $ok !== false;
     }
 
