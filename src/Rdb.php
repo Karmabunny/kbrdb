@@ -1084,4 +1084,19 @@ abstract class Rdb
     {
         return new RdbBucket($this, $config);
     }
+
+
+    public function export($file, string $pattern = '*')
+    {
+        $export = new RdbExport($this, $pattern);
+        $export->export($file);
+    }
+
+
+    public function import($file, string $pattern = '*'): array
+    {
+        $import = new RdbImport($this, $pattern);
+        $import->import($file);
+        return $import->errors;
+    }
 }
