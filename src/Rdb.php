@@ -771,7 +771,7 @@ abstract class Rdb
      * @param int $ttl
      * @param string $value
      * @param array $flags
-     * @return string
+     * @return bool
      */
     public abstract function restore(string $key, int $ttl, string $value, array $flags = []): bool;
 

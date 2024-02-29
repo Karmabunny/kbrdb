@@ -25,7 +25,7 @@ class RdbImport
     /**
      *
      * @param string|resource $file
-     * @return iterable<array> [ key, type, data ]
+     * @return Generator<array> [ key, type, data ]
      */
     public function read($file): Generator
     {

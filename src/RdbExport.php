@@ -42,7 +42,7 @@ class RdbExport
 
     /**
      *
-     * @return iterable<array> [ key, type, data ]
+     * @return Generator<array> [ key, type, data ]
      */
     public function read(): Generator
     {
