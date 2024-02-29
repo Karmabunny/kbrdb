@@ -35,8 +35,10 @@ class RdbImport
     /**
      * Read all data from the file with the given 'pattern'.
      *
+     * This returns a 1-index key.
+     *
      * @param string|resource $file
-     * @return Generator<array> [ key, type, value ]
+     * @return Generator<int, array> [ key, type, value ]
      */
     public function read($file): Generator
     {

@@ -62,7 +62,9 @@ class RdbExport
     /**
      * Read all data from the DB with the given 'pattern'.
      *
-     * @return Generator<array> [ key, ttl, value ]
+     * This returns a 1-index key.
+     *
+     * @return Generator<int, array> [ key, ttl, value ]
      */
     public function read(): Generator
     {
