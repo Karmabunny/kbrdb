@@ -243,6 +243,101 @@ final class DumpTest extends TestCase
     }
 
 
+    public function testPatternExport()
+    {
+        $data = $this->dataDump();
+        [$data] = reset($data);
+
+        $path = __DIR__ . '/data/export-patterns.rdb';
+
+        // Clean initial.
+        $keys = $this->rdb->keys('*');
+        $this->assertEmpty($keys);
+
+        $this->insert($data);
+
+        // Lots of data.
+        $keys = $this->rdb->keys('*');
+        $this->assertNotEmpty($keys);
+
+        $this->rdb->export($path, 'string:*');
+
+        // Remove it all.
+        $keys = $this->rdb->keys('*');
+        $this->rdb->del($keys);
+
+        // Clean again.
+        $keys = $this->rdb->keys('*');
+        $this->assertEmpty($keys);
+
+        // Import it back.
+        $errors = $this->rdb->import($path);
+        $this->assertEmpty($errors, json_encode($errors));
+
+        // We have keys again.
+        $keys = $this->rdb->keys('*');
+        $this->assertNotEmpty($keys);
+
+        // We have the same count.
+        $expected = count($data['string']);
+        $this->assertCount($expected, $keys);
+
+        // We have the same data.
+        foreach ($data['string'] as $key => $expected) {
+            $actual = $this->rdb->get($key);
+            $this->assertEquals($expected, $actual);
+        }
+    }
+
+
+    public function testPatternImport()
+    {
+        $data = $this->dataDump();
+        [$data] = reset($data);
+
+        $path = __DIR__ . '/data/import-patterns.rdb';
+
+        // Clean initial.
+        $keys = $this->rdb->keys('*');
+        $this->assertEmpty($keys);
+
+        $this->insert($data);
+
+        // Lots of data.
+        $keys = $this->rdb->keys('*');
+        $this->assertNotEmpty($keys);
+
+        // Export it all.
+        $this->rdb->export($path);
+
+        // Remove it all.
+        $keys = $this->rdb->keys('*');
+        $this->rdb->del($keys);
+
+        // Clean again.
+        $keys = $this->rdb->keys('*');
+        $this->assertEmpty($keys);
+
+        // Import it back, just strings though.
+        $errors = $this->rdb->import($path, 'string:*');
+        $this->assertEmpty($errors, json_encode($errors));
+
+        // We have keys again.
+        $keys = $this->rdb->keys('*');
+        $this->assertNotEmpty($keys);
+
+        // We have the same count.
+        $expected = count($data['string']);
+        $this->assertCount($expected, $keys, json_encode($keys));
+
+        // We have the same data.
+        foreach ($data['string'] as $key => $expected) {
+            $actual = $this->rdb->get($key);
+            $this->assertEquals($expected, $actual);
+        }
+    }
+
+
     public function testAutoCompress()
     {
         $this->rdb->set('test1', 'one');
