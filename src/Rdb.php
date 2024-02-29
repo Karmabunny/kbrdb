@@ -758,6 +758,25 @@ abstract class Rdb
 
 
     /**
+     *
+     * @param string $key
+     * @return string|null
+     */
+    public abstract function dump(string $key): ?string;
+
+
+    /**
+     *
+     * @param string $key
+     * @param int $ttl
+     * @param string $value
+     * @param array $flags
+     * @return string
+     */
+    public abstract function restore(string $key, int $ttl, string $value, array $flags = []): bool;
+
+
+    /**
      * A wrapper around getRange because it's spooky.
      *
      * This behaves the same as PHP's `substr()`.

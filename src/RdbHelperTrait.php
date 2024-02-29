@@ -183,4 +183,39 @@ trait RdbHelperTrait
 
         return $output;
     }
+
+
+    /**
+     *
+     * @param array $flags
+     * @return array
+     */
+    protected static function parseRestoreFlags(array $flags): array
+    {
+        // Defaults.
+        $output = [
+            'replace' => false,
+            'absttl' => false,
+            'idletime' => null,
+            'freq' => null,
+        ];
+
+        // Normalise things.
+        foreach ($flags as $key => $value) {
+            if (is_numeric($key)) {
+                $flags[strtolower($value)] = true;
+            }
+            else {
+                $flags[strtolower($key)] = $value;
+            }
+        }
+
+        if ($flags['replace'] ?? false) {
+            $output['replace'] = true;
+        }
+
+        // TODO other flags.
+
+        return $output;
+    }
 }

@@ -93,6 +93,30 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function dump(string $key): ?string
+    {
+        return $this->predis->dump($key);
+    }
+
+
+    /** @inheritdoc */
+    public function restore(string $key, int $ttl, string $value, array $flags = []): bool
+    {
+        $flags = $this->parseRestoreFlags($flags);
+
+        $args = [$key, $ttl, $value];
+
+        if ($flags['replace']) {
+            $args[] = 'REPLACE';
+        }
+
+        /** @var Status $status */
+        $status = @call_user_func_array([$this->predis, 'restore'], $args);
+        return $status == 'OK';
+    }
+
+
+    /** @inheritdoc */
     public function ttl(string $key): ?int
     {
         return $this->predis->pttl($key);
