@@ -609,6 +609,61 @@ abstract class AdapterTestCase extends TestCase
         $actual = $this->rdb->zRevRank('ztest', 'b');
         $this->assertEquals($expected, $actual);
     }
+
+
+    public function dataDump()
+    {
+        // command - expected
+        return [
+            [ 'set', 'one' ],
+            [ 'rPush', ['x', 'a', 'z'] ],
+            [ 'sAdd', ['a', 'z', 'b'] ],
+            [ 'zAdd', ['a' => 10, 'g' => 5, 'z' => 7] ],
+        ];
+    }
+
+
+    /**
+     * @dataProvider dataDump
+     */
+    public function testDumpRestore($command, $expected)
+    {
+        $this->rdb->$command('dump:restore', $expected);
+
+        $dump = $this->rdb->dump('dump:restore');
+        $this->assertNotNull($dump);
+
+        $ok = $this->rdb->del('dump:restore');
+        $this->assertEquals(1, $ok);
+
+        $ok = $this->rdb->restore('dump:restore', 0, $dump, ['replace']);
+        $this->assertTrue($ok);
+
+        switch ($command) {
+            case 'set':
+                $actual = $this->rdb->get('dump:restore');
+                break;
+
+            case 'rPush':
+                $actual = $this->rdb->lRange('dump:restore');
+                break;
+
+            case 'sAdd':
+                $actual = $this->rdb->sMembers('dump:restore');
+                sort($actual);
+                sort($expected);
+                break;
+
+            case 'zAdd':
+                $actual = $this->rdb->zRange('dump:restore', null, null, ['withscores']);
+                break;
+
+            default:
+                $this->fail('Unknown command: ' . $command);
+        }
+
+        $this->assertEquals($expected, $actual);
+    }
 }
 
 
