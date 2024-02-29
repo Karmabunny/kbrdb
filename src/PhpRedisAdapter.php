@@ -140,13 +140,12 @@ class PhpRedisAdapter extends Rdb
     public function restore(string $key, int $ttl, string $value, array $flags = []): bool
     {
         $flags = $this->parseRestoreFlags($flags);
-        $options = [];
 
         if ($flags['replace']) {
-            $options[] = 'REPLACE';
+            $this->del($key);
         }
 
-        $ok = $this->redis->restore($key, $ttl, $value, $flags);
+        $ok = $this->redis->restore($key, $ttl, $value);
         return $ok !== false;
     }
 

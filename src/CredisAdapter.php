@@ -142,13 +142,24 @@ class CredisAdapter extends Rdb
     {
         $key = $this->config->prefix . $key;
         $flags = $this->parseRestoreFlags($flags);
-        $options = [];
 
-        if ($flags['replace']) {
-            $options[] = 'REPLACE';
+        if ($this->credis->isStandalone()) {
+            $options = [];
+
+            if ($flags['replace']) {
+                $options[] = 'REPLACE';
+            }
+
+            $ok = $this->credis->restore($key, $ttl, $value, ...$options);
+        }
+        else {
+            if ($flags['replace']) {
+                $this->del($key);
+            }
+
+            $ok = $this->credis->restore($key, $ttl, $value);
         }
 
-        $ok = $this->credis->restore($key, $ttl, $value, ...$options);
         return $ok !== false;
     }
 
