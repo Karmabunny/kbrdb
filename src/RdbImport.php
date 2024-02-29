@@ -65,7 +65,7 @@ class RdbImport
             // Filter keys.
             if (
                 $this->pattern !== '*'
-                and $this->rdb->match($this->pattern, $key)
+                and !$this->rdb->match($this->pattern, $key)
             ) {
                 continue;
             }
