@@ -33,8 +33,10 @@ trait RdbDumpTrait
 
 
     /**
+     * Create a dumper for this rdb + pattern.
      *
      * @param Rdb $rdb
+     * @param string $pattern
      */
     public function __construct(Rdb $rdb, string $pattern = '*')
     {
@@ -44,29 +46,34 @@ trait RdbDumpTrait
 
 
     /**
+     * Open a file in the given 'compression' mode.
      *
-     * @param string $path
+     * Note, gzip will auto-append the binary mode.
+     *
+     * TODO add gzip compression 1-9 support.
+     *
+     * @param string|resource $file
      * @param string $mode
      * @return void
-     * @throws Exception
+     * @throws Exception if the file cannot be opened.
      */
-    protected function open($path, $mode)
+    protected function open($file, string $mode)
     {
-        if (is_string($path)) {
+        if (is_string($file)) {
             if ($this->compressed) {
-                $handle = @gzopen($path, $mode . 'b');
+                $handle = @gzopen($file, $mode . 'b');
             }
             else {
-                $handle = @fopen($path, $mode);
+                $handle = @fopen($file, $mode);
             }
 
             if (!$handle) {
-                throw new Exception("Failed to open file: {$path}");
+                throw new Exception("Failed to open file: {$file}");
             }
         }
 
         if (!is_resource($handle)) {
-            throw new Exception("Invalid file handle: {$path}");
+            throw new Exception("Invalid file handle: {$file}");
         }
 
         $this->handle = $handle;
@@ -74,10 +81,12 @@ trait RdbDumpTrait
 
 
     /**
+     * Is this file a gzip?
+     *
      * @param string $path
      * @return bool
      */
-    public function isGzip(string $path): bool
+    public static function isGzip(string $path): bool
     {
         $file = @fopen($path, 'rb');
 
@@ -107,6 +116,7 @@ trait RdbDumpTrait
 
 
     /**
+     * Get all the lines from the file.
      *
      * @return iterable<string|false>
      */
@@ -137,7 +147,12 @@ trait RdbDumpTrait
     }
 
 
-    protected function eof()
+    /**
+     * Is this file open?
+     *
+     * @return bool false if open, true if closed
+     */
+    protected function eof(): bool
     {
         if ($this->compressed) {
             return gzeof($this->handle);
@@ -149,6 +164,9 @@ trait RdbDumpTrait
 
 
     /**
+     * Close ths file.
+     *
+     * Warning: only close your own files!
      *
      * @return void
      */

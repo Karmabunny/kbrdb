@@ -10,8 +10,24 @@ use Exception;
 use Generator;
 
 /**
- * Dump stuff.
+ * Bulk export of data.
  *
+ * This uses the 'dump' command. Types and TTLs are preserved.
+ *
+ * The output format is a JSON-lines file, with base64 encoded values.
+ *
+ * By default the file will be gzip compressed.
+ *
+ * ```
+ * [ key1, ttl, base64 ]\n
+ * [ key2, ttl, base64 ]\n
+ * [ key3, ttl, base64 ]\n
+ * ...
+ * ```
+ *
+ * Attach a 'log' callback to track export progress and errors.
+ *
+ * @see RdbImport
  * @package karmabunny\rdb
  */
 class RdbExport
@@ -20,6 +36,9 @@ class RdbExport
 
 
     /**
+     * Write an entry to the file.
+     *
+     * This encodes and zips (if enabled).
      *
      * @param string $key
      * @param int $ttl
@@ -41,8 +60,9 @@ class RdbExport
 
 
     /**
+     * Read all data from the DB with the given 'pattern'.
      *
-     * @return Generator<array> [ key, type, data ]
+     * @return Generator<array> [ key, ttl, value ]
      */
     public function read(): Generator
     {
@@ -62,6 +82,10 @@ class RdbExport
 
 
     /**
+     * Export all data from the DB with the 'pattern' into this file.
+     *
+     * If providing a file handle, please ensure the type matches
+     * the 'compressed' setting. Handles are not closed after writing.
      *
      * @param string|resource $file
      * @return void

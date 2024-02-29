@@ -10,8 +10,18 @@ use Exception;
 use Generator;
 
 /**
- * Dump stuff.
+ * Bulk import of data.
  *
+ * This uses the 'restore' command. Types and TTLs are preserved.
+ *
+ * The input is expected to match that of {@see RdbExport} - a JSON-lines file,
+ * with base64 encoded values.
+ *
+ * The gzip compression is auto-detected (if using file paths).
+ *
+ * Attach a 'log' callback to track import progress and errors.
+ *
+ * @see RdbExport
  * @package karmabunny\rdb
  */
 class RdbImport
@@ -23,9 +33,10 @@ class RdbImport
 
 
     /**
+     * Read all data from the file with the given 'pattern'.
      *
      * @param string|resource $file
-     * @return Generator<array> [ key, type, data ]
+     * @return Generator<array> [ key, type, value ]
      */
     public function read($file): Generator
     {
@@ -88,6 +99,12 @@ class RdbImport
 
 
     /**
+     * Import data that matches the 'pattern' into the DB.
+     *
+     * If providing a file handle, please ensure the type matches
+     * the 'compressed' setting. Handles are not closed after writing.
+     *
+     * Compressed files will be auto-detected if using a file path.
      *
      * @param string|resource $file
      * @return bool
