@@ -45,6 +45,7 @@
         "Phar",
         "posix",
         "pspell",
+        "random",
         "readline",
         "redis",
         "Reflection",
