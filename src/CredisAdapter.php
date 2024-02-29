@@ -130,6 +130,28 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function dump(string $key): ?string
+    {
+        return $this->credis->dump($key) ?: null;
+    }
+
+
+    /** @inheritdoc */
+    public function restore(string $key, int $ttl, string $value, array $flags = []): bool
+    {
+        $flags = $this->parseRestoreFlags($flags);
+        $options = [];
+
+        if ($flags['replace']) {
+            $options[] = 'REPLACE';
+        }
+
+        $ok = $this->credis->restore($key, $ttl, $value, $options);
+        return $ok !== false;
+    }
+
+
+    /** @inheritdoc */
     public function ttl(string $key): ?int
     {
         $key = $this->config->prefix . $key;

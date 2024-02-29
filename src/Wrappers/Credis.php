@@ -8,6 +8,9 @@ use CredisException;
 /**
  * This wraps up some error handling. We're just going for simple nulls here.
  *
+ * @method string|null dump(string $key)
+ * @method bool restore(string $key, int $ttl, string $value, array $flags)
+ *
  * @package karmabunny\rdb\Wrappers
  */
 class Credis extends Credis_Client

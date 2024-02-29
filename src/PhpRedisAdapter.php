@@ -130,6 +130,28 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function dump(string $key): ?string
+    {
+        return $this->redis->dump($key) ?: null;
+    }
+
+
+    /** @inheritdoc */
+    public function restore(string $key, int $ttl, string $value, array $flags = []): bool
+    {
+        $flags = $this->parseRestoreFlags($flags);
+        $options = [];
+
+        if ($flags['replace']) {
+            $options[] = 'REPLACE';
+        }
+
+        $ok = $this->redis->restore($key, $ttl, $value, $flags);
+        return $ok !== false;
+    }
+
+
+    /** @inheritdoc */
     public function ttl(string $key): ?int
     {
         $value = $this->redis->pttl($key);
