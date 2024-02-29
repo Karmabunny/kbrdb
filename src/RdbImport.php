@@ -70,7 +70,7 @@ class RdbImport
                 continue;
             }
 
-            $value = base64_decode($value);
+            $value = base64_decode($value, true);
 
             if ($value === false) {
                 $this->errors[$index] = 'base64';
