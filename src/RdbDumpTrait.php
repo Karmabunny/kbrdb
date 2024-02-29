@@ -70,13 +70,16 @@ trait RdbDumpTrait
             if (!$handle) {
                 throw new Exception("Failed to open file: {$file}");
             }
-        }
 
-        if (!is_resource($handle)) {
-            throw new Exception("Invalid file handle: {$file}");
+            $this->handle = $handle;
         }
+        else {
+            if (!is_resource($file)) {
+                throw new Exception("Invalid file handle");
+            }
 
-        $this->handle = $handle;
+            $this->handle = $file;
+        }
     }
 
 
