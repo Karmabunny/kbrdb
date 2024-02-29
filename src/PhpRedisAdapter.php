@@ -383,6 +383,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function lPush(string $key, ...$items): ?int
     {
+        $items = $this->flatten($items, 2);
         $count = $this->redis->lPush($key, ...$items);
         if ($count === false) return null;
         return $count;
@@ -392,6 +393,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function rPush(string $key, ...$items): ?int
     {
+        $items = $this->flatten($items, 2);
         $count = $this->redis->rPush($key, ...$items);
         if ($count === false) return null;
         return $count;

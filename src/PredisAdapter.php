@@ -312,6 +312,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function lPush(string $key, ...$items): ?int
     {
+        $items = $this->flatten($items, 2);
         $count = $this->predis->lpush($key, $items);
         return $count;
     }
@@ -320,6 +321,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function rPush(string $key, ...$items): ?int
     {
+        $items = $this->flatten($items, 2);
         $count = $this->predis->rpush($key, $items);
         return $count;
     }

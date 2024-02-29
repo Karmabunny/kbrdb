@@ -379,6 +379,7 @@ class CredisAdapter extends Rdb
     public function lPush(string $key, ...$items): ?int
     {
         $key = $this->config->prefix . $key;
+        $items = $this->flatten($items, 2);
         $count = $this->credis->lPush($key, ...$items);
         if (!is_numeric($count)) return null;
         return $count;
@@ -389,6 +390,7 @@ class CredisAdapter extends Rdb
     public function rPush(string $key, ...$items): ?int
     {
         $key = $this->config->prefix . $key;
+        $items = $this->flatten($items, 2);
         $count = $this->credis->rPush($key, ...$items);
         if (!is_numeric($count)) return null;
         return $count;
