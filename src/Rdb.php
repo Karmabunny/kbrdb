@@ -103,6 +103,20 @@ abstract class Rdb
 
 
     /**
+     * Does this key match the pattern?
+     *
+     * @param string $pattern
+     * @param string $key
+     * @return bool
+     */
+    public static function match(string $pattern, string $key): bool
+    {
+        $pattern = str_replace('[^', '[!', $pattern);
+        return fnmatch($pattern, $key, FNM_NOESCAPE);
+    }
+
+
+    /**
      * Strip the prefix from list of keys.
      *
      * @param string $key

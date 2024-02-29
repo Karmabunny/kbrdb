@@ -2,6 +2,7 @@
 
 namespace kbtests;
 
+use karmabunny\rdb\Rdb;
 use karmabunny\rdb\RdbHelperTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -10,6 +11,35 @@ use PHPUnit\Framework\TestCase;
  */
 final class HelperTest extends TestCase
 {
+
+    public function dataMatch()
+    {
+        return [
+            ['h?llo', ['hello', 'hallo', 'hxllo'], ['heello']],
+            ['h*llo', ['hllo', 'heeeello', 'helllllo'], ['hlo', 'helloo']],
+            ['h[ae]llo', ['hello', 'hallo'], ['hllo', 'hillo']],
+            ['h[^e]llo', ['hallo', 'hzllo'], ['hllo', 'hello']],
+            ['h[a-b]llo', ['hallo', 'hbllo'], ['hllo', 'hcllo']],
+        ];
+    }
+
+
+    /**
+     * @dataProvider dataMatch
+     */
+    public function testMatch($pattern, $good, $bad)
+    {
+        foreach ($good as $key) {
+            $actual = Rdb::match($pattern, $key);
+            $this->assertTrue($actual, "{$pattern} - {$key}");
+        }
+
+        foreach ($bad as $key) {
+            $actual = Rdb::match($pattern, $key);
+            $this->assertFalse($actual, "{$pattern} - {$key}");
+        }
+    }
+
 
     public function testFlatten()
     {
