@@ -109,13 +109,14 @@ class RdbImport
      * Compressed files will be auto-detected if using a file path.
      *
      * @param string|resource $file
-     * @return bool
+     * @return int The number of items imported.
      * @throws Exception
      */
-    public function import($file): bool
+    public function import($file): int
     {
         $this->errors = [];
 
+        $index = 0;
         $data = $this->read($file);
 
         foreach ($data as $index => $item) {
@@ -128,6 +129,6 @@ class RdbImport
             }
         }
 
-        return empty($this->errors);
+        return $index;
     }
 }

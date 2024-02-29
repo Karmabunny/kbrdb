@@ -90,7 +90,7 @@ class RdbExport
      * the 'compressed' setting. Handles are not closed after writing.
      *
      * @param string|resource $file
-     * @return void
+     * @return int The number of items exported.
      * @throws Exception
      */
     public function export($file)
@@ -114,5 +114,7 @@ class RdbExport
         if (is_string($file)) {
             $this->close();
         }
+
+        return $index;
     }
 }
