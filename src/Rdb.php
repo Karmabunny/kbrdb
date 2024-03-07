@@ -878,6 +878,39 @@ abstract class Rdb
     public abstract function zRevRank(string $key, string $member): ?int;
 
 
+    public abstract function hDel(string $key, ...$fields): int;
+
+
+    public abstract function hExists(string $key, string $field): bool;
+
+
+    public abstract function hGet(string $key, string $field): ?string;
+
+
+    public abstract function hGetAll(string $key): array;
+
+
+    public abstract function hIncrBy(string $key, string $field, $increment);
+
+
+    public abstract function hKeys(string $key): array;
+
+
+    public abstract function hLen(string $key): int;
+
+
+    public abstract function hmGet(string $key, ...$fields): array;
+
+
+    public abstract function hScan(string $key, array $pattern): Generator;
+
+
+    public abstract function hSet(string $key, array $fields, bool $force = false): bool;
+
+
+    public abstract function hVals(string $key, array $fields, bool $force = false): array;
+
+
     /**
      * Do these keys exist?
      *

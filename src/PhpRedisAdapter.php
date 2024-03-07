@@ -792,4 +792,80 @@ class PhpRedisAdapter extends Rdb
         return $ok;
     }
 
+
+    /** @inheritdoc */
+    public function hDel(string $key, ...$fields): int
+    {
+
+    }
+
+
+    /** @inheritdoc */
+    public function hExists(string $key, string $field): bool
+    {
+
+    }
+
+
+    /** @inheritdoc */
+    public function hGet(string $key, string $field): ?string
+    {
+
+    }
+
+
+    /** @inheritdoc */
+    public function hGetAll(string $key): array
+    {
+
+    }
+
+
+    /** @inheritdoc */
+    public function hIncrBy(string $key, string $field, $increment)
+    {
+
+    }
+
+
+    /** @inheritdoc */
+    public function hKeys(string $key): array
+    {
+
+    }
+
+
+    /** @inheritdoc */
+    public function hLen(string $key): int
+    {
+
+    }
+
+
+    /** @inheritdoc */
+    public function hmGet(string $key, ...$fields): array
+    {
+
+    }
+
+
+    /** @inheritdoc */
+    public function hScan(string $key, array $pattern): Generator
+    {
+
+    }
+
+
+    /** @inheritdoc */
+    public function hSet(string $key, array $fields, bool $force = false): bool
+    {
+
+    }
+
+
+    /** @inheritdoc */
+    public function hVals(string $key, array $fields, bool $force = false): array
+    {
+
+    }
 }

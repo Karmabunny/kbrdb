@@ -808,4 +808,81 @@ class CredisAdapter extends Rdb
         $key = $this->config->prefix . $key;
         return $this->credis->zRevRank($key, $member);
     }
+
+
+    /** @inheritdoc */
+    public function hDel(string $key, ...$fields): int
+    {
+        $key = $this->config->prefix . $key;
+    }
+
+
+    /** @inheritdoc */
+    public function hExists(string $key, string $field): bool
+    {
+        $key = $this->config->prefix . $key;
+    }
+
+
+    /** @inheritdoc */
+    public function hGet(string $key, string $field): ?string
+    {
+        $key = $this->config->prefix . $key;
+    }
+
+
+    /** @inheritdoc */
+    public function hGetAll(string $key): array
+    {
+        $key = $this->config->prefix . $key;
+    }
+
+
+    /** @inheritdoc */
+    public function hIncrBy(string $key, string $field, $increment)
+    {
+        $key = $this->config->prefix . $key;
+    }
+
+
+    /** @inheritdoc */
+    public function hKeys(string $key): array
+    {
+        $key = $this->config->prefix . $key;
+    }
+
+
+    /** @inheritdoc */
+    public function hLen(string $key): int
+    {
+        $key = $this->config->prefix . $key;
+    }
+
+
+    /** @inheritdoc */
+    public function hmGet(string $key, ...$fields): array
+    {
+        $key = $this->config->prefix . $key;
+    }
+
+
+    /** @inheritdoc */
+    public function hScan(string $key, array $pattern): Generator
+    {
+        $key = $this->config->prefix . $key;
+    }
+
+
+    /** @inheritdoc */
+    public function hSet(string $key, array $fields, bool $force = false): bool
+    {
+        $key = $this->config->prefix . $key;
+    }
+
+
+    /** @inheritdoc */
+    public function hVals(string $key, array $fields, bool $force = false): array
+    {
+        $key = $this->config->prefix . $key;
+    }
 }
