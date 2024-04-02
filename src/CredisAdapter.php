@@ -72,6 +72,21 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function select(int $database): bool
+    {
+        return (bool) $this->credis->select($database);
+    }
+
+
+    /** @inheritdoc */
+    public function move(string $key, int $database): bool
+    {
+        $key = $this->config->prefix . $key;
+        return (bool) $this->credis->move($key, $database);
+    }
+
+
+    /** @inheritdoc */
     public function registerSessionHandler(string $prefix = 'session:'): bool
     {
         if ($this->credis->isStandalone()) {

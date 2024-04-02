@@ -85,6 +85,20 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function select(int $database): bool
+    {
+        return (bool) $this->redis->select($database);
+    }
+
+
+    /** @inheritdoc */
+    public function move(string $key, int $database): bool
+    {
+        return (bool) $this->redis->move($key, $database);
+    }
+
+
+    /** @inheritdoc */
     public function registerSessionHandler(string $prefix = 'session:'): bool
     {
         ini_set('session.save_handler', 'redis');

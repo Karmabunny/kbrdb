@@ -134,6 +134,25 @@ abstract class Rdb
 
 
     /**
+     * Change the active database.
+     *
+     * @param int $database
+     * @return bool
+     */
+    public abstract function select(int $database): bool;
+
+
+    /**
+     * Move a key from the active database to another database.
+     *
+     * @param string $key
+     * @param int $database
+     * @return bool
+     */
+    public abstract function move(string $key, int $database): bool;
+
+
+    /**
      * Install a session handler.
      *
      * Some adapters may not support session handlers in certain conditions.

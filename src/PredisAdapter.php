@@ -53,6 +53,20 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function select(int $database): bool
+    {
+        return (bool) $this->predis->select($database);
+    }
+
+
+    /** @inheritdoc */
+    public function move(string $key, int $database): bool
+    {
+        return (bool) $this->predis->move($key, $database);
+    }
+
+
+    /** @inheritdoc */
     public function registerSessionHandler(string $prefix = 'session:'): bool
     {
         // We're creating a new client here, but with a modified prefix.
