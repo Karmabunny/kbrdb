@@ -58,6 +58,8 @@ class PhpRedisAdapter extends Rdb
         // Skip empty results within the extension, which is hopefully
         // a bit faster than doing it in PHP.
         $this->redis->setOption(Redis::OPT_SCAN, Redis::SCAN_RETRY);
+
+        $this->redis->select($this->config->database);
     }
 
 

@@ -45,6 +45,7 @@ class CredisAdapter extends Rdb
         }
 
         $this->credis->connect();
+        $this->credis->select($config->database);
     }
 
 

@@ -47,6 +47,8 @@ class PredisAdapter extends Rdb
 
         $this->predis = new Predis($parameters, $options);
         $this->predis->connect();
+
+        $this->predis->select($this->config->database);
     }
 
 

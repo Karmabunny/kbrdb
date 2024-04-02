@@ -39,6 +39,9 @@ class RdbConfig
     /** @var string */
     public $prefix = '';
 
+    /** @var int */
+    public $database = 0;
+
     /** @var string RdbConfig::TYPE */
     public $adapter = self::TYPE_PREDIS;
 
