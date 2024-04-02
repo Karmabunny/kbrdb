@@ -21,6 +21,7 @@ final class CredisTest extends AdapterTestCase
         ]);
 
         $this->rdb = $rdb;
+        $rdb->select(0);
         $rdb->del($rdb->keys('*'));
     }
 }

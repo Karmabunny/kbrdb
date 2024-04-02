@@ -21,6 +21,7 @@ final class PhpRedisTest extends AdapterTestCase
         ]);
 
         $this->rdb = $rdb;
+        $rdb->select(0);
         $rdb->del($rdb->keys('*'));
     }
 }

@@ -611,6 +611,35 @@ abstract class AdapterTestCase extends TestCase
     }
 
 
+
+    public function testSelectMove()
+    {
+        // Quick tidy up.
+        $this->rdb->select(1);
+        $this->rdb->del($this->rdb->keys('*'));
+        $this->rdb->select(0);
+
+        $expected = 'hello';
+        $this->rdb->set('move:thing', $expected);
+
+        $actual = $this->rdb->get('move:thing');
+        $this->assertEquals($expected, $actual);
+
+        // Do the move.
+        $this->rdb->move('move:thing', 1);
+
+        // Check empty.
+        $actual = $this->rdb->get('move:thing');
+        $this->assertNull($actual);
+
+        // Switch and check new DB location.
+        $this->rdb->select(1);
+
+        $actual = $this->rdb->get('move:thing');
+        $this->assertEquals($expected, $actual);
+    }
+
+
     public function dataDump()
     {
         // command - expected
