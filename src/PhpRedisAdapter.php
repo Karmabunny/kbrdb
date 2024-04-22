@@ -345,6 +345,27 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function sScan(string $key, string $pattern = null): Generator
+    {
+        $pattern = $pattern ?: '*';
+        $it = null;
+
+        for (;;) {
+            $items = $this->redis->sscan($it, $pattern, $this->config->scan_size);
+            if ($items === false) break;
+
+            foreach ($items as $item) {
+                yield $item;
+            }
+
+            // The iterator is done.
+            // Keys might not be empty though, so do this last.
+            if (!$it) break;
+        }
+    }
+
+
+    /** @inheritdoc */
     public function sRem(string $key, ...$values): ?int
     {
         $values = self::flattenArrays($values);

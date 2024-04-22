@@ -10,6 +10,7 @@ use Generator;
 use karmabunny\rdb\Wrappers\Predis;
 use Predis\Client;
 use Predis\Collection\Iterator\Keyspace;
+use Predis\Collection\Iterator\SetKey;
 use Predis\Connection\Parameters;
 use Predis\Response\Status;
 use Predis\Session\Handler;
@@ -270,6 +271,14 @@ class PredisAdapter extends Rdb
     public function sMembers(string $key): ?array
     {
         return $this->predis->smembers($key);
+    }
+
+
+    /** @inheritdoc */
+    public function sScan(string $key, string $pattern = null): Generator
+    {
+        $iterator = new SetKey($this->predis, $key, $pattern, $this->config->scan_size);
+        yield from $iterator;
     }
 
 

@@ -346,6 +346,31 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function sScan(string $key, string $pattern = null): Generator
+    {
+        $pattern = $pattern ?: '*';
+        $key = $this->config->prefix . $key;
+
+        $it = null;
+
+        for (;;) {
+            $items = $this->credis->sscan($it, $pattern, $this->config->scan_size);
+
+            // If it's backed by php-redis it might return false.
+            if ($items === false) break;
+
+            foreach ($items as $item) {
+                yield $item;
+            }
+
+            // The iterator is done.
+            // Keys might not be empty though, so do this last.
+            if (!$it) break;
+        }
+    }
+
+
+    /** @inheritdoc */
     public function sRem(string $key, ...$values): ?int
     {
         $values = self::flattenArrays($values);

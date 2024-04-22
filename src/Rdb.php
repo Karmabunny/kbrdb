@@ -328,6 +328,18 @@ abstract class Rdb
 
 
     /**
+     * Scan values of a set.
+     *
+     * All results will be unique.
+     *
+     * @param string $key
+     * @param string $pattern
+     * @return Generator<string> set members
+     */
+    public abstract function sScan(string $key, string $pattern = '*'): Generator;
+
+
+    /**
      * Remove an item (or items) from a set.
      *
      * @param string $key
