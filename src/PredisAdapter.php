@@ -270,6 +270,11 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function sMembers(string $key): ?array
     {
+        if ($this->config->scan_keys) {
+            $items = $this->sScan($key);
+            return iterator_to_array($items, false);
+        }
+
         return $this->predis->smembers($key);
     }
 

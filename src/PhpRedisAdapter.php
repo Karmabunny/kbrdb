@@ -337,6 +337,11 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function sMembers(string $key): ?array
     {
+        if ($this->config->scan_keys) {
+            $items = $this->sScan($key);
+            return iterator_to_array($items, false);
+        }
+
         /** @var array|false $items - typings are LYING */
         $items = $this->redis->sMembers($key);
         if ($items === false) return null;

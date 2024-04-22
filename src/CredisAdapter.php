@@ -341,6 +341,12 @@ class CredisAdapter extends Rdb
     public function sMembers(string $key): ?array
     {
         $key = $this->config->prefix . $key;
+
+        if ($this->config->scan_keys) {
+            $items = $this->sScan($key);
+            return iterator_to_array($items, false);
+        }
+
         return $this->credis->sMembers($key);
     }
 
