@@ -99,7 +99,7 @@ class PredisAdapter extends Rdb
     public function scan(string $pattern): Generator
     {
         $pattern = $this->config->prefix . $pattern;
-        $iterator = new Keyspace($this->predis, $pattern, $this->config->chunk_size);
+        $iterator = new Keyspace($this->predis, $pattern, $this->config->scan_size);
 
         foreach ($iterator as $key) {
             $key = $this->stripPrefix($key);

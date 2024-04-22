@@ -135,12 +135,16 @@ class PhpRedisAdapter extends Rdb
         $it = null;
 
         for (;;) {
-            $keys = $this->redis->scan($it, $pattern, $this->config->chunk_size);
+            $keys = $this->redis->scan($it, $pattern, $this->config->scan_size);
             if ($keys === false) break;
 
             foreach ($keys as $key) {
                 yield $this->stripPrefix($key);
             }
+
+            // The iterator is done.
+            // Keys might not be empty though, so do this last.
+            if (!$it) break;
         }
     }
 

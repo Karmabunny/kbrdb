@@ -129,13 +129,13 @@ class CredisAdapter extends Rdb
         $it = null;
 
         for (;;) {
-            $keys = $this->credis->scan($it, $pattern, $this->config->chunk_size);
+            $keys = $this->credis->scan($it, $pattern, $this->config->scan_size);
 
             // If it's backed by php-redis it might return false.
-            if ($keys) {
-                foreach ($keys as $key) {
-                    yield $this->stripPrefix($key);
-                }
+            if ($keys === false) break;
+
+            foreach ($keys as $key) {
+                yield $this->stripPrefix($key);
             }
 
             // The iterator is done.

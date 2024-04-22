@@ -45,8 +45,11 @@ class RdbConfig
     /** @var string RdbConfig::TYPE */
     public $adapter = self::TYPE_PREDIS;
 
-    /** @var int for scan, mscan, and friends */
+    /** @var int for mscan and friends (mScanObjects) */
     public $chunk_size = 50;
+
+    /** @var int for scan and friends (sscan, hscan, zscan) */
+    public $scan_size = 1000;
 
     /** @var int in seconds - connection timeout */
     public $timeout = 5;
