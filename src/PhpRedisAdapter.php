@@ -356,7 +356,7 @@ class PhpRedisAdapter extends Rdb
         $it = null;
 
         for (;;) {
-            $items = $this->redis->sscan($it, $pattern, $this->config->scan_size);
+            $items = $this->redis->sscan($key, $it, $pattern, $this->config->scan_size);
             if ($items === false) break;
 
             foreach ($items as $item) {

@@ -360,7 +360,7 @@ class CredisAdapter extends Rdb
         $it = null;
 
         for (;;) {
-            $items = $this->credis->sscan($it, $pattern, $this->config->scan_size);
+            $items = $this->credis->sscan($it, $key, $pattern, $this->config->scan_size);
 
             // If it's backed by php-redis it might return false.
             if ($items === false) break;
