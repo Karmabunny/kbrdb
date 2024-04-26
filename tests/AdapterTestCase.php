@@ -224,6 +224,10 @@ abstract class AdapterTestCase extends TestCase
         $actual = $this->rdb->sMembers('yes:a:set');
         $this->assertArraySameAs($expected, $actual);
 
+        $actual = $this->rdb->sScan('yes:a:set');
+        $actual = iterator_to_array($actual);
+        $this->assertArraySameAs($expected, $actual);
+
         // Removing from a set.
         $expected = 0;
         $actual = $this->rdb->sRem('yes:a:set', 'blah');
@@ -240,6 +244,10 @@ abstract class AdapterTestCase extends TestCase
         // Check.
         $expected = [];
         $actual = $this->rdb->sMembers('yes:a:set');
+        $this->assertArraySameAs($expected, $actual);
+
+        $actual = $this->rdb->sScan('yes:a:set');
+        $actual = iterator_to_array($actual);
         $this->assertArraySameAs($expected, $actual);
 
         // Testing bad types.
