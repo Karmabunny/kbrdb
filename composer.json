@@ -36,6 +36,7 @@
         "tests": "phpunit --testdox --configuration phpunit.xml tests",
         "analyse": "phpstan analyse -c phpstan.neon",
         "publish": "bash scripts/publish.sh",
-        "compat": "phpcs -p --standard=phpcs.xml --colors --extensions=php"
+        "compat": "phpcs -p --standard=phpcs.xml --colors --extensions=php",
+        "changelog": "@php scripts/changelog.php > CHANGELOG.md"
     }
 }
