@@ -419,6 +419,13 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function incrByFloat(string $key, float $amount = 1): float
+    {
+        return (float) $this->redis->incrbyfloat($key, $amount);
+    }
+
+
+    /** @inheritdoc */
     public function decr(string $key, int $amount = 1): int
     {
         return $this->redis->decrby($key, $amount);

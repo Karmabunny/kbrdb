@@ -390,6 +390,29 @@ abstract class Rdb
 
 
     /**
+     * Increment a value by X. Wraps `incr`.
+     *
+     * @param string $key
+     * @param int $amount
+     * @return int the value after incrementing
+     */
+    public function incrBy(string $key, int $amount): int
+    {
+        return $this->incr($key, $amount);
+    }
+
+
+    /**
+     * Increment a value by X.
+     *
+     * @param string $key
+     * @param float $amount
+     * @return float the value after incrementing
+     */
+    public abstract function incrByFloat(string $key, float $amount = 1): float;
+
+
+    /**
      * Decrement a value by X.
      *
      * @param string $key
@@ -397,6 +420,20 @@ abstract class Rdb
      * @return int the value after decrementing
      */
     public abstract function decr(string $key, int $amount = 1): int;
+
+
+    /**
+     * Decrement a value by X. Wraps `decr`.
+     *
+     * @param string $key
+     * @param int $amount
+     * @return int the value after incrementing
+     */
+    public function decrBy(string $key, int $amount): int
+    {
+        return $this->decr($key, $amount);
+    }
+
 
 
     /**

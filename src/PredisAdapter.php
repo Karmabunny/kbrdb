@@ -333,6 +333,13 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function incrByFloat(string $key, float $amount = 1): float
+    {
+        return (float) $this->predis->incrbyfloat($key, $amount);
+    }
+
+
+    /** @inheritdoc */
     public function decr(string $key, int $amount = 1): int
     {
         return $this->predis->decrby($key, $amount);

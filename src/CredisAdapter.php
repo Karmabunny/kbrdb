@@ -428,6 +428,14 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function incrByFloat(string $key, float $amount = 1): float
+    {
+        $key = $this->config->prefix . $key;
+        return (float) $this->credis->incrByFloat($key, $amount);
+    }
+
+
+    /** @inheritdoc */
     public function decr(string $key, int $amount = 1): int
     {
         $key = $this->config->prefix . $key;
