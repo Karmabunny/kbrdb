@@ -332,6 +332,72 @@ abstract class AdapterTestCase extends TestCase
     }
 
 
+    public function testIncrementBy()
+    {
+        // No exist.
+        $thing = $this->rdb->get('my:value');
+        $this->assertNull($thing);
+
+        $new = $this->rdb->incrBy('my:value', 1);
+        $this->assertEquals(1, $new);
+
+        $new = $this->rdb->incrBy('my:value', 1);
+        $this->assertEquals(2, $new);
+
+        $new = $this->rdb->incrBy('my:value', 2);
+        $this->assertEquals(4, $new);
+
+        $new = $this->rdb->incrBy('my:other:value', 1);
+        $this->assertEquals(1, $new);
+
+        $new = $this->rdb->decrBy('my:value', 1);
+        $this->assertEquals(3, $new);
+
+        $new = $this->rdb->decrBy('my:value', 3);
+        $this->assertEquals(0, $new);
+
+        $actual = $this->rdb->get('my:value');
+        $expected = 0;
+
+        $this->assertEquals($expected, $actual);
+
+        $actual = $this->rdb->get('my:other:value');
+        $expected = 1;
+
+        $this->assertEquals($expected, $actual);
+    }
+
+
+    public function testIncrementByFloat()
+    {
+        // No exist.
+        $thing = $this->rdb->get('my:value');
+        $this->assertNull($thing);
+
+        $new = $this->rdb->incrByFloat('my:value', 0.5);
+        $this->assertEquals(0.5, $new);
+
+        $new = $this->rdb->incrByFloat('my:value', 1.5);
+        $this->assertEquals(2, $new);
+
+        $new = $this->rdb->incrByFloat('my:value', 0.87);
+        $this->assertEquals(2.87, $new);
+
+        $new = $this->rdb->incrByFloat('my:other:value', 1.258);
+        $this->assertEquals(1.258, $new);
+
+        $actual = $this->rdb->get('my:value');
+        $expected = 2.87;
+
+        $this->assertEquals($expected, $actual);
+
+        $actual = $this->rdb->get('my:other:value');
+        $expected = 1.258;
+
+        $this->assertEquals($expected, $actual);
+    }
+
+
     public function testScan()
     {
         $this->rdb->config->scan_keys = false;
