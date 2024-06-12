@@ -382,34 +382,42 @@ abstract class Rdb
     /**
      * Increment a value by X.
      *
+     * This is a wrapper around `incrBy` and `incrByFloat` and will use either
+     * depending on the given type.
+     *
      * @param string $key
-     * @param int $amount
-     * @return int the value after incrementing
+     * @param int|float|string $amount
+     * @return int|float the value after incrementing
      */
-    public abstract function incr(string $key, int $amount = 1): int;
+    public function incr(string $key, $amount = 1)
+    {
+        if (is_float($amount)) {
+            return $this->incrByFloat($key, $amount);
+        }
+        else {
+            return $this->incrBy($key, $amount);
+        }
+    }
 
 
     /**
-     * Increment a value by X. Wraps `incr`.
+     * Increment a value by X (integer).
      *
      * @param string $key
      * @param int $amount
      * @return int the value after incrementing
      */
-    public function incrBy(string $key, int $amount): int
-    {
-        return $this->incr($key, $amount);
-    }
+    public abstract function incrBy(string $key, int $amount): int;
 
 
     /**
-     * Increment a value by X.
+     * Increment a value by X (float).
      *
      * @param string $key
      * @param float $amount
      * @return float the value after incrementing
      */
-    public abstract function incrByFloat(string $key, float $amount = 1): float;
+    public abstract function incrByFloat(string $key, float $amount): float;
 
 
     /**
