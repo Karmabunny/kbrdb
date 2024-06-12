@@ -304,6 +304,7 @@ abstract class AdapterTestCase extends TestCase
 
         $new = $this->rdb->incr('my:value');
         $this->assertEquals(1, $new);
+        $this->assertIsInt($new);
 
         $new = $this->rdb->incr('my:value');
         $this->assertEquals(2, $new);
@@ -316,6 +317,7 @@ abstract class AdapterTestCase extends TestCase
 
         $new = $this->rdb->decr('my:value');
         $this->assertEquals(3, $new);
+        $this->assertIsInt($new);
 
         $new = $this->rdb->decr('my:value', 3);
         $this->assertEquals(0, $new);
@@ -329,6 +331,44 @@ abstract class AdapterTestCase extends TestCase
         $expected = 1;
 
         $this->assertEquals($expected, $actual);
+
+        $new = $this->rdb->incr('my:value', 3.5);
+        $this->assertEquals(3.5, $new);
+
+        $new = $this->rdb->incr('my:value', 6.5);
+        $this->assertEquals(10, $new);
+        $this->assertIsFloat($new);
+
+        $new = $this->rdb->decr('my:value', 3.5);
+        $this->assertEquals(6.5, $new);
+
+        $new = $this->rdb->decr('my:value', 6.5);
+        $this->assertEquals(0, $new);
+        $this->assertIsFloat($new);
+
+        $new = $this->rdb->decr('my:value', 10);
+        $this->assertEquals(-10, $new);
+        $this->assertIsInt($new);
+
+        $new = $this->rdb->incr('my:value', 10);
+        $this->assertEquals(0, $new);
+        $this->assertIsInt($new);
+
+        $new = $this->rdb->incr('my:value', 10, 'float');
+        $this->assertEquals(10, $new);
+        $this->assertIsFloat($new);
+
+        $new = $this->rdb->incr('my:value', 5.2, 'integer');
+        $this->assertEquals(15, $new);
+        $this->assertIsInt($new);
+
+        $new = $this->rdb->incr('my:value', '5.55', 'auto');
+        $this->assertEquals(20.55, $new);
+        $this->assertIsFloat($new);
+
+        $new = $this->rdb->decr('my:value', '20.55');
+        $this->assertEqualsWithDelta(0.0, $new, 0.001);
+        $this->assertIsFloat($new);
     }
 
 
