@@ -423,25 +423,32 @@ abstract class Rdb
     /**
      * Decrement a value by X.
      *
+     * This will use `decrBy` for integers and `incrByFloat` (negative value)
+     * for floats.
+     *
+     * @param string $key
+     * @param int|float $amount
+     * @return int|float the value after decrementing
+     */
+    public function decr(string $key, $amount = 1)
+    {
+        if (is_float($amount)) {
+            return $this->incrByFloat($key, -1 * $amount);
+        }
+        else {
+            return $this->decrBy($key, $amount);
+        }
+    }
+
+
+    /**
+     * Decrement a value by X (int).
+     *
      * @param string $key
      * @param int $amount
      * @return int the value after decrementing
      */
-    public abstract function decr(string $key, int $amount = 1): int;
-
-
-    /**
-     * Decrement a value by X. Wraps `decr`.
-     *
-     * @param string $key
-     * @param int $amount
-     * @return int the value after incrementing
-     */
-    public function decrBy(string $key, int $amount): int
-    {
-        return $this->decr($key, $amount);
-    }
-
+    public abstract function decrBy(string $key, int $amount): int;
 
 
     /**
