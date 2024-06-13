@@ -39,6 +39,11 @@ abstract class Rdb
     ];
 
 
+    const CAST_AUTO = 'auto';
+    const CAST_FLOAT = 'float';
+    const CAST_INTEGER = 'integer';
+
+
     /** @var RdbConfig */
     public $config;
 
@@ -130,6 +135,43 @@ abstract class Rdb
         else {
             return $key;
         }
+    }
+
+
+    /**
+     * Convert string/int/float to int/float with a preference mode thing.
+     *
+     * @param mixed $amount
+     * @param string $mode
+     * @return int|float
+     */
+    protected function cast($amount, string $mode)
+    {
+        if ($mode === self::CAST_FLOAT) {
+            return (float) $amount;
+        }
+
+        if ($mode === self::CAST_INTEGER) {
+            return (int) $amount;
+        }
+
+        // Happily convert objects with a __toString method.
+        if (is_object($amount)) {
+            $amount = (string) $amount;
+        }
+
+        if (!is_numeric($amount)) {
+            return 0;
+        }
+
+        // Auto cast for strings by detecting a decimal point.
+        if (is_string($amount)) {
+            return strpos($amount, '.') !== false
+                ? (float) $amount
+                : (int) $amount;
+        }
+
+        return $amount;
     }
 
 
@@ -382,21 +424,80 @@ abstract class Rdb
     /**
      * Increment a value by X.
      *
+     * This is a wrapper around `incrBy` and `incrByFloat` and will use either
+     * depending on the given type. This behaviour can be force either way with
+     * the 'cast' param.
+     *
+     * @param string $key
+     * @param int|float|string $amount
+     * @param string $cast one of: 'auto', 'float', 'integer'
+     * @return int|float the value after incrementing
+     */
+    public function incr(string $key, $amount = 1, $cast = self::CAST_AUTO)
+    {
+        $amount = self::cast($amount, $cast);
+
+        if (is_float($amount)) {
+            return $this->incrByFloat($key, $amount);
+        }
+        else {
+            return $this->incrBy($key, $amount);
+        }
+    }
+
+
+    /**
+     * Increment a value by X (integer).
+     *
      * @param string $key
      * @param int $amount
      * @return int the value after incrementing
      */
-    public abstract function incr(string $key, int $amount = 1): int;
+    public abstract function incrBy(string $key, int $amount): int;
+
+
+    /**
+     * Increment a value by X (float).
+     *
+     * @param string $key
+     * @param float $amount
+     * @return float the value after incrementing
+     */
+    public abstract function incrByFloat(string $key, float $amount): float;
 
 
     /**
      * Decrement a value by X.
      *
+     * This will use `decrBy` for integers and `incrByFloat` (negative value)
+     * for floats.
+     *
+     * @param string $key
+     * @param int|float|string $amount
+     * @param string $cast one of: 'auto', 'float', 'integer'
+     * @return int|float the value after decrementing
+     */
+    public function decr(string $key, $amount = 1, $cast = self::CAST_AUTO)
+    {
+        $amount = self::cast($amount, $cast);
+
+        if (is_float($amount)) {
+            return $this->incrByFloat($key, -1 * $amount);
+        }
+        else {
+            return $this->decrBy($key, $amount);
+        }
+    }
+
+
+    /**
+     * Decrement a value by X (int).
+     *
      * @param string $key
      * @param int $amount
      * @return int the value after decrementing
      */
-    public abstract function decr(string $key, int $amount = 1): int;
+    public abstract function decrBy(string $key, int $amount): int;
 
 
     /**
