@@ -36,11 +36,39 @@ trait RdbDumpTrait
      * Create a dumper for this rdb + pattern.
      *
      * @param Rdb $rdb
-     * @param string $pattern
+     * @param string $pattern keys to include
      */
     public function __construct(Rdb $rdb, string $pattern = '*')
     {
         $this->rdb = $rdb;
+        $this->pattern = $pattern;
+    }
+
+
+    /**
+     * Set a logger callback.
+     *
+     * @param callable $log
+     * @return void
+     */
+    public function setLog(callable $log)
+    {
+        $this->log = $log;
+    }
+
+
+    /**
+     * Set an include pattern.
+     *
+     * Default is all keys - `*`.
+     *
+     * Note, that this is still subject to the rdb's 'prefix'.
+     *
+     * @param string $pattern
+     * @return void
+     */
+    public function setPattern(string $pattern)
+    {
         $this->pattern = $pattern;
     }
 
