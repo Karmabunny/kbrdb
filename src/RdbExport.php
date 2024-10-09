@@ -72,6 +72,10 @@ class RdbExport
         $index = 0;
 
         foreach ($keys as $key) {
+            if (!$this->match($key)) {
+                continue;
+            }
+
             $index++;
             $value = $this->rdb->dump($key);
 

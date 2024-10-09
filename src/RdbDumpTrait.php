@@ -22,6 +22,9 @@ trait RdbDumpTrait
     /** @var string */
     public $pattern;
 
+    /** @var string[] */
+    public $excludes = [];
+
     /** @var bool */
     public $compressed = true;
 
@@ -70,6 +73,43 @@ trait RdbDumpTrait
     public function setPattern(string $pattern)
     {
         $this->pattern = $pattern;
+    }
+
+
+    /**
+     *
+     * @param string[]|string $pattern
+     * @return void
+     */
+    public function setExclude($pattern)
+    {
+        $pattern = is_array($pattern) ? $pattern : [$pattern];
+        $this->excludes = $pattern;
+    }
+
+
+    /**
+     *
+     * @param string $key
+     * @return bool
+     */
+    protected function match(string $key)
+    {
+        if ($this->pattern === '*') {
+            return true;
+        }
+
+        if (!$this->rdb->match($this->pattern, $key)) {
+            return false;
+        }
+
+        foreach ($this->excludes as $exclude) {
+            if ($this->rdb->match($exclude, $key)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 

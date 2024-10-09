@@ -76,10 +76,7 @@ class RdbImport
             [$key, $ttl, $value] = $item;
 
             // Filter keys.
-            if (
-                $this->pattern !== '*'
-                and !$this->rdb->match($this->pattern, $key)
-            ) {
+            if (!$this->match($key)) {
                 continue;
             }
 

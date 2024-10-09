@@ -337,6 +337,55 @@ final class DumpTest extends TestCase
         }
     }
 
+    public function testPatternExclude()
+    {
+        $data = $this->dataDump();
+        [$data] = reset($data);
+
+        $path = __DIR__ . '/data/exclude-patterns.rdb';
+
+        // Clean initial.
+        $keys = $this->rdb->keys('*');
+        $this->assertEmpty($keys);
+
+        $this->insert($data);
+
+        // Lots of data.
+        $keys = $this->rdb->keys('*');
+        $this->assertNotEmpty($keys);
+
+        // Export some of it.
+        $export = new RdbExport($this->rdb);
+        $export->setExclude(['set:*', 'zset:*']);
+        $export->export($path);
+
+        // Remove it all.
+        $keys = $this->rdb->keys('*');
+        $this->rdb->del($keys);
+
+        // Clean again.
+        $keys = $this->rdb->keys('*');
+        $this->assertEmpty($keys);
+
+        // Import it back, just strings though.
+        $errors = $this->rdb->import($path, 'string:*');
+        $this->assertEmpty($errors, json_encode($errors));
+
+        // We have keys again.
+        $keys = $this->rdb->keys('*');
+        $this->assertNotEmpty($keys);
+
+        // We have the same count.
+        $expected = count($data['string']);
+        $this->assertCount($expected, $keys, json_encode($keys));
+
+        // We have the same data.
+        foreach ($data['string'] as $key => $expected) {
+            $actual = $this->rdb->get($key);
+            $this->assertEquals($expected, $actual);
+        }
+    }
+
 
     public function testAutoCompress()
     {
