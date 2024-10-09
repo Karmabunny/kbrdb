@@ -177,6 +177,34 @@ abstract class Rdb
 
 
     /**
+     *
+     * @param bool $async
+     * @return void
+     */
+    public abstract function flushAll(bool $async = false);
+
+
+    /**
+     *
+     * @param bool $async
+     * @return void
+     */
+    public abstract function flushDb(bool $async = false);
+
+
+    /**
+     *
+     * @param bool $scan
+     * @return void
+     */
+    public function flushPrefix(bool $scan = true)
+    {
+        $keys = $scan ? $this->scan('*') : $this->keys('*');
+        $this->del($keys);
+    }
+
+
+    /**
      * Change the active database.
      *
      * @param int $database

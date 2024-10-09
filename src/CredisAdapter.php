@@ -72,6 +72,30 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function flushAll(bool $async = false)
+    {
+        if ($this->credis->isStandalone()) {
+            $this->credis->__call('flushall', [$async ? 'ASYNC' : 'SYNC']);
+        }
+        else {
+            $this->credis->__call('flushall', [$async]);
+        }
+    }
+
+
+    /** @inheritdoc */
+    public function flushDb(bool $async = false)
+    {
+        if ($this->credis->isStandalone()) {
+            $this->credis->__call('flushdb', [$async ? 'ASYNC' : 'SYNC']);
+        }
+        else {
+            $this->credis->__call('flushdb', [$async]);
+        }
+    }
+
+
+    /** @inheritdoc */
     public function select(int $database): bool
     {
         return (bool) $this->credis->select($database);

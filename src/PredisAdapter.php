@@ -54,6 +54,20 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function flushAll(bool $async = false)
+    {
+        @call_user_func_array([$this->predis, 'flushall'], [$async ? 'ASYNC' : 'SYNC']);
+    }
+
+
+    /** @inheritdoc */
+    public function flushDb(bool $async = false)
+    {
+        @call_user_func_array([$this->predis, 'flushdb'], [$async ? 'ASYNC' : 'SYNC']);
+    }
+
+
+    /** @inheritdoc */
     public function select(int $database): bool
     {
         return (bool) $this->predis->select($database);

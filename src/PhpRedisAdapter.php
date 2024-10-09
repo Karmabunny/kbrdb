@@ -85,6 +85,20 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function flushAll(bool $async = false)
+    {
+        $this->redis->flushAll($async);
+    }
+
+
+    /** @inheritdoc */
+    public function flushDb(bool $async = false)
+    {
+        $this->redis->flushDB($async);
+    }
+
+
+    /** @inheritdoc */
     public function select(int $database): bool
     {
         return (bool) $this->redis->select($database);
