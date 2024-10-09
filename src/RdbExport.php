@@ -95,7 +95,7 @@ class RdbExport
      *
      * @param string|resource $file
      * @return int The number of items exported.
-     * @throws Exception
+     * @throws Exception fatal errors, such as file access.
      */
     public function export($file)
     {

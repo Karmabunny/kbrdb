@@ -16,6 +16,9 @@ use Exception;
 trait RdbDumpTrait
 {
 
+    const CONFIG = [ 'pattern', 'excludes', 'compressed', 'log' ];
+
+
     /** @var Rdb */
     public $rdb;
 
@@ -39,12 +42,32 @@ trait RdbDumpTrait
      * Create a dumper for this rdb + pattern.
      *
      * @param Rdb $rdb
-     * @param string $pattern keys to include
+     * @param string|array $config
+     * - pattern (include pattern, default: '*')
+     * - excludes (array of patterns)
+     * - compressed (default: true)
+     * - log (callback)
+     *
+     * Include + exclude patterns still respect the rdb's 'prefix'.
      */
-    public function __construct(Rdb $rdb, string $pattern = '*')
+    public function __construct(Rdb $rdb, $config = [])
     {
         $this->rdb = $rdb;
-        $this->pattern = $pattern;
+
+        // Backwards compat.
+        if (is_string($config)) {
+            $config = ['pattern' => $config];
+        }
+
+        if (empty($config['pattern'])) {
+            $config['pattern'] = '*';
+        }
+
+        $config = array_intersect_key($config, array_fill_keys(self::CONFIG, true));
+
+        foreach ($config as $key => $value) {
+            $this->$key = $value;
+        }
     }
 
 

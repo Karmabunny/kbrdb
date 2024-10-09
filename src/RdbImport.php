@@ -107,7 +107,7 @@ class RdbImport
      *
      * @param string|resource $file
      * @return int The number of items imported.
-     * @throws Exception
+     * @throws Exception fatal errors, such as file access.
      */
     public function import($file): int
     {

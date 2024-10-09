@@ -6,6 +6,7 @@
 
 namespace karmabunny\rdb;
 
+use Exception;
 use Generator;
 use InvalidArgumentException;
 use JsonException;
@@ -1218,16 +1219,42 @@ abstract class Rdb
     }
 
 
-    public function export($file, string $pattern = '*')
+    /**
+     * Export to this file.
+     *
+     * - pattern (include pattern, default: '*')
+     * - excludes (array of patterns)
+     * - compressed (default true)
+     * - log (callback)
+     *
+     * @param string|resource $file
+     * @param array|string $config
+     * @return int number of items exported
+     * @throws Exception
+     * @throws Exception fatal errors
+     */
+    public function export($file, $config = []): int
     {
-        $export = new RdbExport($this, $pattern);
-        $export->export($file);
+        $export = new RdbExport($this, $config);
+        return $export->export($file);
     }
 
 
-    public function import($file, string $pattern = '*'): array
+    /**
+     * Import from this file.
+     *
+     * - pattern (include pattern, default: '*')
+     * - excludes (array of patterns)
+     * - log (callback)
+     *
+     * @param string|resource $file
+     * @param array|string $config
+     * @return string[] errors
+     * @throws Exception fatal errors
+     */
+    public function import($file, $config = []): array
     {
-        $import = new RdbImport($this, $pattern);
+        $import = new RdbImport($this, $config);
         $import->import($file);
         return $import->errors;
     }
