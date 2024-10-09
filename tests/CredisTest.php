@@ -12,16 +12,11 @@ use karmabunny\rdb\RdbConfig;
  */
 final class CredisTest extends AdapterTestCase
 {
-    public function setUp(): void
+    public function createRdb(): Rdb
     {
-        static $rdb;
-        if (!$rdb) $rdb = Rdb::create([
+        return Rdb::create([
             'prefix' => uniqid('rdb:') . ':',
             'adapter' => RdbConfig::TYPE_CREDIS,
         ]);
-
-        $this->rdb = $rdb;
-        $rdb->select(0);
-        $rdb->del($rdb->keys('*'));
     }
 }

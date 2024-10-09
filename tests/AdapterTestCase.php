@@ -19,6 +19,20 @@ abstract class AdapterTestCase extends TestCase
     public $rdb;
 
 
+    public abstract function createRdb(): Rdb;
+
+
+    public function setUp(): void
+    {
+        static $rdb;
+        if (!$rdb) $rdb = $this->createRdb();
+
+        $this->rdb = $rdb;
+        $rdb->select(0);
+        $rdb->del($rdb->keys('*'));
+    }
+
+
     public function assertArraySameAs($expected, $actual)
     {
         $this->assertEmpty(array_diff($expected, $actual));
@@ -751,6 +765,89 @@ abstract class AdapterTestCase extends TestCase
 
         $actual = $this->rdb->get('move:thing');
         $this->assertEquals($expected, $actual);
+    }
+
+
+    public function testFlushDb()
+    {
+        // Note, intentionally not testing flushall because it's so destructive.
+
+        $this->rdb->select(1);
+
+        $this->rdb->set('do:not:flush', 'me');
+        $this->rdb->set('also:do:not:flush', 'this');
+
+        $keys = $this->rdb->keys('*');
+        $this->assertNotEmpty($keys);
+
+        // new db.
+        $this->rdb->select(10);
+
+        $keys = $this->rdb->keys('*');
+        $this->assertEmpty($keys);
+
+        $this->rdb->set('flush:thing', 'hello');
+        $this->rdb->set('flush:another', 'world');
+
+        $keys = $this->rdb->keys('*');
+        $this->assertNotEmpty($keys);
+
+        $this->rdb->flushDb();
+
+        // Good.
+        $keys = $this->rdb->keys('*');
+        $this->assertEmpty($keys);
+
+        $this->rdb->select(1);
+
+        // Also good.
+        $keys = $this->rdb->keys('*');
+        $this->assertNotEmpty($keys);
+    }
+
+
+    public function testFlushPrefix()
+    {
+        $this->rdb->set('flush:test:one', 'hello');
+        $this->rdb->set('flush:test:two', 'world');
+
+        $keys = $this->rdb->keys('*');
+        $this->assertNotEmpty($keys);
+
+        // new prefix.
+        $other = $this->createRdb();
+
+        $keys = $other->keys('*');
+        $this->assertEmpty($keys);
+
+        $other->set('flush:test:one', 'other:hello');
+        $other->set('flush:test:two', 'other:world');
+
+        $keys = $other->keys('*');
+        $this->assertNotEmpty($keys);
+
+        // Do the thing.
+        $this->rdb->flushPrefix();
+
+        // Good.
+        $keys = $this->rdb->keys('*');
+        $this->assertEmpty($keys);
+
+        // Also good.
+        $keys = $other->keys('*');
+        $this->assertNotEmpty($keys);
+
+        // Once more.
+        $this->rdb->set('flush:test:one', 'hello');
+        $this->rdb->set('flush:test:two', 'world');
+
+        $other->flushPrefix();
+
+        $keys = $other->keys('*');
+        $this->assertEmpty($keys);
+
+        $keys = $this->rdb->keys('*');
+        $this->assertNotEmpty($keys);
     }
 
 

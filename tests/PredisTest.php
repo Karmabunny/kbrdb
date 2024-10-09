@@ -10,16 +10,11 @@ use karmabunny\rdb\RdbConfig;
  */
 final class PredisTest extends AdapterTestCase
 {
-    public function setUp(): void
+    public function createRdb(): Rdb
     {
-        static $rdb;
-        if (!$rdb) $rdb = Rdb::create([
+        return Rdb::create([
             'prefix' => uniqid('rdb:') . ':',
             'adapter' => RdbConfig::TYPE_PREDIS,
         ]);
-
-        $this->rdb = $rdb;
-        $rdb->select(0);
-        $rdb->del($rdb->keys('*'));
     }
 }

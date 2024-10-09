@@ -10,18 +10,14 @@ use karmabunny\rdb\RdbConfig;
  */
 final class CredisStandaloneTest extends AdapterTestCase
 {
-    public function setUp(): void
+    public function createRdb(): Rdb
     {
-        static $rdb;
-        if (!$rdb) $rdb = Rdb::create([
+        return Rdb::create([
             'prefix' => uniqid('rdb:') . ':',
             'adapter' => RdbConfig::TYPE_CREDIS,
             'options' => [
                 'standalone' => true,
             ]
         ]);
-
-        $this->rdb = $rdb;
-        $rdb->del($rdb->keys('*'));
     }
 }
