@@ -118,7 +118,7 @@ trait RdbDumpTrait
      */
     protected function match(string $key)
     {
-        if ($this->pattern === '*') {
+        if ($this->pattern === '*' and empty($this->excludes)) {
             return true;
         }
 
