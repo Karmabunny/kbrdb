@@ -44,16 +44,14 @@ class RdbSessionHandler implements \SessionHandlerInterface
 
 
     /** @inheritdoc*/
-    #[\ReturnTypeWillChange]
-    public function open($save_path, $session_id)
+    public function open($save_path, $session_id): bool
     {
         return true;
     }
 
 
     /** @inheritdoc*/
-    #[\ReturnTypeWillChange]
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -77,8 +75,7 @@ class RdbSessionHandler implements \SessionHandlerInterface
 
 
     /** @inheritdoc*/
-    #[\ReturnTypeWillChange]
-    public function write($session_id, $session_data)
+    public function write($session_id, $session_data): bool
     {
         $this->rdb->set($session_id, $session_data, $this->ttl * 1000);
         return true;
@@ -86,8 +83,7 @@ class RdbSessionHandler implements \SessionHandlerInterface
 
 
     /** @inheritdoc*/
-    #[\ReturnTypeWillChange]
-    public function destroy($session_id)
+    public function destroy($session_id): bool
     {
         $this->rdb->del($session_id);
         return true;
