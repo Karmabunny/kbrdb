@@ -18,8 +18,11 @@ use Predis\Session\Handler;
 /**
  * Rdb using the predis library.
  *
- * Adapter options are documented in predis. Rdb will naturally clobber
- * the `prefix` and `timeout` parameters.
+ * Adapter options are documented in predis, with adjustments:
+ *
+ * - `prefix` overwritten by rdb config.
+ * - `timeout` overwritten by rdb config.
+ * - `use_predis_session` use the predis {@see Handler} instead of {@see RdbSessionHandler}.
  *
  * @package karmabunny\rdb
  */
@@ -35,10 +38,6 @@ class PredisAdapter extends Rdb
     {
         parent::__construct($config);
 
-        $options = $this->config->options;
-        $options['prefix'] = $this->config->prefix;
-        $options['timeout'] = $this->config->timeout;
-
         // Just to be clear about what parameters we're using.
         $host = $this->config->getHost(false);
 
@@ -46,10 +45,27 @@ class PredisAdapter extends Rdb
         $parameters['port'] = $this->config->getPort();
         $parameters = new Parameters($parameters);
 
+        $options = $this->getClientOptions();
+
         $this->predis = new Predis($parameters, $options);
         $this->predis->connect();
 
         $this->predis->select($this->config->database);
+    }
+
+
+    /**
+     * Get the options for the predis client.
+     *
+     * @return array
+     */
+    protected function getClientOptions(): array
+    {
+        $options = $this->config->options;
+        $options['prefix'] = $this->config->prefix;
+        $options['timeout'] = $this->config->timeout;
+        unset($options['use_predis_session']);
+        return $options;
     }
 
 
@@ -78,6 +94,25 @@ class PredisAdapter extends Rdb
     public function move(string $key, int $database): bool
     {
         return (bool) $this->predis->move($key, $database);
+    }
+
+
+    /** @inheritdoc */
+    public function registerSessionHandler(string $prefix = 'session:'): bool
+    {
+        if (isset($this->config->options['use_predis_session'])) {
+            // We're creating a new client here, but with a modified prefix.
+            $options = $this->getClientOptions();
+            $options['prefix'] .= $prefix;
+
+            $predis = new Predis($this->config->getHost(true), $options);
+            $handler = new Handler($predis);
+
+            return session_set_save_handler($handler, true);
+        }
+        else {
+            parent::registerSessionHandler($prefix);
+        }
     }
 
 
