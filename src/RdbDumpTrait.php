@@ -16,8 +16,6 @@ use Exception;
 trait RdbDumpTrait
 {
 
-    const CONFIG = [ 'pattern', 'excludes', 'compressed', 'log' ];
-
 
     /** @var Rdb */
     public $rdb;
@@ -63,7 +61,8 @@ trait RdbDumpTrait
             $config['pattern'] = '*';
         }
 
-        $config = array_intersect_key($config, array_fill_keys(self::CONFIG, true));
+        static $CONFIG = [ 'pattern', 'excludes', 'compressed', 'log' ];
+        $config = array_intersect_key($config, array_fill_keys($CONFIG, true));
 
         foreach ($config as $key => $value) {
             $this->$key = $value;
