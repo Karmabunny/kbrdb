@@ -226,12 +226,17 @@ abstract class Rdb
     /**
      * Install a session handler.
      *
-     * Some adapters may not support session handlers in certain conditions.
-     *
      * @param string $prefix
      * @return bool true on a successful install
      */
-    public abstract function registerSessionHandler(string $prefix = 'session:'): bool;
+    public function registerSessionHandler(string $prefix = 'session:'): bool
+    {
+        $session = new RdbSessionHandler($this, [
+            'prefix' => $prefix,
+        ]);
+
+        return session_set_save_handler($session, true);
+    }
 
 
     /**
