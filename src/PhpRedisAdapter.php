@@ -796,76 +796,136 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function hDel(string $key, ...$fields): int
     {
-
+        $fields = self::flatten($fields);
+        return $this->redis->hDel($key, ...$fields);
     }
 
 
     /** @inheritdoc */
     public function hExists(string $key, string $field): bool
     {
+        return (bool) $this->redis->hExists($key, $field);
+    }
 
+
+    /** @inheritdoc */
+    public function hSet(string $key, string $field, $value, bool $replace = true): bool
+    {
+        if ($replace) {
+            $ok = $this->redis->hSet($key, $field, $value);
+        }
+        else {
+            $ok = $this->redis->hSetNx($key, $field, $value);
+        }
+        return (bool) $ok;
     }
 
 
     /** @inheritdoc */
     public function hGet(string $key, string $field): ?string
     {
-
+        $res = $this->redis->hGet($key, $field);
+        if ($res === false) return null;
+        return $res;
     }
 
 
     /** @inheritdoc */
-    public function hGetAll(string $key): array
+    public function hGetAll(string $key): ?array
     {
-
+        $res = $this->redis->hGetAll($key);
+        if ($res === false) return null;
+        return $res;
     }
 
 
     /** @inheritdoc */
-    public function hIncrBy(string $key, string $field, $increment)
+    public function hIncrBy(string $key, string $field, int $amount): int
     {
-
+        $res = $this->redis->hIncrBy($key, $field, $amount);
+        return (int) $res;
     }
 
 
     /** @inheritdoc */
-    public function hKeys(string $key): array
+    public function hIncrByFloat(string $key, string $field, float $amount): float
     {
-
+        $res = $this->redis->hIncrByFloat($key, $field, $amount);
+        return (float) $res;
     }
 
 
     /** @inheritdoc */
-    public function hLen(string $key): int
+    public function hStrLen(string $key, string $field): ?int
     {
-
+        $res = $this->redis->hStrLen($key, $field);
+        if ($res === false) return null;
+        return (int) $res;
     }
 
 
     /** @inheritdoc */
-    public function hmGet(string $key, ...$fields): array
+    public function hKeys(string $key): ?array
     {
-
+        $res = $this->redis->hKeys($key);
+        if ($res === false) return null;
+        return $res;
     }
 
 
     /** @inheritdoc */
-    public function hScan(string $key, array $pattern): Generator
+    public function hVals(string $key): ?array
     {
-
+        $res = $this->redis->hVals($key);
+        if ($res === false) return null;
+        return $res;
     }
 
 
     /** @inheritdoc */
-    public function hSet(string $key, array $fields, bool $force = false): bool
+    public function hLen(string $key): ?int
     {
-
+        $res = $this->redis->hLen($key);
+        if ($res === false) return 0;
+        return $res;
     }
 
 
     /** @inheritdoc */
-    public function hVals(string $key, array $fields, bool $force = false): array
+    public function hmGet(string $key, ...$fields): ?array
     {
-
+        $values = $this->redis->hMGet($key, $fields);
+        if ($values === false) return null;
+        return array_values($values);
     }
+
+
+    /** @inheritdoc */
+    public function hmSet(string $key, array $fields): bool
+    {
+        $res = $this->redis->hmSet($key, $fields);
+        return (bool) $res;
+    }
+
+
+    /** @inheritdoc */
+    public function hScan(string $key, string $pattern = null): Generator
+    {
+        $pattern = $pattern ?: '*';
+        $it = null;
+
+        for (;;) {
+            $items = $this->redis->hScan($key, $it, $pattern, $this->config->scan_size);
+            if ($items === false) break;
+
+            foreach ($items as $key => $value) {
+                yield $key => $value;
+            }
+
+            // The iterator is done.
+            // Keys might not be empty though, so do this last.
+            if (!$it) break;
+        }
+    }
+
 }

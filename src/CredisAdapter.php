@@ -814,6 +814,8 @@ class CredisAdapter extends Rdb
     public function hDel(string $key, ...$fields): int
     {
         $key = $this->config->prefix . $key;
+        $fields = self::flatten($fields);
+        return (int) $this->credis->hDel($key, ...$fields);
     }
 
 
@@ -821,6 +823,21 @@ class CredisAdapter extends Rdb
     public function hExists(string $key, string $field): bool
     {
         $key = $this->config->prefix . $key;
+        return (bool) $this->credis->hExists($key, $field);
+    }
+
+
+    /** @inheritdoc */
+    public function hSet(string $key, string $field, $value, bool $replace = true): bool
+    {
+        $key = $this->config->prefix . $key;
+        if ($replace) {
+            $ok = $this->credis->hSet($key, $field, $value);
+        }
+        else {
+            $ok = $this->credis->hSetNx($key, $field, $value);
+        }
+        return (bool) $ok;
     }
 
 
@@ -828,61 +845,114 @@ class CredisAdapter extends Rdb
     public function hGet(string $key, string $field): ?string
     {
         $key = $this->config->prefix . $key;
+        $value = $this->credis->hGet($key, $field);
+        if ($value === false) return null;
+        return $value;
     }
 
 
     /** @inheritdoc */
-    public function hGetAll(string $key): array
+    public function hGetAll(string $key): ?array
     {
         $key = $this->config->prefix . $key;
+        $value = $this->credis->hGetAll($key);
+        if (!is_array($value)) return null;
+        return $value;
     }
 
 
     /** @inheritdoc */
-    public function hIncrBy(string $key, string $field, $increment)
+    public function hIncrBy(string $key, string $field, int $amount): int
     {
         $key = $this->config->prefix . $key;
+        return $this->credis->hIncrBy($key, $field, $amount);
     }
 
 
     /** @inheritdoc */
-    public function hKeys(string $key): array
+    public function hIncrByFloat(string $key, string $field, float $amount): float
     {
         $key = $this->config->prefix . $key;
+        return (float) $this->credis->hIncrByFloat($key, $field, $amount);
     }
 
 
     /** @inheritdoc */
-    public function hLen(string $key): int
+    public function hStrLen(string $key, string $field): ?int
     {
         $key = $this->config->prefix . $key;
+        $res = $this->credis->hStrLen($key, $field);
+        if (!is_numeric($res)) return null;
+        return (int) $res;
     }
 
 
     /** @inheritdoc */
-    public function hmGet(string $key, ...$fields): array
+    public function hKeys(string $key): ?array
     {
         $key = $this->config->prefix . $key;
+        $res = $this->credis->hKeys($key);
+        if (!is_array($res)) return null;
+        return $res;
     }
 
 
     /** @inheritdoc */
-    public function hScan(string $key, array $pattern): Generator
+    public function hLen(string $key): ?int
     {
         $key = $this->config->prefix . $key;
+        $res = $this->credis->hLen($key);
+        if (!is_numeric($res)) return null;
+        return (int) $res;
     }
 
 
     /** @inheritdoc */
-    public function hSet(string $key, array $fields, bool $force = false): bool
+    public function hmGet(string $key, ...$fields): ?array
     {
         $key = $this->config->prefix . $key;
+        $fields = self::flatten($fields);
+        $values = $this->credis->hMGet($key, $fields);
+        if (!is_array($values)) return null;
+        return array_values($values);
     }
 
 
     /** @inheritdoc */
-    public function hVals(string $key, array $fields, bool $force = false): array
+    public function hmSet(string $key, array $fields): bool
     {
         $key = $this->config->prefix . $key;
+        $ok = $this->credis->hMSet($key, $fields);
+        return (bool) $ok;
+    }
+
+
+    /** @inheritdoc */
+    public function hScan(string $key, string $pattern = null): Generator
+    {
+        $key = $this->config->prefix . $key;
+        $pattern = $pattern ?: '*';
+        $it = null;
+
+        for (;;) {
+            $items = $this->credis->hScan($it, $key, $pattern, $this->config->scan_size);
+            if ($items === false) break;
+
+            foreach ($items as $key => $item) {
+                yield $key => $item;
+            }
+
+            // The iterator is done.
+            // Keys might not be empty though, so do this last.
+            if (!$it) break;
+        }
+    }
+
+
+    /** @inheritdoc */
+    public function hVals(string $key): array
+    {
+        $key = $this->config->prefix . $key;
+        return $this->credis->hVals($key);
     }
 }
