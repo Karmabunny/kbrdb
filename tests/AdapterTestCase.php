@@ -24,12 +24,9 @@ abstract class AdapterTestCase extends TestCase
 
     public function setUp(): void
     {
-        static $rdb;
-        if (!$rdb) $rdb = $this->createRdb();
-
-        $this->rdb = $rdb;
-        $rdb->select(0);
-        $rdb->del($rdb->keys('*'));
+        $this->rdb ??= $this->createRdb();
+        $this->rdb->select(0);
+        $this->rdb->del($this->rdb->keys('*'));
     }
 
 
