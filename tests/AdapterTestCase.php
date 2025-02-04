@@ -901,6 +901,111 @@ abstract class AdapterTestCase extends TestCase
 
         $this->assertEquals($expected, $actual);
     }
+
+
+    public function testHashes()
+    {
+        // hSet/hGet
+        $ok = $this->rdb->hSet('hash:123', 'field1', 'value1');
+        $this->assertTrue($ok);
+
+        $actual = $this->rdb->hGet('hash:123', 'field1');
+        $this->assertEquals('value1', $actual);
+
+        // hSet no replace
+        $ok = $this->rdb->hSet('hash:123', 'field1', 'value2', false);
+        $this->assertFalse($ok);
+
+        $actual = $this->rdb->hGet('hash:123', 'field1');
+        $this->assertEquals('value1', $actual);
+
+        // hExists
+        $this->assertTrue($this->rdb->hExists('hash:123', 'field1'));
+        $this->assertFalse($this->rdb->hExists('hash:123', 'nonexistent'));
+
+        // hDel
+        $ok = $this->rdb->hDel('hash:123', 'field1');
+        $this->assertEquals(1, $ok);
+
+        $this->assertNull($this->rdb->hGet('hash:123', 'field1'));
+
+        // hmSet/hmGet
+        $ok = $this->rdb->hmSet('hash:123', [
+            'field1' => 'value1',
+            'field2' => 'value2',
+            'field3' => 'value3'
+        ]);
+        $this->assertTrue($ok);
+
+        $actual = $this->rdb->hmGet('hash:123', 'field1', 'field2', 'field3');
+        $this->assertEquals(['value1', 'value2', 'value3'], $actual);
+
+        // hGetAll
+        $actual = $this->rdb->hGetAll('hash:123');
+        $this->assertEquals([
+            'field1' => 'value1',
+            'field2' => 'value2',
+            'field3' => 'value3'
+        ], $actual);
+
+        // hKeys
+        $actual = $this->rdb->hKeys('hash:123');
+        sort($actual);
+        $this->assertEquals(['field1', 'field2', 'field3'], $actual);
+
+        // hVals
+        $actual = $this->rdb->hVals('hash:123');
+        sort($actual);
+        $this->assertEquals(['value1', 'value2', 'value3'], $actual);
+
+        // hLen
+        $this->assertEquals(3, $this->rdb->hLen('hash:123'));
+
+        // hIncrBy
+        $ok = $this->rdb->hSet('hash:123', 'counter', 5);
+        $this->assertTrue($ok);
+
+        $actual = $this->rdb->hIncrBy('hash:123', 'counter', 3);
+        $this->assertEquals(8, $actual);
+
+        $actual = $this->rdb->hGet('hash:123', 'counter');
+        $this->assertEquals('8', $actual);
+
+        $actual = $this->rdb->hIncrBy('hash:123', 'counter', -2);
+        $this->assertEquals(6, $actual);
+
+        $actual = $this->rdb->hGet('hash:123', 'counter');
+        $this->assertEquals('6', $actual);
+
+        // hIncrByFloat
+        $actual = $this->rdb->hIncrByFloat('hash:123', 'counter', 1.5);
+        $this->assertEquals(7.5, $actual);
+
+        $actual = $this->rdb->hGet('hash:123', 'counter');
+        $this->assertEquals('7.5', $actual);
+
+        $this->rdb->hSet('hstrlen:123', 'a', 'hello');
+        $this->rdb->hSet('hstrlen:123', 'b', 'world');
+
+        $this->assertEquals(5, $this->rdb->hStrLen('hstrlen:123', 'a'));
+
+        // hScan
+        $actual = $this->rdb->hScan('hash:123', 'field*');
+        $this->assertInstanceOf(\Traversable::class, $actual);
+
+        $result = iterator_to_array($actual);
+        ksort($result);
+        $this->assertEquals([
+            'field1' => 'value1',
+            'field2' => 'value2',
+            'field3' => 'value3',
+        ], $result);
+
+        // Wrong type tests
+        $this->rdb->set('string:123', 'hello');
+        $this->assertNull($this->rdb->hGet('string:123', 'field1'));
+        $this->assertNull($this->rdb->hGetAll('string:123'));
+    }
 }
 
 
