@@ -90,6 +90,19 @@ final class DumpTest extends TestCase
             $data['zset'][$key] = $list;
         }
 
+        // Hash data.
+        foreach (range(0, 99) as $i) {
+            $hash = $this->random(100);
+            $hash = str_split($hash, 10);
+            $hash = array_combine(
+                array_map(fn() => $this->random(10), $hash),
+                $hash,
+            );
+
+            $key = 'hash:' . $this->random(10);
+            $data['hash'][$key] = $hash;
+        }
+
         return [
             'compressed' => [$data, true],
             'uncompressed' => [$data, false],
@@ -113,6 +126,10 @@ final class DumpTest extends TestCase
 
         foreach ($data['zset'] as $key => $zset) {
             $this->rdb->zAdd($key, $zset);
+        }
+
+        foreach ($data['hash'] as $key => $hash) {
+            $this->rdb->hmSet($key, $hash);
         }
     }
 
@@ -236,6 +253,11 @@ final class DumpTest extends TestCase
 
                 case 'zset':
                     $actual = $this->rdb->zRange($key, 0, -1, ['withscores']);
+                    $this->assertEquals($expected, $actual, $type);
+                    break;
+
+                case 'hash':
+                    $actual = $this->rdb->hGetAll($key);
                     $this->assertEquals($expected, $actual, $type);
                     break;
             }

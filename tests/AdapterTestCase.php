@@ -1011,6 +1011,7 @@ abstract class AdapterTestCase extends TestCase
             [ 'rPush', ['x', 'a', 'z'] ],
             [ 'sAdd', ['a', 'z', 'b'] ],
             [ 'zAdd', ['a' => 10, 'g' => 5, 'z' => 7] ],
+            [ 'hmSet', ['field1' => 'value1', 'field2' => 'value2', 'field3' => 'value3']],
         ];
     }
 
@@ -1048,6 +1049,10 @@ abstract class AdapterTestCase extends TestCase
 
             case 'zAdd':
                 $actual = $this->rdb->zRange('dump:restore', null, null, ['withscores']);
+                break;
+
+            case 'hmSet':
+                $actual = $this->rdb->hGetAll('dump:restore');
                 break;
 
             default:
