@@ -136,3 +136,26 @@ Add select/move helpers.
 ### v1.24
 
 Add sscan, new scan_size config.
+- IncrBy and IncrByFloat
+
+
+### v1.25
+
+Add shorthand configuration for dump tools.
+
+
+### v1.26
+
+Add tests for flush.
+- Fix excludes if include is not wildcard.
+- Fix const in trait.
+
+
+### v1.27
+
+Support for hash types.
+
+
+### v1.28
+
+New object driver for alternate object serialisers.
