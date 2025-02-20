@@ -5,6 +5,7 @@ namespace kbtests;
 use ArrayIterator;
 use karmabunny\rdb\Objects\HashObjectDriver;
 use karmabunny\rdb\Objects\JsonObjectDriver;
+use karmabunny\rdb\Objects\MsgPackObjectDriver;
 use karmabunny\rdb\Objects\PhpObjectDriver;
 use karmabunny\rdb\Rdb;
 use karmabunny\rdb\RdbJsonObject;
@@ -497,6 +498,7 @@ abstract class AdapterTestCase extends TestCase
             'php' => [ PhpObjectDriver::class ],
             'json' => [ JsonObjectDriver::class ],
             'hash' => [ HashObjectDriver::class ],
+            'msgpack' => [ MsgPackObjectDriver::class ],
         ];
     }
 
