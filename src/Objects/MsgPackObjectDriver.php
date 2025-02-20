@@ -38,7 +38,7 @@ class MsgPackObjectDriver implements RdbObjectDriver
             throw new InvalidArgumentException('Object must serialize to an array');
         }
 
-        return (bool) $this->rdb->pack($key, $value, $ttl);
+        return $this->rdb->pack($key, $value, $ttl);
     }
 
 

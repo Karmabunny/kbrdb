@@ -1396,12 +1396,18 @@ abstract class Rdb
      * @param string $key
      * @param mixed $value
      * @param int $ttl milliseconds
-     * @return bool
+     * @return int
      */
-    public function pack(string $key, $value, int $ttl = 0): bool
+    public function pack(string $key, $value, int $ttl = 0): int
     {
         $value = MessagePack::pack($value);
-        return $this->set($key, $value, $ttl);
+        $ok = $this->set($key, $value, $ttl);
+
+        if (!$ok) {
+            return 0;
+        }
+
+        return strlen($value);
     }
 
 
