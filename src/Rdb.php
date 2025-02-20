@@ -49,6 +49,10 @@ abstract class Rdb
     public $config;
 
 
+    /** @var RdbObjectDriver */
+    public $driver;
+
+
     /**
      * Build the config.
      *
@@ -65,6 +69,8 @@ abstract class Rdb
         else {
             $this->config = new RdbConfig($config);
         }
+
+        $this->driver = new ($this->config->object_driver)($this);
     }
 
 
@@ -1170,9 +1176,7 @@ abstract class Rdb
      */
     public function setObject(string $key, $value, $ttl = 0): int
     {
-        $value = serialize($value);
-        if (!$this->set($key, $value, $ttl)) return 0;
-        return strlen($value);
+        return $this->driver->setObject($key, $value, $ttl);
     }
 
 
@@ -1197,18 +1201,7 @@ abstract class Rdb
             throw new InvalidArgumentException('Not a class or interface: ' . $expected);
         }
 
-        $value = @unserialize($this->get($key));
-        if ($value === false) return null;
-        if (!is_object($value)) return null;
-
-        if (
-            // @phpstan-ignore-next-line : doesn't like string classes.
-            $expected and
-            get_class($value) !== $expected and
-            !is_subclass_of($value, $expected, false)
-        ) return null;
-
-        return $value;
+        return $this->driver->getObject($key, $expected);
     }
 
 
@@ -1239,31 +1232,13 @@ abstract class Rdb
             return [];
         }
 
-        $items = $this->mGet($keys);
-        $output = [];
+        $items = $this->driver->mGetObjects($keys, $expected);
 
         if ($nullish) {
-            $output = array_fill_keys($keys, null);
+            $items = $items + array_fill_keys($keys, null);
         }
 
-        foreach ($items as $key => $item) {
-            $item = @unserialize($item) ?: null;
-
-            if (!$key or !$item) continue;
-
-            if (!is_object($item)) continue;
-
-            if (
-                // @phpstan-ignore-next-line : doesn't like string classes.
-                $expected and
-                get_class($item) !== $expected and
-                !is_subclass_of($item, $expected, false)
-            ) continue;
-
-            $output[$key] = $item;
-        }
-
-        return $output;
+        return $items;
     }
 
 
@@ -1276,6 +1251,7 @@ abstract class Rdb
      * @param string|null $expected Ensure all results is of this type
      * @param bool $nullish (false) return empty values
      * @return Generator<object|null> [ key => item ]
+     * @throws InvalidArgumentException
      */
     public function mScanObjects(iterable $keys, string $expected = null, bool $nullish = false): Generator
     {
@@ -1316,24 +1292,11 @@ abstract class Rdb
      */
     public function mSetObjects(array $items): array
     {
-        if (empty($items)) return [];
-
-        $sizes = [];
-
-        /** @var string[] $items */
-        foreach ($items as $key => &$item) {
-            $item = serialize($item);
-            $sizes[$key] = strlen($item);
-        }
-        unset($item);
-
-        $ok = $this->mSet($items);
-
-        if (!$ok) {
+        if (empty($items)) {
             return [];
         }
 
-        return $sizes;
+        return $this->driver->mSetObjects($items);
     }
 
 

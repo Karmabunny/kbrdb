@@ -6,6 +6,7 @@
 
 namespace karmabunny\rdb;
 
+use karmabunny\rdb\Objects\PhpObjectDriver;
 
 /**
  * Configuration for Rdb.
@@ -44,6 +45,9 @@ class RdbConfig
 
     /** @var string RdbConfig::TYPE */
     public $adapter = self::TYPE_PREDIS;
+
+    /** @var class-string<RdbObjectDriver> */
+    public $object_driver = PhpObjectDriver::class;
 
     /** @var int for mscan and friends (mScanObjects) */
     public $chunk_size = 50;
