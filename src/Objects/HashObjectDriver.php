@@ -8,6 +8,36 @@ use karmabunny\rdb\JsonDeserializable;
 use karmabunny\rdb\Rdb;
 use karmabunny\rdb\RdbObjectDriver;
 
+/**
+ * Store an object as a flattened hash.
+ *
+ * This converts nested object + arrays into a flattened form using a dot notation.
+ *
+ * For example:
+ *
+ * ```
+ * ['abc' => [
+ *     'def' => [123, 456]
+ * ]]
+ * ```
+ *
+ * becomes:
+ *
+ * ```
+ * 'abc.def.0' => 123
+ * 'abc.def.1' => 456
+ * ```
+ *
+ * This somewhat breaks the setObject() signature, where the return value is
+ * the number of keys rather than the number of bytes.
+ *
+ * Objects are expected to implement `JsonSerializable` and `JsonDeserializable`.
+ * For convenience, implement the `RdbJsonObject` interface.
+ *
+ * The 'expected' parameter is required.
+ *
+ * @package karmabunny\rdb\Objects
+ */
 class HashObjectDriver implements RdbObjectDriver
 {
 

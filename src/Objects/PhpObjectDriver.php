@@ -5,6 +5,15 @@ namespace karmabunny\rdb\Objects;
 use karmabunny\rdb\Rdb;
 use karmabunny\rdb\RdbObjectDriver;
 
+/**
+ * Store an object as a PHP serialized string.
+ *
+ * This doesn't require that objects implement any particular interface.
+ *
+ * This is the default object driver and the the simplest.
+ *
+ * @package karmabunny\rdb\Objects
+ */
 class PhpObjectDriver implements RdbObjectDriver
 {
 

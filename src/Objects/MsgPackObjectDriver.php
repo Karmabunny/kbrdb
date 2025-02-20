@@ -10,6 +10,16 @@ use karmabunny\rdb\Rdb;
 use karmabunny\rdb\RdbObjectDriver;
 use MessagePack\MessagePack;
 
+/**
+ * Store an object as a MessagePack string.
+ *
+ * Objects are expected to implement `JsonSerializable` and `JsonDeserializable`.
+ * For convenience, implement the `RdbJsonObject` interface.
+ *
+ * The 'expected' parameter is required.
+ *
+ * @package karmabunny\rdb\Objects
+ */
 class MsgPackObjectDriver implements RdbObjectDriver
 {
 

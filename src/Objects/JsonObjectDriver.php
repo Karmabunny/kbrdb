@@ -9,6 +9,16 @@ use karmabunny\rdb\JsonDeserializable;
 use karmabunny\rdb\Rdb;
 use karmabunny\rdb\RdbObjectDriver;
 
+/**
+ * Store an object as a JSON string.
+ *
+ * Objects are expected to implement `JsonSerializable` and `JsonDeserializable`.
+ * For convenience, implement the `RdbJsonObject` interface.
+ *
+ * The 'expected' parameter is required.
+ *
+ * @package karmabunny\rdb\Objects
+ */
 class JsonObjectDriver implements RdbObjectDriver
 {
 

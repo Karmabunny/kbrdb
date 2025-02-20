@@ -126,6 +126,25 @@ __Credis__
 | standalone         | Force standalone mode vs phpredis  |
 
 
+### Object drivers
+
+The object driver is responsible for serialising and deserialising objects for the 'object methods'.
+
+These are:
+
+- `setObject`
+- `getObject`
+- `mSetObjects`
+- `mGetObjects`
+
+Available drivers:
+
+- `PhpObjectDriver` (default)
+- `JsonObjectDriver`
+- `MsgPackObjectDriver`
+- `HashObjectDriver`
+
+
 
 ### Usage
 
