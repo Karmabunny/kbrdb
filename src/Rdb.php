@@ -1347,6 +1347,42 @@ abstract class Rdb
 
 
     /**
+     * Store an array in a hash.
+     *
+     * This supports nested arrays using flattened keys in a dot notation.
+     *
+     * @param string $key
+     * @param array $value
+     * @return bool
+     */
+    public function setHash(string $key, array $value): bool
+    {
+        $value = self::flattenKeys($value);
+        return $this->hmSet($key, $value);
+    }
+
+
+    /**
+     * Get an array from a hash.
+     *
+     * This supports nested arrays using flattened keys in a dot notation.
+     *
+     * @param string $key
+     * @return array|null
+     */
+    public function getHash(string $key): ?array
+    {
+        $value = $this->hGetAll($key);
+        if ($value === null) {
+            return null;
+        }
+
+        $value = self::explodeFlatKeys($value);
+        return $value;
+    }
+
+
+    /**
      * Create a lock.
      *
      * This will block for `$wait` milliseconds until the lock is released.

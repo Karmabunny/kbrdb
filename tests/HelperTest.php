@@ -143,6 +143,44 @@ final class HelperTest extends TestCase
     {
 
     }
+
+
+    public function testFlattenKeys()
+    {
+        $actual = Helper::flattenKeys([
+            'abc' => [
+                'def' => 123,
+                'ghi' => [ 456, 789 ],
+            ],
+        ]);
+
+        $expected = [
+            'abc.def' => 123,
+            'abc.ghi.0' => 456,
+            'abc.ghi.1' => 789,
+        ];
+
+        $this->assertEquals($expected, $actual);
+    }
+
+
+    public function testExplodeFlatKeys()
+    {
+        $actual = Helper::explodeFlatKeys([
+            'abc.def' => 123,
+            'abc.ghi.0' => 456,
+            'abc.ghi.1' => 789,
+        ]);
+
+        $expected = [
+            'abc' => [
+                'def' => 123,
+                'ghi' => [ 456, 789 ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $actual);
+    }
 }
 
 class Helper
@@ -151,5 +189,7 @@ class Helper
         flatten as public;
         parseSetFlags as public;
         parseRangeFlags as public;
+        flattenKeys as public;
+        explodeFlatKeys as public;
     }
 }

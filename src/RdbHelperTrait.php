@@ -70,6 +70,104 @@ trait RdbHelperTrait
 
 
     /**
+     * Flatten the keys of an array with a 'glue'.
+     *
+     * For example:
+     * ```
+     * [ 'abc' => [
+     *     'def' => 123,
+     *     'ghi' => 567,
+     * ]]
+     * ```
+     *
+     * Becomes:
+     * ```
+     * [
+     *     'abc.def' => 123,
+     *     'abc.ghi' => 567,
+     * ]
+     * ```
+     *
+     * @param iterable $item
+     * @param string $glue
+     * @return array
+     */
+    protected static function flattenKeys(iterable $item, string $glue = '.'): array
+    {
+        $flat = [];
+
+        foreach ($item as $key => $value) {
+            if (is_iterable($value)) {
+
+                // Recurse in!
+                $subflat = self::flattenKeys($value, $glue);
+
+                foreach ($subflat as $subkey => $subvalue) {
+                    $flat[$key . $glue . $subkey] = $subvalue;
+                }
+            }
+            else {
+                $flat[$key] = $value;
+            }
+        }
+
+        return $flat;
+    }
+
+
+    /**
+     * Convert a flattened array into a nested form.
+     *
+     * For example:
+     * ```
+     * [
+     *     'abc.def' => 123,
+     *     'abc.ghi.0' => 456,
+     *     'abc.ghi.1' => 789,
+     * ]
+     * ```
+     *
+     * Becomes:
+     * ```
+     * [ 'abc' => [
+     *     'def' => 123,
+     *     'ghi' => [456, 789],
+     * ]]
+     * ```
+     *
+     * @param iterable $item
+     * @param string $glue
+     * @return array
+     */
+    protected static function explodeFlatKeys(iterable $item, string $glue = '.'): array
+    {
+        $output = [];
+
+        foreach ($item as $key => $value) {
+            $parts = explode($glue, $key);
+            $target = &$output;
+
+            // Creates create the whole path as a deep nested array.
+            // abc.def.ghi => [abc][def][ghi] = []
+            foreach ($parts as $part) {
+                // @phpstan-ignore-next-line
+                if (!isset($target[$part])) {
+                    $target[$part] = [];
+                }
+
+                // Iterate into the next level.
+                $target = &$target[$part];
+            }
+
+            // Target is now the deepest level of the path.
+            $target = $value;
+        }
+
+        return $output;
+    }
+
+
+    /**
      * Parse + normalise set() flags.
      *
      * @param array $flags

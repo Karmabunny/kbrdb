@@ -644,6 +644,51 @@ abstract class AdapterTestCase extends TestCase
     }
 
 
+    public function testHashNested()
+    {
+        // No exist.
+        $thing = $this->rdb->getHash('hash:not:exist');
+        $this->assertNull($thing);
+
+        // Set nested array.
+        $expected = [
+            'name' => bin2hex(random_bytes(5)),
+            'value' => random_int(1, 1000),
+            'nested' => [
+                'a' => [
+                    'foo' => 1,
+                    'bar' => 2,
+                ],
+                'b' => [
+                    'baz' => [
+                        'deep' => 3,
+                        'deeper' => 4,
+                    ],
+                ],
+                'c' => [1, 2, 3],
+            ],
+        ];
+
+        $ok = $this->rdb->setHash('hash:nested', $expected);
+        $this->assertTrue($ok);
+
+        $ok = $this->rdb->setJson('hash:json', $expected);
+        $ok = $this->rdb->setObject('hash:object', (object) $expected);
+        $ok = $this->rdb->pack('hash:packed', $expected);
+
+        // Get nested array.
+        $actual = $this->rdb->getHash('hash:nested');
+        $this->assertEquals($expected, $actual);
+
+        // Delete.
+        $num = $this->rdb->del('hash:nested');
+        $this->assertEquals(1, $num);
+
+        // Double check.
+        $thing = $this->rdb->getHash('hash:nested');
+        $this->assertNull($thing);
+    }
+
 
     public function testSortedSets()
     {
