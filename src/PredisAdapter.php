@@ -112,7 +112,7 @@ class PredisAdapter extends Rdb
             return session_set_save_handler($handler, true);
         }
         else {
-            parent::registerSessionHandler($prefix);
+            return parent::registerSessionHandler($prefix);
         }
     }
 
