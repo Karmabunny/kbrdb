@@ -673,12 +673,8 @@ abstract class AdapterTestCase extends TestCase
             ],
         ];
 
-        $ok = $this->rdb->setHash('hash:nested', $expected);
-        $this->assertTrue($ok);
-
-        $ok = $this->rdb->setJson('hash:json', $expected);
-        $ok = $this->rdb->setObject('hash:object', (object) $expected);
-        $ok = $this->rdb->pack('hash:packed', $expected);
+        $count = $this->rdb->setHash('hash:nested', $expected);
+        $this->assertEquals(9, $count);
 
         // Get nested array.
         $actual = $this->rdb->getHash('hash:nested');
@@ -719,12 +715,8 @@ abstract class AdapterTestCase extends TestCase
             ],
         ];
 
-        $ok = $this->rdb->pack('pack:nested', $expected);
-        $this->assertTrue($ok);
-
-        $ok = $this->rdb->setJson('pack:json', $expected);
-        $ok = $this->rdb->setObject('pack:object', (object) $expected);
-        $ok = $this->rdb->setHash('pack:hash', $expected);
+        $size = $this->rdb->pack('pack:nested', $expected);
+        $this->assertGreaterThan(0, $size);
 
         // Get nested array.
         $actual = $this->rdb->unpack('pack:nested');
