@@ -1311,6 +1311,12 @@ abstract class Rdb
     public function setJson(string $key, $value, $ttl = 0): int
     {
         $value = json_encode($value);
+
+        $error = json_last_error();
+        if ($error !== JSON_ERROR_NONE) {
+            throw new JsonException(json_last_error_msg(), $error);
+        }
+
         if (!$this->set($key, $value, $ttl)) return 0;
         return strlen($value);
     }

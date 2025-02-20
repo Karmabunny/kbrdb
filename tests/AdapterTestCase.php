@@ -603,6 +603,44 @@ abstract class AdapterTestCase extends TestCase
 
     public function testJson()
     {
+        // No exist.
+        $thing = $this->rdb->getJson('json:not:exist');
+        $this->assertNull($thing);
+
+        // Set string.
+        $expected = bin2hex(random_bytes(10));
+        $ok = $this->rdb->setJson('json:string', $expected);
+        $this->assertGreaterThan(0, $ok);
+
+        // Get string.
+        $actual = $this->rdb->getJson('json:string');
+        $this->assertEquals($expected, $actual);
+
+        // Set array.
+        $expected = [
+            'name' => bin2hex(random_bytes(5)),
+            'value' => random_int(1, 1000),
+            'nested' => [
+                'a' => 1,
+                'b' => 2,
+                'c' => 3,
+            ],
+        ];
+
+        $ok = $this->rdb->setJson('json:array', $expected);
+        $this->assertGreaterThan(0, $ok);
+
+        // Get array.
+        $actual = $this->rdb->getJson('json:array');
+        $this->assertEquals($expected, $actual);
+
+        // Delete.
+        $num = $this->rdb->del('json:array');
+        $this->assertEquals(1, $num);
+
+        // To be sure.
+        $thing = $this->rdb->getJson('json:array');
+        $this->assertNull($thing);
     }
 
 
