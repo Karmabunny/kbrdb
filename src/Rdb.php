@@ -10,6 +10,7 @@ use Exception;
 use Generator;
 use InvalidArgumentException;
 use JsonException;
+use MessagePack\MessagePack;
 
 /**
  * Rdb is a wrapper around other popular redis libraries.
@@ -1379,6 +1380,39 @@ abstract class Rdb
 
         $value = self::explodeFlatKeys($value);
         return $value;
+    }
+
+
+    /**
+     * Store a value using the MessagePack format.
+     *
+     * @param string $key
+     * @param mixed $value
+     * @param int $ttl milliseconds
+     * @return bool
+     */
+    public function pack(string $key, $value, int $ttl = 0): bool
+    {
+        $value = MessagePack::pack($value);
+        return $this->set($key, $value, $ttl);
+    }
+
+
+    /**
+     * Get a value from the MessagePack format.
+     *
+     * @param string $key
+     * @return mixed|null
+     */
+    public function unpack(string $key): mixed
+    {
+        $value = $this->get($key);
+
+        if ($value === null) {
+            return null;
+        }
+
+        return MessagePack::unpack($value);
     }
 
 

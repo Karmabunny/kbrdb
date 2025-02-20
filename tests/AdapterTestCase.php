@@ -692,6 +692,52 @@ abstract class AdapterTestCase extends TestCase
     }
 
 
+    public function testMsgPack()
+    {
+        // No exist.
+        $thing = $this->rdb->unpack('pack:not:exist');
+        $this->assertNull($thing);
+
+        // Set nested array.
+        $expected = [
+            'name' => bin2hex(random_bytes(5)),
+            'value' => random_int(1, 1000),
+            'nested' => [
+                'a' => [
+                    'foo' => 1,
+                    'bar' => 2,
+                ],
+                'b' => [
+                    'baz' => [
+                        'deep' => 3,
+                        'deeper' => 4,
+                    ],
+                ],
+                'c' => [1, 2, 3],
+            ],
+        ];
+
+        $ok = $this->rdb->pack('pack:nested', $expected);
+        $this->assertTrue($ok);
+
+        $ok = $this->rdb->setJson('pack:json', $expected);
+        $ok = $this->rdb->setObject('pack:object', (object) $expected);
+        $ok = $this->rdb->setHash('pack:hash', $expected);
+
+        // Get nested array.
+        $actual = $this->rdb->unpack('pack:nested');
+        $this->assertEquals($expected, $actual);
+
+        // Delete.
+        $num = $this->rdb->del('pack:nested');
+        $this->assertEquals(1, $num);
+
+        // Double check.
+        $thing = $this->rdb->unpack('pack:nested');
+        $this->assertNull($thing);
+    }
+
+
     public function testSortedSets()
     {
 
