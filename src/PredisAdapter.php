@@ -655,7 +655,9 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function hGetAll(string $key): ?array
     {
-        return $this->predis->hgetall($key);
+        $res = $this->predis->hgetall($key);
+        if (empty($res)) return null;
+        return $res;
     }
 
 
@@ -683,21 +685,25 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function hKeys(string $key): ?array
     {
-        return $this->predis->hkeys($key);
+        $res = $this->predis->hkeys($key);
+        if (empty($res)) return null;
+        return $res;
     }
 
 
     /** @inheritdoc */
     public function hVals(string $key): ?array
     {
-        return $this->predis->hvals($key);
+        $res = $this->predis->hvals($key);
+        if (empty($res)) return null;
+        return $res;
     }
 
 
     /** @inheritdoc */
-    public function hLen(string $key): ?int
+    public function hLen(string $key): int
     {
-        return $this->predis->hlen($key);
+        return (int) $this->predis->hlen($key);
     }
 
 

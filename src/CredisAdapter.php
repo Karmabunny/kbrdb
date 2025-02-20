@@ -856,7 +856,7 @@ class CredisAdapter extends Rdb
     {
         $key = $this->config->prefix . $key;
         $value = $this->credis->hGetAll($key);
-        if (!is_array($value)) return null;
+        if (!is_array($value) or empty($value)) return null;
         return $value;
     }
 
@@ -892,17 +892,27 @@ class CredisAdapter extends Rdb
     {
         $key = $this->config->prefix . $key;
         $res = $this->credis->hKeys($key);
-        if (!is_array($res)) return null;
+        if (!is_array($res) or empty($res)) return null;
         return $res;
     }
 
 
     /** @inheritdoc */
-    public function hLen(string $key): ?int
+    public function hVals(string $key): ?array
+    {
+        $key = $this->config->prefix . $key;
+        $res = $this->credis->hVals($key);
+        if (!is_array($res) or empty($res)) return null;
+        return $res;
+    }
+
+
+    /** @inheritdoc */
+    public function hLen(string $key): int
     {
         $key = $this->config->prefix . $key;
         $res = $this->credis->hLen($key);
-        if (!is_numeric($res)) return null;
+        if (!is_numeric($res)) return 0;
         return (int) $res;
     }
 
@@ -946,13 +956,5 @@ class CredisAdapter extends Rdb
             // Keys might not be empty though, so do this last.
             if (!$it) break;
         }
-    }
-
-
-    /** @inheritdoc */
-    public function hVals(string $key): array
-    {
-        $key = $this->config->prefix . $key;
-        return $this->credis->hVals($key);
     }
 }

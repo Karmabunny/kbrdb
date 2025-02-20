@@ -961,6 +961,40 @@ abstract class AdapterTestCase extends TestCase
         // hLen
         $this->assertEquals(3, $this->rdb->hLen('hash:123'));
 
+        // hScan
+        $actual = $this->rdb->hScan('hash:123', 'field*');
+        $this->assertInstanceOf(\Traversable::class, $actual);
+
+        $result = iterator_to_array($actual);
+        ksort($result);
+        $this->assertEquals([
+            'field1' => 'value1',
+            'field2' => 'value2',
+            'field3' => 'value3',
+        ], $result);
+
+        // Delete + test empty results.
+        $ok = $this->rdb->del('hash:123');
+        $this->assertEquals(1, $ok);
+
+        $actual = $this->rdb->hGetAll('hash:123');
+        $this->assertNull($actual);
+
+        $actual = $this->rdb->hGet('hash:123', 'field1');
+        $this->assertNull($actual);
+
+        $actual = $this->rdb->hKeys('hash:123');
+        $this->assertNull($actual);
+
+        $actual = $this->rdb->hVals('hash:123');
+        $this->assertNull($actual);
+
+        $actual = $this->rdb->hLen('hash:123');
+        $this->assertEquals(0, $actual);
+
+        $actual = $this->rdb->hStrLen('hash:123', 'field1');
+        $this->assertEquals(0, $actual);
+
         // hIncrBy
         $ok = $this->rdb->hSet('hash:123', 'counter', 5);
         $this->assertTrue($ok);
@@ -984,22 +1018,11 @@ abstract class AdapterTestCase extends TestCase
         $actual = $this->rdb->hGet('hash:123', 'counter');
         $this->assertEquals('7.5', $actual);
 
+        // strlen
         $this->rdb->hSet('hstrlen:123', 'a', 'hello');
         $this->rdb->hSet('hstrlen:123', 'b', 'world');
 
         $this->assertEquals(5, $this->rdb->hStrLen('hstrlen:123', 'a'));
-
-        // hScan
-        $actual = $this->rdb->hScan('hash:123', 'field*');
-        $this->assertInstanceOf(\Traversable::class, $actual);
-
-        $result = iterator_to_array($actual);
-        ksort($result);
-        $this->assertEquals([
-            'field1' => 'value1',
-            'field2' => 'value2',
-            'field3' => 'value3',
-        ], $result);
 
         // Wrong type tests
         $this->rdb->set('string:123', 'hello');

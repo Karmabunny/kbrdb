@@ -834,7 +834,7 @@ class PhpRedisAdapter extends Rdb
     public function hGetAll(string $key): ?array
     {
         $res = $this->redis->hGetAll($key);
-        if ($res === false) return null;
+        if (empty($res)) return null;
         return $res;
     }
 
@@ -868,7 +868,7 @@ class PhpRedisAdapter extends Rdb
     public function hKeys(string $key): ?array
     {
         $res = $this->redis->hKeys($key);
-        if ($res === false) return null;
+        if (!is_array($res) or empty($res)) return null;
         return $res;
     }
 
@@ -877,17 +877,17 @@ class PhpRedisAdapter extends Rdb
     public function hVals(string $key): ?array
     {
         $res = $this->redis->hVals($key);
-        if ($res === false) return null;
+        if (!is_array($res) or empty($res)) return null;
         return $res;
     }
 
 
     /** @inheritdoc */
-    public function hLen(string $key): ?int
+    public function hLen(string $key): int
     {
         $res = $this->redis->hLen($key);
-        if ($res === false) return 0;
-        return $res;
+        if (!is_numeric($res)) return 0;
+        return (int) $res;
     }
 
 

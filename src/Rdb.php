@@ -1009,9 +1009,9 @@ abstract class Rdb
      * Get the number of fields in a hash.
      *
      * @param string $key
-     * @return int|null Number of fields, or null if the key is not a hash
+     * @return int Number of fields
      */
-    public abstract function hLen(string $key): ?int;
+    public abstract function hLen(string $key): int;
 
 
     /**
