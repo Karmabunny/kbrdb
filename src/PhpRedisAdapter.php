@@ -17,6 +17,7 @@ use RedisException;
  * Adapter options:
  * - `retry_interval`
  * - `retry_timeout`
+ * - `use_native_session`
  *
  * @package karmabunny\rdb
  */
@@ -115,14 +116,19 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function registerSessionHandler(string $prefix = 'session:'): bool
     {
-        ini_set('session.save_handler', 'redis');
-        ini_set('session.save_path', vsprintf('%s?prefix=%s', [
-            $this->config->getHost(true),
-            $prefix,
-        ]));
+        if (!empty($this->config->options['use_native_session'])) {
+            ini_set('session.save_handler', 'redis');
+            ini_set('session.save_path', vsprintf('%s?prefix=%s', [
+                $this->config->getHost(true),
+                $prefix,
+            ]));
 
-        // Assume it worked..?
-        return true;
+            // Assume it worked..?
+            return true;
+        }
+        else {
+            return parent::registerSessionHandler($prefix);
+        }
     }
 
 
