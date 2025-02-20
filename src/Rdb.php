@@ -879,6 +879,172 @@ abstract class Rdb
 
 
     /**
+     * Delete one or more hash fields.
+     *
+     * @param string $key
+     * @param string ...$fields
+     * @return int Number of fields removed
+     */
+    public abstract function hDel(string $key, ...$fields): int;
+
+
+    /**
+     * Check if a hash field exists.
+     *
+     * @param string $key
+     * @param string $field
+     * @return bool True if field exists
+     */
+    public abstract function hExists(string $key, string $field): bool;
+
+
+    /**
+     * Set the value of a hash field.
+     *
+     * @param string $key
+     * @param string $field
+     * @param mixed $value
+     * @param bool $replace use `hSetNx` if false
+     * @return bool
+     */
+    public abstract function hSet(string $key, string $field, $value, bool $replace = true): bool;
+
+
+    /**
+     * Get the value of a hash field.
+     *
+     * @param string $key
+     * @param string $field
+     * @return string|null value or null
+     */
+    public abstract function hGet(string $key, string $field): ?string;
+
+
+    /**
+     * Get all fields and values in a hash.
+     *
+     * @param string $key
+     * @return array|null [ field => value ]
+     */
+    public abstract function hGetAll(string $key): ?array;
+
+
+    /**
+     * Increment a hash field value by X.
+     *
+     * This is a wrapper around `hIncrBy` and `hIncrByFloat` and will use either
+     * depending on the given type. This behaviour can be forced either way with
+     * the 'cast' param.
+     *
+     * @param string $key
+     * @param string $field
+     * @param int|float|string $amount
+     * @param string $cast one of: 'auto', 'float', 'integer'
+     * @return int|float the value after incrementing
+     */
+    public function hIncr(string $key, string $field, $amount = 1, $cast = self::CAST_AUTO)
+    {
+        $amount = self::cast($amount, $cast);
+
+        if (is_float($amount)) {
+            return $this->hIncrByFloat($key, $field, $amount);
+        }
+        else {
+            return $this->hIncrBy($key, $field, $amount);
+        }
+    }
+
+
+    /**
+     * Increment a hash field by a number (integer).
+     *
+     * @param string $key
+     * @param string $field
+     * @param int $amount Amount to increment by
+     * @return int New value after increment
+     */
+    public abstract function hIncrBy(string $key, string $field, int $amount): int;
+
+
+    /**
+     * Increment a hash field by a number (integer).
+     *
+     * @param string $key
+     * @param string $field
+     * @param float $amount Amount to increment by
+     * @return float New value after increment
+     */
+    public abstract function hIncrByFloat(string $key, string $field, float $amount): float;
+
+
+    /**
+     * Get the string length of a hash field's value.
+     *
+     * @param string $key
+     * @param string $field
+     * @return int|null Length of the value string, or null if field does not exist
+     */
+    public abstract function hStrLen(string $key, string $field): ?int;
+
+
+    /**
+     * Get all field names in a hash.
+     *
+     * @param string $key
+     * @return array|null Array of field names, or null if the key is not a hash
+     */
+    public abstract function hKeys(string $key): ?array;
+
+
+    /**
+     * Get all values in a hash.
+     *
+     * @param string $key
+     * @return array|null values of the hash (not keyed), or null if the key is not a hash
+     */
+    public abstract function hVals(string $key): ?array;
+
+
+    /**
+     * Get the number of fields in a hash.
+     *
+     * @param string $key
+     * @return int Number of fields
+     */
+    public abstract function hLen(string $key): int;
+
+
+    /**
+     * Get the values of multiple hash fields.
+     *
+     * @param string $key
+     * @param string ...$fields
+     * @return array|null Array of values, or null if the key is not a hash
+     */
+    public abstract function hmGet(string $key, ...$fields): ?array;
+
+
+    /**
+     * Set multiple hash fields to multiple values.
+     *
+     * @param string $key
+     * @param array $fields Array of field-value pairs
+     * @return bool True if successful
+     */
+    public abstract function hmSet(string $key, array $fields): bool;
+
+
+    /**
+     * Incrementally iterate over hash fields and values.
+     *
+     * @param string $key
+     * @param string $pattern Pattern to match field names
+     * @return Generator<string,string> Generator yielding field-value pairs
+     */
+    public abstract function hScan(string $key, string $pattern = '*'): Generator;
+
+
+    /**
      * Do these keys exist?
      *
      * @param string|iterable<string> $keys

@@ -12,6 +12,7 @@ use CredisException;
  * @method bool restore(string $key, int $ttl, string $value, string ...$flags)
  * @method bool move(string $key, int $index)
  * @method float incrByFloat(string $key, float $amount)
+ * @method int|null hStrLen(string $key, string $field)
  *
  * @package karmabunny\rdb\Wrappers
  */

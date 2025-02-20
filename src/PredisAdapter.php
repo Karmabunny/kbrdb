@@ -9,6 +9,7 @@ namespace karmabunny\rdb;
 use Generator;
 use karmabunny\rdb\Wrappers\Predis;
 use Predis\Client;
+use Predis\Collection\Iterator\HashKey;
 use Predis\Collection\Iterator\Keyspace;
 use Predis\Collection\Iterator\SetKey;
 use Predis\Connection\Parameters;
@@ -614,4 +615,121 @@ class PredisAdapter extends Rdb
     {
         return $this->predis->zrevrank($key, $member);
     }
+
+
+    /** @inheritdoc */
+    public function hDel(string $key, ...$fields): int
+    {
+        $fields = self::flatten($fields);
+        return $this->predis->hdel($key, $fields);
+    }
+
+
+    /** @inheritdoc */
+    public function hExists(string $key, string $field): bool
+    {
+        return (bool) $this->predis->hexists($key, $field);
+    }
+
+
+    /** @inheritdoc */
+    public function hSet(string $key, string $field, $value, bool $replace = true): bool
+    {
+        if ($replace) {
+            $ok = $this->predis->hset($key, $field, $value);
+        } else {
+            $ok = $this->predis->hsetnx($key, $field, $value);
+        }
+
+        return (bool) $ok;
+    }
+
+
+    /** @inheritdoc */
+    public function hGet(string $key, string $field): ?string
+    {
+        return $this->predis->hget($key, $field);
+    }
+
+
+    /** @inheritdoc */
+    public function hGetAll(string $key): ?array
+    {
+        $res = $this->predis->hgetall($key);
+        if (empty($res)) return null;
+        return $res;
+    }
+
+
+    /** @inheritdoc */
+    public function hIncrBy(string $key, string $field, int $amount): int
+    {
+        return $this->predis->hincrby($key, $field, $amount);
+    }
+
+
+    /** @inheritdoc */
+    public function hIncrByFloat(string $key, string $field, float $amount): float
+    {
+        return (float) $this->predis->hincrbyfloat($key, $field, $amount);
+    }
+
+
+    /** @inheritdoc */
+    public function hStrLen(string $key, string $field): ?int
+    {
+        return $this->predis->hstrlen($key, $field);
+    }
+
+
+    /** @inheritdoc */
+    public function hKeys(string $key): ?array
+    {
+        $res = $this->predis->hkeys($key);
+        if (empty($res)) return null;
+        return $res;
+    }
+
+
+    /** @inheritdoc */
+    public function hVals(string $key): ?array
+    {
+        $res = $this->predis->hvals($key);
+        if (empty($res)) return null;
+        return $res;
+    }
+
+
+    /** @inheritdoc */
+    public function hLen(string $key): int
+    {
+        return (int) $this->predis->hlen($key);
+    }
+
+
+    /** @inheritdoc */
+    public function hmGet(string $key, ...$fields): array
+    {
+        $fields = self::flatten($fields);
+        return $this->predis->hmget($key, $fields);
+    }
+
+
+    /** @inheritdoc */
+    public function hmSet(string $key, array $fields): bool
+    {
+        $ok = $this->predis->hmset($key, $fields);
+        return (bool) $ok;
+    }
+
+
+    /** @inheritdoc */
+    public function hScan(string $key, string $pattern = null): Generator
+    {
+        $iterator = new HashKey($this->predis, $key, $pattern, $this->config->scan_size);
+        //Dunno, phpstan think this has int|null keys. It doesn't.
+        // @phpstan-ignore-next-line
+        yield from $iterator;
+    }
+
 }
