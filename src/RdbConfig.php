@@ -14,10 +14,13 @@ use karmabunny\rdb\Objects\PhpObjectDriver;
  * Common properties:
  * - host
  * - prefix
+ * - database
  * - adapter
  *
  * Also:
+ * - object_driver
  * - chunk_size
+ * - scan_size
  * - timeout
  * - lock_sleep
  * - scan_keys

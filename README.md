@@ -53,15 +53,18 @@ Type errors are currently (hopefully) always a `null` return. This can quite con
 
 ### Config
 
-- `host` - server name + port
-- `prefix` - key prefix
-- `adapter` - 'predis' (default), 'php-redis', 'credis'
-- `timeout` - connection timeout, in seconds (default: 5)
-- `lock_sleep` - tick size for locking, in milliseconds (default: 5)
-- `chunk_size` - max key size for mscan methods (default: 50)
-- `scan_size` - count hint for scan methods (default: 1000)
-- `scan_keys` - replace keys() with scan() (default: false)
-- `options` - adapter specific options
+| Key           | Default         | Description                             |
+|---------------|-----------------|-----------------------------------------|
+| host          | 127.0.0.1       | Server name + port                      |
+| prefix        | ''              | Key prefix                              |
+| adapter       | 'predis'        | Adapter type: predis, php-redis, credis |
+| object_driver | PhpObjectDriver | Object driver class                     |
+| timeout       | 5               | Connection timeout, in seconds          |
+| lock_sleep    | 5               | Tick size for locking, in milliseconds  |
+| chunk_size    | 50              | Max key size for mscan methods          |
+| scan_size     | 1000            | Count hint for scan methods             |
+| scan_keys     | false           | Replace keys() with scan()              |
+| options       | []              | Adapter specific options                |
 
 Notes:
 
@@ -75,6 +78,8 @@ return [
 
     // Defaults
     'adapter' => 'predis',
+    'object_driver' => JsonObjectDriver::class,
+    'timeout' => 5,
     'lock_sleep' => 5,
     'chunk_size' => 50,
     'scan_size' => 1000,
@@ -82,6 +87,38 @@ return [
     'options' => [],
 ];
 ```
+
+#### Adapter options
+
+__Predis__
+
+The predis adapter accepts any options supported by the Predis client.
+
+| Option             | Description                        |
+|--------------------|------------------------------------|
+| use_predis_session | Use the predis session handler     |
+| exceptions         | Enable exceptions on errors        |
+| connections        | Connection settings                |
+| cluster            | Cluster configuration              |
+| replication        | Replication configuration          |
+
+__PhpRedis__
+
+
+| Option             | Description                        |
+|--------------------|------------------------------------|
+| use_native_session | Use the native session handler     |
+| retry_interval     | Time between reconnection attempts |
+| read_timeout       | Socket read timeout                |
+
+__Credis__
+
+
+| Option             | Description                        |
+|--------------------|------------------------------------|
+| use_native_session | only if `standalone = false`       |
+| standalone         | Force standalone mode vs phpredis  |
+
 
 
 ### Usage
