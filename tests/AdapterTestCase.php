@@ -1007,11 +1007,11 @@ abstract class AdapterTestCase extends TestCase
     {
         // command - expected
         return [
-            [ 'set', 'one' ],
-            [ 'rPush', ['x', 'a', 'z'] ],
-            [ 'sAdd', ['a', 'z', 'b'] ],
-            [ 'zAdd', ['a' => 10, 'g' => 5, 'z' => 7] ],
-            [ 'hmSet', ['field1' => 'value1', 'field2' => 'value2', 'field3' => 'value3']],
+            'string' => [ 'set', 'one' ],
+            'list' => [ 'rPush', ['x', 'a', 'z'] ],
+            'set' => [ 'sAdd', ['a', 'z', 'b'] ],
+            'zset' => [ 'zAdd', ['a' => 10, 'g' => 5, 'z' => 7] ],
+            'hash' => [ 'hmSet', ['field1' => 'value1', 'field2' => 'value2', 'field3' => 'value3']],
         ];
     }
 
