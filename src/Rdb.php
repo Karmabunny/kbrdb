@@ -1192,6 +1192,8 @@ abstract class Rdb
      * This returns null if the key is empty or the object doesn't match the
      * 'expected' type.
      *
+     * IMPORTANT: the `$expected` parameter will become mandatory in v2.
+     *
      * @param string $key
      * @param string|null $expected Ensure the result inherits/is this type
      * @return object|null
@@ -1215,6 +1217,8 @@ abstract class Rdb
      * Bulk fetch objects via a list of keys.
      *
      * Empty keys are filtered out - if `nullish` is false (default).
+     *
+     * IMPORTANT: the `$expected` parameter will become mandatory in v2.
      *
      * @param iterable<string> $keys Non-prefixed keys
      * @param string|null $expected Ensure all results inherits/is of this type
