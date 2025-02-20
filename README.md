@@ -3,7 +3,13 @@
 
 Like Pdb, but for Redis. I guess.
 
-Big emphasis on prefixing keys and object serialization.
+This wraps existing Redis clients and normalises the API (between server versions and client implementations). It also introduces a few additional helpers:
+
+- Object serialization
+- Leaky bucket rate limiting
+- Locking
+- Export/import
+- Session handler
 
 Also because I don't want a hard dependency on either predis or php-redis. They both have their problems (vague magical commands API, binary extension, etc). ~~Or wouldn't it be wonderful if a 3rd option showed up /s~~. Also supports credis.
 
@@ -225,16 +231,46 @@ Submit a PR if you like. But before you do, please do the following:
 
 #### Core Methods
 
-- get
-- set
 - keys
 - scan
-- mGet
-- mSet
 - del
 - exists
+- ttl
+- expire
+- expireat
+- type
+- rename
+- move
+- select
+- dump/restore
+
+scalar:
+- get
+- set
+- mGet
+- mSet
+- append
+- substr
+- getRange
+- incrBy
+- decrBy
+- incrByFloat
+- decrByFloat
+
+sets:
 - sMembers
 - sAdd
+- sRem
+- sCard
+- sIsMember
+- sMove
+- sScan
+- TODO sRandMember
+- TODO sDiff (+ store)
+- TODO sInter (+ store)
+- TODO sUnion (+ store)
+
+lists:
 - lLen
 - lRange
 - lTrim
@@ -248,6 +284,8 @@ Submit a PR if you like. But before you do, please do the following:
 - rPop
 - brPop
 - brPoplPush
+
+sorted sets:
 - zAdd
 - zIncrBy
 - zRange
@@ -258,18 +296,23 @@ Submit a PR if you like. But before you do, please do the following:
 - zRank
 - zRevRank
 
+hashes:
+- hSet
+- hGet
+- hExists
+- hDel
+- hmSet
+- hmGet
+- hGetAll
+- hIncrBy/hIncrByFloat
+- hKeys
+- hVals
+- hLen
+- hScan
+- hStrLen
 
-TODO: more
 
-sets:
-- sScan
-- sRandMember
-- sDiff (+ store)
-- sInter (+ store)
-- sUnion (+ store)
-
-
-#### Extended Methods
+#### Extended/Wrapper Methods
 
 - mScan
 - getObject
@@ -279,14 +322,15 @@ sets:
 - mSetObjects
 - setJson
 - getJson
+- setHash/getHash (nested arrays in hash)
+- pack/unpack (MessagePack format)
+- incr/decr
+- hIncr/hDecr
+- export/import
+
 
 #### Builtin Utilities
 
 - 'Leaky bucket' rate limiting
 - Locking
 
-
-### TODOs
-
-- more tests
-- more methods
