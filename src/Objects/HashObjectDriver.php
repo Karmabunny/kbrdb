@@ -36,15 +36,13 @@ class HashObjectDriver implements RdbObjectDriver
             throw new InvalidArgumentException('Object must serialize to an array');
         }
 
-        $ok = $this->rdb->setHash($key, $value);
-        if (!$ok) return false;
+        $count = $this->rdb->setHash($key, $value);
 
-        if ($ttl > 0) {
-            $ok = $this->rdb->expire($key, $ttl);
-            if (!$ok) return false;
+        if ($count and $ttl > 0) {
+            $this->rdb->expire($key, $ttl);
         }
 
-        return true;
+        return $count;
     }
 
 
@@ -87,8 +85,7 @@ class HashObjectDriver implements RdbObjectDriver
                 throw new InvalidArgumentException('Object must serialize to an array');
             }
 
-            $ok = $this->rdb->setHash($key, $item);
-            $sizes[$key] = $ok ? count($item) : 0;
+            $sizes[$key] = $this->rdb->setHash($key, $item);
         }
 
         return $sizes;

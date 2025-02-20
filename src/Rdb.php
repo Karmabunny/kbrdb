@@ -1359,12 +1359,14 @@ abstract class Rdb
      *
      * @param string $key
      * @param array $value
-     * @return bool
+     * @return int number of keys set
      */
-    public function setHash(string $key, array $value): bool
+    public function setHash(string $key, array $value): int
     {
         $value = self::flattenKeys($value);
-        return $this->hmSet($key, $value);
+        $ok = $this->hmSet($key, $value);
+        if (!$ok) return 0;
+        return count($value);
     }
 
 
