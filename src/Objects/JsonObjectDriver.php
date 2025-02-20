@@ -37,7 +37,7 @@ class JsonObjectDriver implements RdbObjectDriver
             throw new InvalidArgumentException('Object must serialize to an array');
         }
 
-        return (bool) $this->rdb->setJson($key, $value, $ttl);
+        return $this->rdb->setJson($key, $value, $ttl);
     }
 
 
