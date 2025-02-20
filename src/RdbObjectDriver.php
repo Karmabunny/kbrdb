@@ -3,6 +3,15 @@
 namespace karmabunny\rdb;
 
 
+/**
+ * Base interface for object drivers.
+ *
+ * These implement different methods for serialising object data.
+ *
+ * The `$expected` parameter will become mandatory in v2.
+ *
+ * @package karmabunny\rdb
+ */
 interface RdbObjectDriver
 {
 
