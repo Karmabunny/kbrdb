@@ -3,7 +3,10 @@
 namespace kbtests;
 
 use ArrayIterator;
+use karmabunny\rdb\Objects\JsonObjectDriver;
+use karmabunny\rdb\Objects\PhpObjectDriver;
 use karmabunny\rdb\Rdb;
+use karmabunny\rdb\RdbJsonObject;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Traversable;
@@ -27,6 +30,12 @@ abstract class AdapterTestCase extends TestCase
         $this->rdb ??= $this->createRdb();
         $this->rdb->select(0);
         $this->rdb->del($this->rdb->keys('*'));
+    }
+
+
+    public function tearDown(): void
+    {
+        $this->rdb->driver = PhpObjectDriver::class;
     }
 
 
@@ -480,8 +489,21 @@ abstract class AdapterTestCase extends TestCase
     }
 
 
-    public function testObjects()
+    public function dataObjectDrivers()
     {
+        // command - expected
+        return [
+            'php' => [ PhpObjectDriver::class ],
+            'json' => [ JsonObjectDriver::class ],
+        ];
+    }
+
+
+    /** @dataProvider dataObjectDrivers */
+    public function testObjects($driver)
+    {
+        $this->rdb->config->object_driver = $driver;
+
         // get/set object
         $object = new RandoObject([ 'foo' => 123, 'bar' => 456 ]);
 
@@ -1032,7 +1054,7 @@ abstract class AdapterTestCase extends TestCase
 }
 
 
-class RandoObject
+class RandoObject implements RdbJsonObject
 {
     public $foo;
     public $bar;
@@ -1048,5 +1070,17 @@ class RandoObject
     {
         $iterator = new ArrayIterator($this);
         return iterator_to_array($iterator);
+    }
+
+
+    public static function fromJson(array $json): self
+    {
+        return new self($json);
+    }
+
+
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 }
