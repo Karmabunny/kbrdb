@@ -379,7 +379,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function sScan(string $key, string $pattern = null): Generator
+    public function sScan(string $key, ?string $pattern = null): Generator
     {
         $pattern = $pattern ?: '*';
         $key = $this->config->prefix . $key;
@@ -570,7 +570,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function blPop($keys, int $timeout = null): ?array
+    public function blPop($keys, ?int $timeout = null): ?array
     {
         if (is_scalar($keys)) {
             $keys = $this->config->prefix . $keys;
@@ -599,7 +599,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPop($keys, int $timeout = null): ?array
+    public function brPop($keys, ?int $timeout = null): ?array
     {
         if (is_scalar($keys)) {
             $keys = $this->config->prefix . $keys;
@@ -624,7 +624,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPoplPush(string $src, string $dst, int $timeout = null): ?string
+    public function brPoplPush(string $src, string $dst, ?int $timeout = null): ?string
     {
         $src = $this->config->prefix . $src;
         $dst = $this->config->prefix . $dst;
@@ -941,7 +941,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function hScan(string $key, string $pattern = null): Generator
+    public function hScan(string $key, ?string $pattern = null): Generator
     {
         $key = $this->config->prefix . $key;
         $pattern = $pattern ?: '*';

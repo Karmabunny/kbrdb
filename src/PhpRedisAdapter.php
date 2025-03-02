@@ -370,7 +370,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function sScan(string $key, string $pattern = null): Generator
+    public function sScan(string $key, ?string $pattern = null): Generator
     {
         $pattern = $pattern ?: '*';
         $it = null;
@@ -559,7 +559,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function blPop($keys, int $timeout = null): ?array
+    public function blPop($keys, ?int $timeout = null): ?array
     {
         if (is_scalar($keys)) {
             $keys = [$keys];
@@ -579,7 +579,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPop($keys, int $timeout = null): ?array
+    public function brPop($keys, ?int $timeout = null): ?array
     {
         if (!is_scalar($keys)) {
             $keys = self::normalizeIterable($keys, false);
@@ -596,7 +596,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPoplPush(string $src, string $dst, int $timeout = null): ?string
+    public function brPoplPush(string $src, string $dst, ?int $timeout = null): ?string
     {
         if ($timeout === null) {
             $timeout = $this->config->timeout;
@@ -915,7 +915,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function hScan(string $key, string $pattern = null): Generator
+    public function hScan(string $key, ?string $pattern = null): Generator
     {
         $pattern = $pattern ?: '*';
         $it = null;

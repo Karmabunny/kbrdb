@@ -34,7 +34,7 @@ interface RdbObjectDriver
      * @param class-string<T>|null $expected
      * @return T|null
      */
-    public function getObject(string $key, string $expected = null): ?object;
+    public function getObject(string $key, ?string $expected = null): ?object;
 
 
     /**
@@ -54,5 +54,5 @@ interface RdbObjectDriver
      * @param class-string<T>|null $expected
      * @return array<string, T|null>
      */
-    public function mGetObjects(array $keys, string $expected = null): array;
+    public function mGetObjects(array $keys, ?string $expected = null): array;
 }

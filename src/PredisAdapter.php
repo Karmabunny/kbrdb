@@ -315,7 +315,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function sScan(string $key, string $pattern = null): Generator
+    public function sScan(string $key, ?string $pattern = null): Generator
     {
         $iterator = new SetKey($this->predis, $key, $pattern, $this->config->scan_size);
         yield from $iterator;
@@ -465,7 +465,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function blPop($keys, int $timeout = null): ?array
+    public function blPop($keys, ?int $timeout = null): ?array
     {
         if (is_scalar($keys)) {
             $keys = [$keys];
@@ -483,7 +483,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPop($keys, int $timeout = null): ?array
+    public function brPop($keys, ?int $timeout = null): ?array
     {
         if (is_scalar($keys)) {
             $keys = [$keys];
@@ -501,7 +501,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPoplPush(string $src, string $dst, int $timeout = null): ?string
+    public function brPoplPush(string $src, string $dst, ?int $timeout = null): ?string
     {
         if ($timeout === null) {
             $timeout = $this->config->timeout;
@@ -744,7 +744,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function hScan(string $key, string $pattern = null): Generator
+    public function hScan(string $key, ?string $pattern = null): Generator
     {
         $iterator = new HashKey($this->predis, $key, $pattern, $this->config->scan_size);
         //Dunno, phpstan think this has int|null keys. It doesn't.

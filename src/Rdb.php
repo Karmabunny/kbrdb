@@ -711,7 +711,7 @@ abstract class Rdb
      * @param int $timeout in seconds - if unset, the config/connection timeout
      * @return string[]|null [key, item] or `null` if the timeout occurs
      */
-    public abstract function blPop($keys, int $timeout = null): ?array;
+    public abstract function blPop($keys, ?int $timeout = null): ?array;
 
 
     /**
@@ -724,7 +724,7 @@ abstract class Rdb
      * @param int $timeout in seconds - if unset, the config/connection timeout
      * @return string[]|null [key, item] or `null` if the timeout occurs
      */
-    public abstract function brPop($keys, int $timeout = null): ?array;
+    public abstract function brPop($keys, ?int $timeout = null): ?array;
 
 
     /**
@@ -741,7 +741,7 @@ abstract class Rdb
      * @param int $timeout in seconds - if unset, the config/connection timeout
      * @return string|null item being moved or `null` if the timeout occurs
      */
-    public abstract function brPoplPush(string $src, string $dst, int $timeout = null): ?string;
+    public abstract function brPoplPush(string $src, string $dst, ?int $timeout = null): ?string;
 
 
     /**
@@ -1199,7 +1199,7 @@ abstract class Rdb
      * @return object|null
      * @throws InvalidArgumentException
      */
-    public function getObject(string $key, string $expected = null)
+    public function getObject(string $key, ?string $expected = null)
     {
         if (
             $expected
@@ -1226,7 +1226,7 @@ abstract class Rdb
      * @return (object|null)[] [ key => item ]
      * @throws InvalidArgumentException
      */
-    public function mGetObjects($keys, string $expected = null, bool $nullish = false): array
+    public function mGetObjects($keys, ?string $expected = null, bool $nullish = false): array
     {
         if (
             $expected
@@ -1263,7 +1263,7 @@ abstract class Rdb
      * @return Generator<object|null> [ key => item ]
      * @throws InvalidArgumentException
      */
-    public function mScanObjects(iterable $keys, string $expected = null, bool $nullish = false): Generator
+    public function mScanObjects(iterable $keys, ?string $expected = null, bool $nullish = false): Generator
     {
         if (
             $expected
