@@ -10,23 +10,12 @@ use PHPUnit\Framework\TestCase;
  * Test the leaky bucket.
  *
  * TODO Should probably test alternate drip-rates.
+ *
+ * @mixin TestCase
+ * @property Rdb $rdb
  */
-final class BucketTest extends TestCase
+trait BucketTestTrait
 {
-    /** @var Rdb */
-    public $rdb;
-
-
-    public function setUp(): void
-    {
-        static $rdb;
-        if (!$rdb) $rdb = Rdb::create([ 'prefix' => 'rdb:' ]);
-
-        $this->rdb = $rdb;
-        $keys = $rdb->keys('drip:*');
-        $rdb->del($keys);
-    }
-
 
     /**
      * Typical drip stuff.

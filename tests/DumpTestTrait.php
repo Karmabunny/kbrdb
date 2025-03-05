@@ -9,24 +9,12 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test the predis adapter.
+ *
+ * @mixin TestCase
+ * @property Rdb $rdb
  */
-final class DumpTest extends TestCase
+trait DumpTestTrait
 {
-
-    /** @var Rdb */
-    public $rdb;
-
-
-    public function setUp(): void
-    {
-        static $rdb;
-        if (!$rdb) $rdb = Rdb::create([
-            'prefix' => uniqid('rdb:') . ':',
-        ]);
-
-        $this->rdb = $rdb;
-        $rdb->del($rdb->keys('*'));
-    }
 
 
     public function random($length)

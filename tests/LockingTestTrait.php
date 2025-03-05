@@ -7,26 +7,14 @@ use karmabunny\rdb\RdbLock;
 use PHPUnit\Framework\TestCase;
 use kbtests\Release;
 
-// include __DIR__ . '/release.php';
-
 /**
  * Test the locking mechanism.
+ *
+ * @mixin TestCase
+ * @property Rdb $rdb
  */
-final class LockingTest extends TestCase
+trait LockingTestTrait
 {
-    /** @var Rdb */
-    public $rdb;
-
-    public function setUp(): void
-    {
-        static $rdb;
-        if (!$rdb) $rdb = Rdb::create([ 'prefix' => 'rdb:' ]);
-
-        $this->rdb = $rdb;
-        $keys = $rdb->keys('lock:*');
-        $rdb->del($keys);
-    }
-
 
     public function testLock()
     {
@@ -56,7 +44,7 @@ final class LockingTest extends TestCase
         $this->assertNotNull($lock1);
 
         // Release after 1/2 second off-thread.
-        Release::release('lock:1', 0.5);
+        Release::release($this->rdb->config->adapter, $this->rdb->config->prefix, 'lock:1', 0.5);
 
         // Existing lock, waits 0.5, gets a lock.
         $time = self::mtime();

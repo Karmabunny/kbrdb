@@ -14,32 +14,13 @@ use stdClass;
 use Traversable;
 
 /**
- * Tests for adapters.
+ * Standard tests.
  *
- * Extend this and swap in a different adapter config.
+ * @mixin TestCase
+ * @property Rdb $rdb
  */
-abstract class AdapterTestCase extends TestCase
+trait AdapterTestTrait
 {
-    /** @var Rdb */
-    public $rdb;
-
-
-    public abstract function createRdb(): Rdb;
-
-
-    public function setUp(): void
-    {
-        $this->rdb ??= $this->createRdb();
-        $this->rdb->select(0);
-        $this->rdb->del($this->rdb->keys('*'));
-    }
-
-
-    public function tearDown(): void
-    {
-        $this->rdb->driver = PhpObjectDriver::class;
-    }
-
 
     public function assertArraySameAs($expected, $actual)
     {
@@ -995,7 +976,7 @@ abstract class AdapterTestCase extends TestCase
     }
 
 
-    public function dataDump()
+    public function dataDumpRestore()
     {
         // command - expected
         return [
@@ -1009,7 +990,7 @@ abstract class AdapterTestCase extends TestCase
 
 
     /**
-     * @dataProvider dataDump
+     * @dataProvider dataDumpRestore
      */
     public function testDumpRestore($command, $expected)
     {

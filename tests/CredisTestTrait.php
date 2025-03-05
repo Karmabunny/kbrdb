@@ -8,9 +8,11 @@ use karmabunny\rdb\RdbConfig;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Test the predis adapter.
+ * Test the credis adapter while wrapping php-redis.
+ *
+ * @requires extension redis
  */
-final class PredisTest extends TestCase
+final class CredisTest extends TestCase
 {
     use AdapterTestTrait;
     use DumpTestTrait;
@@ -22,7 +24,7 @@ final class PredisTest extends TestCase
     {
         return Rdb::create([
             'prefix' => uniqid('rdb:') . ':',
-            'adapter' => RdbConfig::TYPE_PREDIS,
+            'adapter' => RdbConfig::TYPE_CREDIS,
         ]);
     }
 
