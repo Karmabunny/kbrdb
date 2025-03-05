@@ -120,7 +120,7 @@ class PhpRedisAdapter extends Rdb
             ini_set('session.save_handler', 'redis');
             ini_set('session.save_path', vsprintf('%s?prefix=%s', [
                 $this->config->getHost(true),
-                $prefix,
+                $this->config->prefix . $prefix,
             ]));
 
             // Assume it worked..?
