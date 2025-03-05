@@ -70,7 +70,7 @@ class RdbSessionHandler implements \SessionHandlerInterface
     public function read($session_id)
     {
         $data = $this->rdb->get($this->prefix . $session_id);
-        return $data ?? false;
+        return $data ?: '';
     }
 
 
