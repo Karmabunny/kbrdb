@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "85308e86e4d4244ce25514ae623a55a4",
+    "content-hash": "1cb18b7661c41665316f4eb8defda549",
     "packages": [
         {
             "name": "colinmollenhour/credis",
@@ -323,6 +323,40 @@
                 }
             ],
             "time": "2022-12-30T00:23:10+00:00"
+        },
+        {
+            "name": "karmabunny/visor",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Karmabunny/visor.git",
+                "reference": "0f622f3cb476513a16b1ca9fa7860a587ab15b04"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Karmabunny/visor/zipball/0f622f3cb476513a16b1ca9fa7860a587ab15b04",
+                "reference": "0f622f3cb476513a16b1ca9fa7860a587ab15b04",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "karmabunny\\visor\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A supervisor for PHP-CLI servers",
+            "support": {
+                "issues": "https://github.com/Karmabunny/visor/issues",
+                "source": "https://github.com/Karmabunny/visor/tree/v1.1.0"
+            },
+            "time": "2023-08-03T04:45:34+00:00"
         },
         {
             "name": "myclabs/deep-copy",

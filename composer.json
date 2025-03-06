@@ -30,7 +30,8 @@
     "require-dev": {
         "phpunit/phpunit": "^9",
         "phpstan/phpstan": "^1.10",
-        "phpcompatibility/php-compatibility": "^9.3"
+        "phpcompatibility/php-compatibility": "^9.3",
+        "karmabunny/visor": "^1.1"
     },
     "license": "MIT",
     "scripts": {
