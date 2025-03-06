@@ -77,7 +77,7 @@ class RdbSessionHandler implements \SessionHandlerInterface
     /** @inheritdoc*/
     public function write($session_id, $session_data): bool
     {
-        $this->rdb->set($session_id, $session_data, $this->ttl * 1000);
+        $this->rdb->set($this->prefix . $session_id, $session_data, $this->ttl * 1000);
         return true;
     }
 
@@ -85,7 +85,7 @@ class RdbSessionHandler implements \SessionHandlerInterface
     /** @inheritdoc*/
     public function destroy($session_id): bool
     {
-        $this->rdb->del($session_id);
+        $this->rdb->del($this->prefix . $session_id);
         return true;
     }
 
