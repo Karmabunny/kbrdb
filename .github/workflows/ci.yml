@@ -1,0 +1,65 @@
+name: CI
+
+on: [push]
+
+jobs:
+  phpstan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: /tmp/composer-cache
+        key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+    - uses: php-actions/composer@v6
+      with:
+        php_version: 8.2
+
+    - uses: php-actions/phpstan@v3
+      with:
+        php_version: 8.2
+        php_extensions: redis
+        path: src/
+        version: composer
+        configuration: phpstan.neon
+        command: analyse
+
+  phpunit:
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: /tmp/composer-cache
+        key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+    - uses: php-actions/composer@v6
+      with:
+        php_version: 8.2
+
+    - uses: php-actions/phpunit@v4
+      with:
+        php_version: 8.2
+        php_extensions: redis
+        version: composer
+        configuration: phpunit.xml
+        args: '--testdox'
+
