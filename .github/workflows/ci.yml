@@ -58,7 +58,7 @@ jobs:
     - uses: php-actions/phpunit@v4
       with:
         php_version: 8.2
-        php_extensions: redis
+        php_extensions: "redis pcntl"
         version: composer
         configuration: phpunit.xml
         args: '--testdox'
