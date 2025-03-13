@@ -60,6 +60,7 @@ class RdbBucket
         }
 
         foreach ($config as $key => $value) {
+            if (!property_exists($this, $key)) continue;
             $this->$key = $value;
         }
 

@@ -65,6 +65,7 @@ trait RdbDumpTrait
         $config = array_intersect_key($config, array_fill_keys($CONFIG, true));
 
         foreach ($config as $key => $value) {
+            if (!property_exists($this, $key)) continue;
             $this->$key = $value;
         }
     }
