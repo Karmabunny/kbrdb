@@ -72,6 +72,11 @@ abstract class Rdb
         }
 
         $class = $this->config->object_driver;
+
+        if (!is_subclass_of($class, RdbObjectDriver::class)) {
+            throw new InvalidArgumentException('Invalid object driver: ' . $class);
+        }
+
         $this->driver = new $class($this);
     }
 
