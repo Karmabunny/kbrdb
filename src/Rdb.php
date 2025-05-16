@@ -71,7 +71,8 @@ abstract class Rdb
             $this->config = new RdbConfig($config);
         }
 
-        $this->driver = new ($this->config->object_driver)($this);
+        $class = $this->config->object_driver;
+        $this->driver = new $class($this);
     }
 
 
