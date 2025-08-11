@@ -237,11 +237,14 @@ class PredisAdapter extends Rdb
             $args[] = 'GET';
         }
 
-        /** @var Status */
         $status = @call_user_func_array([$this->predis, 'set'], $args);
 
+        if ($status instanceof Status) {
+            $status = $status->getPayload();
+        }
+
         if ($flags['get_set']) {
-            return $status->getPayload();
+            return $status;
         }
 
         return $status == 'OK';
