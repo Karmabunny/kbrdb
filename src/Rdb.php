@@ -1427,7 +1427,7 @@ abstract class Rdb
      * @param string $key
      * @return mixed|null
      */
-    public function unpack(string $key): mixed
+    public function unpack(string $key)
     {
         $value = $this->get($key);
 
