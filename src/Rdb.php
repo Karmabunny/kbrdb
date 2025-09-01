@@ -253,6 +253,17 @@ abstract class Rdb
 
 
     /**
+     * Execute a Lua script.
+     *
+     * @param string $script
+     * @param array $keys
+     * @param array $args
+     * @return string|array|null
+     */
+    public abstract function eval(string $script, array $keys = [], array $args = []);
+
+
+    /**
      * Get the TTL for a key.
      *
      * @param string $key

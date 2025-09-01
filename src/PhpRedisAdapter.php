@@ -133,6 +133,20 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function eval(string $script, array $keys = [], array $args = [])
+    {
+        $args = array_merge($keys, $args);
+        $result = $this->redis->eval($script, $args, count($keys));
+
+        if (!is_array($result) and !is_scalar($result)) {
+            return null;
+        }
+
+        return $result;
+    }
+
+
+    /** @inheritdoc */
     public function keys(string $pattern): array
     {
         if ($this->config->scan_keys) {
