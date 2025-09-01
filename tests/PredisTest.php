@@ -16,6 +16,7 @@ final class PredisTest extends TestCase
     use DumpTestTrait;
     use BucketTestTrait;
     use LockingTestTrait;
+    use MutexTestTrait;
 
 
     public function createRdb(): Rdb
