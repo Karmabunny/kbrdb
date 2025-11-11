@@ -18,6 +18,10 @@ final class PredisTest extends TestCase
     use LockingTestTrait;
 
 
+    /** @var Rdb */
+    public $rdb;
+
+
     public function createRdb(): Rdb
     {
         return Rdb::create([
