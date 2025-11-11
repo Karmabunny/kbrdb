@@ -4,6 +4,7 @@ namespace karmabunny\rdb\Wrappers;
 
 use Credis_Client;
 use CredisException;
+use RedisException;
 
 /**
  * This wraps up some error handling. We're just going for simple nulls here.
@@ -42,6 +43,32 @@ class Credis extends Credis_Client
             }
 
             throw $exception;
+        }
+    }
+
+
+    public function restore($key, $ttl, $value, ...$options)
+    {
+        if ($this->isStandalone()) {
+            return parent::__call('restore', [$key, $ttl, $value, ...$options]);
+        }
+        else {
+            // Because credis flattens the args.
+            try {
+                return $this->redis->restore($key, $ttl, $value, $options);
+            } catch (RedisException $e) {
+                $code = 0;
+                try {
+                    if (!($result = $this->redis->IsConnected())) {
+                        $this->close(true);
+                        $code = CredisException::CODE_DISCONNECTED;
+                    }
+                } catch (RedisException $e2) {
+                    throw new CredisException($e2->getMessage(), $e2->getCode(), $e2);
+                }
+                throw new CredisException($e->getMessage(), $code, $e);
+            }
+
         }
     }
 }
