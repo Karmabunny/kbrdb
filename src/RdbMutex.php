@@ -108,18 +108,17 @@ LUA;
         $key = $this->getKey();
 
         if ($this->value === null) {
-            $this->rdb->get($key);
+            return false;
         }
 
         $count = $this->rdb->eval(self::LUA_RELEASE, [$key], [$this->value]);
 
-        if ($count === 0) {
+        if (!is_numeric($count)) {
             return false;
         }
 
         return $count !== 0;
     }
-
 
 
     /**
