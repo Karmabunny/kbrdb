@@ -91,14 +91,14 @@ LUA;
 
                 // Preventing infinite loops with a timeout.
                 if (microtime(true) - $start >= $timeout) {
-                    return false;
+                    break;
                 }
 
                 usleep($tick);
             }
-        }
 
-        return false;
+            return false;
+        }
     }
 
 
