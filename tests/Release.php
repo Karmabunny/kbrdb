@@ -4,7 +4,7 @@ namespace kbtests;
 
 use karmabunny\rdb\Rdb;
 
-if (realpath(@$argv[0]) === __FILE__) {
+if (isset($argv[0]) && realpath($argv[0]) === __FILE__) {
     require __DIR__ . '/../vendor/autoload.php';
 
     [, $adapter, $prefix, $key, $wait] = $argv;
