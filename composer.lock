@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1cb18b7661c41665316f4eb8defda549",
+    "content-hash": "d6a58f7f2b3f9eeb0299cbf9c38654a1",
     "packages": [
         {
             "name": "colinmollenhour/credis",
@@ -52,6 +52,57 @@
                 "source": "https://github.com/colinmollenhour/credis/tree/v1.16.0"
             },
             "time": "2023-10-26T17:02:51+00:00"
+        },
+        {
+            "name": "karmabunny/interfaces",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Karmabunny/kbinterfaces.git",
+                "reference": "ec4b6a46b55b4449996c006ba5cb500f31848d2e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Karmabunny/kbinterfaces/zipball/ec4b6a46b55b4449996c006ba5cb500f31848d2e",
+                "reference": "ec4b6a46b55b4449996c006ba5cb500f31848d2e",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2|^8"
+            },
+            "require-dev": {
+                "phpcompatibility/php-compatibility": "^9.3",
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^9.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "karmabunny\\interfaces\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Karmabunny",
+                    "email": "info@karmabunny.com.au"
+                }
+            ],
+            "description": "Base KB interfaces",
+            "keywords": [
+                "interfaces",
+                "karmabunny",
+                "kb",
+                "utilities"
+            ],
+            "support": {
+                "issues": "https://github.com/Karmabunny/kbinterfaces/issues",
+                "source": "https://github.com/Karmabunny/kbinterfaces/tree/v1.0.0"
+            },
+            "time": "2025-09-01T05:46:40+00:00"
         },
         {
             "name": "predis/predis",

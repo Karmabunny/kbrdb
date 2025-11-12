@@ -18,6 +18,7 @@ final class CredisTest extends TestCase
     use DumpTestTrait;
     use BucketTestTrait;
     use LockingTestTrait;
+    use MutexTestTrait;
 
 
     /** @var Rdb */
