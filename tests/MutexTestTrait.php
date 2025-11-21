@@ -4,6 +4,7 @@ namespace kbtests;
 
 use karmabunny\interfaces\MutexInterface;
 use karmabunny\rdb\Rdb;
+use karmabunny\rdb\RdbMultiMutex;
 use karmabunny\rdb\RdbMutex;
 use PHPUnit\Framework\TestCase;
 
@@ -80,6 +81,47 @@ trait MutexTestTrait
 
         $lock2 = $this->createMutex('test:5');
         $this->assertTrue($lock2->acquire(0));
+    }
+
+
+
+    public function testMultiMutex()
+    {
+        // Something that consumes 3 locks at once.
+        $multi = new RdbMultiMutex($this->rdb, ['test:6', 'test:7', 'test:8']);
+        $this->assertTrue($multi->acquire(0));
+
+        // Can't.
+        $lock1 = $this->createMutex('test:6');
+        $this->assertFalse($lock1->acquire(0));
+
+        // Can't.
+        $lock2 = $this->createMutex('test:7');
+        $this->assertFalse($lock2->acquire(0));
+
+        // Release it.
+        $this->assertTrue($multi->release());
+
+        // Can!
+        $lock1 = $this->createMutex('test:6');
+        $lock1->autoExpire = 2;
+        $this->assertTrue($lock1->acquire(0));
+
+        // Can!
+        $lock2 = $this->createMutex('test:7');
+        $lock2->autoExpire = 3;
+        $this->assertTrue($lock2->acquire(0));
+
+        $time = microtime(true);
+
+        // Not released at 2s, only at 3s when both locks expire.
+        // Also not at 5 when timeout occurs.
+        $ok = $multi->acquire(5);
+        $time = microtime(true) - $time;
+
+        $this->assertTrue($ok);
+        $this->assertGreaterThan(2.9, $time);
+        $this->assertLessThan(3.1, $time);
     }
 
 }
