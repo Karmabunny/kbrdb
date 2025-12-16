@@ -13,7 +13,10 @@
     "autoload": {
         "psr-4": {
             "karmabunny\\rdb\\": "src/"
-        }
+        },
+        "files": [
+            "src/bootstrap.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

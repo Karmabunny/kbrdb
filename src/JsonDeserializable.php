@@ -2,17 +2,10 @@
 
 namespace karmabunny\rdb;
 
-/**
- * An object that can be deserialized from a JSON array.
- */
-interface JsonDeserializable
-{
+class_exists(\karmabunny\interfaces\JsonDeserializable::class);
 
-    /**
-     * Create an object from a JSON array.
-     *
-     * @param array $json
-     * @return self
-     */
-    public static function fromJson(array $json);
+// @phpstan-ignore-next-line: IBE hints.
+if (false) {
+    /** @deprecated Use \karmabunny\interfaces\JsonDeserializable instead */
+    interface JsonDeserializable extends \karmabunny\interfaces\JsonDeserializable {}
 }
