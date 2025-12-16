@@ -10,6 +10,8 @@ use Exception;
 use Generator;
 use InvalidArgumentException;
 use JsonException;
+use MessagePack\Exception\PackingFailedException;
+use MessagePack\Exception\UnpackingFailedException;
 use MessagePack\MessagePack;
 
 /**
@@ -1418,6 +1420,7 @@ abstract class Rdb
      * @param mixed $value
      * @param int $ttl milliseconds
      * @return int
+     * @throws PackingFailedException
      */
     public function pack(string $key, $value, int $ttl = 0): int
     {
@@ -1437,6 +1440,7 @@ abstract class Rdb
      *
      * @param string $key
      * @return mixed|null
+     * @throws UnpackingFailedException
      */
     public function unpack(string $key)
     {
