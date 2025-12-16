@@ -26,7 +26,7 @@
         "php": ">=7.2",
         "symfony/polyfill-php73": "^1.29",
         "rybakit/msgpack": "^0.9.1",
-        "karmabunny/interfaces": "^1.0"
+        "karmabunny/interfaces": "^1.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^9",

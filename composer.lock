@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d6a58f7f2b3f9eeb0299cbf9c38654a1",
+    "content-hash": "3cb0d8a07d14527ad69e095a460efb3b",
     "packages": [
         {
             "name": "colinmollenhour/credis",
@@ -55,16 +55,16 @@
         },
         {
             "name": "karmabunny/interfaces",
-            "version": "v1.0.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Karmabunny/kbinterfaces.git",
-                "reference": "ec4b6a46b55b4449996c006ba5cb500f31848d2e"
+                "reference": "25c153404c16ab269339f585db2f2cc3b66a6614"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Karmabunny/kbinterfaces/zipball/ec4b6a46b55b4449996c006ba5cb500f31848d2e",
-                "reference": "ec4b6a46b55b4449996c006ba5cb500f31848d2e",
+                "url": "https://api.github.com/repos/Karmabunny/kbinterfaces/zipball/25c153404c16ab269339f585db2f2cc3b66a6614",
+                "reference": "25c153404c16ab269339f585db2f2cc3b66a6614",
                 "shasum": ""
             },
             "require": {
@@ -100,9 +100,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Karmabunny/kbinterfaces/issues",
-                "source": "https://github.com/Karmabunny/kbinterfaces/tree/v1.0.0"
+                "source": "https://github.com/Karmabunny/kbinterfaces/tree/v1.1.1"
             },
-            "time": "2025-09-01T05:46:40+00:00"
+            "time": "2025-12-16T02:46:25+00:00"
         },
         {
             "name": "predis/predis",
