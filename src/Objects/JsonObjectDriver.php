@@ -5,7 +5,7 @@ namespace karmabunny\rdb\Objects;
 use InvalidArgumentException;
 use JsonException;
 use JsonSerializable;
-use karmabunny\rdb\JsonDeserializable;
+use karmabunny\interfaces\JsonDeserializable;
 use karmabunny\rdb\Rdb;
 use karmabunny\rdb\RdbObjectDriver;
 
