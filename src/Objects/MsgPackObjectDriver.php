@@ -8,6 +8,7 @@ use JsonSerializable;
 use karmabunny\interfaces\JsonDeserializable;
 use karmabunny\rdb\Rdb;
 use karmabunny\rdb\RdbObjectDriver;
+use MessagePack\Exception\UnpackingFailedException;
 use MessagePack\MessagePack;
 
 /**
@@ -65,8 +66,13 @@ class MsgPackObjectDriver implements RdbObjectDriver
 
         /** @var JsonDeserializable $expected */
 
-        $value = $this->rdb->unpack($key);
-        if ($value === null) {
+        try {
+            $value = $this->rdb->unpack($key);
+            if ($value === null) {
+                return null;
+            }
+        }
+        catch (UnpackingFailedException $_error) {
             return null;
         }
 

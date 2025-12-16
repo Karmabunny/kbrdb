@@ -64,8 +64,13 @@ class JsonObjectDriver implements RdbObjectDriver
 
         /** @var JsonDeserializable $expected */
 
-        $value = $this->rdb->getJson($key);
-        if ($value === null) {
+        try {
+            $value = $this->rdb->getJson($key);
+            if ($value === null) {
+                return null;
+            }
+        }
+        catch (JsonException $_error) {
             return null;
         }
 
