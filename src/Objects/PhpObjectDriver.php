@@ -82,9 +82,11 @@ class PhpObjectDriver implements RdbObjectDriver
         $output = [];
 
         foreach ($items as $key => $item) {
+            if (!$key or !$item) continue;
+
             $item = @unserialize($item) ?: null;
 
-            if (!$key or !$item) continue;
+            if (!$item) continue;
 
             if (!is_object($item)) continue;
 
