@@ -60,13 +60,15 @@ class HashObjectDriver implements RdbObjectDriver
             throw new InvalidArgumentException('Object must implement JsonSerializable');
         }
 
-        $value = $value->jsonSerialize();
+        $blob = $value->jsonSerialize();
 
-        if (!is_array($value)) {
+        if (!is_array($blob)) {
             throw new InvalidArgumentException('Object must serialize to an array');
         }
 
-        $count = $this->rdb->setHash($key, $value);
+        $blob['__class__'] = get_class($value);
+
+        $count = $this->rdb->setHash($key, $blob);
 
         if ($count and $ttl > 0) {
             $this->rdb->expire($key, $ttl);
@@ -94,6 +96,11 @@ class HashObjectDriver implements RdbObjectDriver
             return null;
         }
 
+        if (isset($value['__class__']) and $value['__class__'] !== $expected) {
+            return null;
+        }
+
+        unset($value['__class__']);
         return $expected::fromJson($value);
     }
 
@@ -109,14 +116,16 @@ class HashObjectDriver implements RdbObjectDriver
                 continue;
             }
 
-            $item = $item->jsonSerialize();
+            $blob = $item->jsonSerialize();
 
-            if (!is_array($item)) {
+            if (!is_array($blob)) {
                 throw new InvalidArgumentException('Object must serialize to an array');
             }
 
-            $sizes[$key] = $this->rdb->setHash($key, $item);
+            $blob['__class__'] = get_class($item);
+            $sizes[$key] = $this->rdb->setHash($key, $blob);
         }
+        unset($item);
 
         return $sizes;
     }
@@ -144,6 +153,11 @@ class HashObjectDriver implements RdbObjectDriver
                 continue;
             }
 
+            if (isset($item['__class__']) and $item['__class__'] !== $expected) {
+                continue;
+            }
+
+            unset($item['__class__']);
             $output[$key] = $expected::fromJson($item);
         }
 
