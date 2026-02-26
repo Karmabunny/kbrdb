@@ -73,13 +73,23 @@ abstract class Rdb
             $this->config = new RdbConfig($config);
         }
 
+        $this->getObjectDriver();
+    }
+
+
+    protected function getObjectDriver(): RdbObjectDriver
+    {
         $class = $this->config->object_driver;
 
-        if (!is_subclass_of($class, RdbObjectDriver::class)) {
-            throw new InvalidArgumentException('Invalid object driver: ' . $class);
+        if ($this->driver === null or get_class($this->driver) !== $class) {
+            if (!is_subclass_of($class, RdbObjectDriver::class)) {
+                throw new InvalidArgumentException('Invalid object driver: ' . $class);
+            }
+
+            $this->driver = new $class($this);
         }
 
-        $this->driver = new $class($this);
+        return $this->driver;
     }
 
 
@@ -1201,7 +1211,7 @@ abstract class Rdb
      */
     public function setObject(string $key, $value, $ttl = 0): int
     {
-        return $this->driver->setObject($key, $value, $ttl);
+        return $this->getObjectDriver()->setObject($key, $value, $ttl);
     }
 
 
@@ -1228,7 +1238,7 @@ abstract class Rdb
             throw new InvalidArgumentException('Not a class or interface: ' . $expected);
         }
 
-        return $this->driver->getObject($key, $expected);
+        return $this->getObjectDriver()->getObject($key, $expected);
     }
 
 
@@ -1261,7 +1271,7 @@ abstract class Rdb
             return [];
         }
 
-        $items = $this->driver->mGetObjects($keys, $expected);
+        $items = $this->getObjectDriver()->mGetObjects($keys, $expected);
 
         if ($nullish) {
             $items = $items + array_fill_keys($keys, null);
@@ -1325,7 +1335,7 @@ abstract class Rdb
             return [];
         }
 
-        return $this->driver->mSetObjects($items);
+        return $this->getObjectDriver()->mSetObjects($items);
     }
 
 
