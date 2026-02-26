@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @link      https://github.com/Karmabunny
  * @copyright Copyright (c) 2021 Karmabunny
@@ -31,11 +32,11 @@ class PredisAdapter extends Rdb
 {
 
     /** @var Client */
-    public $predis;
+    public Client $predis;
 
 
     /** @inheritdoc */
-    protected function __construct($config)
+    protected function __construct(RdbConfig|array $config)
     {
         parent::__construct($config);
 
@@ -71,14 +72,14 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function flushAll(bool $async = false)
+    public function flushAll(bool $async = false): void
     {
         @call_user_func_array([$this->predis, 'flushall'], [$async ? 'ASYNC' : 'SYNC']);
     }
 
 
     /** @inheritdoc */
-    public function flushDb(bool $async = false)
+    public function flushDb(bool $async = false): void
     {
         @call_user_func_array([$this->predis, 'flushdb'], [$async ? 'ASYNC' : 'SYNC']);
     }
@@ -118,7 +119,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function eval(string $script, array $keys = [], array $args = [])
+    public function eval(string $script, array $keys = [], array $args = []): int|string|array|null
     {
         $args = array_merge($keys, $args);
         $result = $this->predis->eval($script, count($keys), ...$args);
@@ -220,7 +221,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function set(string $key, string $value, int $ttl = 0, array $flags = [])
+    public function set(string $key, string $value, int $ttl = 0, array $flags = []): bool|string|null
     {
         $flags = self::parseSetFlags($flags);
 
@@ -258,7 +259,7 @@ class PredisAdapter extends Rdb
         }
 
         if ($flags['get_set']) {
-            return $status;
+            return ($status === null or $status === false) ? null : (string) $status;
         }
 
         return $status == 'OK';

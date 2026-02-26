@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @link      https://github.com/Karmabunny
  * @copyright Copyright (c) 2021 Karmabunny
@@ -24,11 +25,11 @@ class CredisAdapter extends Rdb
 {
 
     /** @var Credis */
-    public $credis;
+    public Credis $credis;
 
 
     /** @inheritdoc */
-    protected function __construct($config)
+    protected function __construct(RdbConfig|array $config)
     {
         parent::__construct($config);
         $config = $this->config;
@@ -73,7 +74,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function flushAll(bool $async = false)
+    public function flushAll(bool $async = false): void
     {
         if ($this->credis->isStandalone()) {
             $this->credis->__call('flushall', [$async ? 'ASYNC' : 'SYNC']);
@@ -85,7 +86,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function flushDb(bool $async = false)
+    public function flushDb(bool $async = false): void
     {
         if ($this->credis->isStandalone()) {
             $this->credis->__call('flushdb', [$async ? 'ASYNC' : 'SYNC']);
@@ -135,7 +136,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function eval(string $script, array $keys = [], array $args = [])
+    public function eval(string $script, array $keys = [], array $args = []): int|string|array|null
     {
         $keys = $this->prefixKeys($keys);
         $result = $this->credis->eval($script, $keys, $args);
@@ -257,7 +258,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function set(string $key, string $value, int $ttl = 0, array $flags = [])
+    public function set(string $key, string $value, int $ttl = 0, array $flags = []): bool|string|null
     {
         $flags = self::parseSetFlags($flags);
 
@@ -291,7 +292,7 @@ class CredisAdapter extends Rdb
 
         // TODO Uhh.. does getset actually work here?
         if ($flags['get_set']) {
-            return $result === false ? null : $result;
+            return $result === false ? null : (string) $result;
         }
 
         return (bool) $result;

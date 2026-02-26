@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace karmabunny\rdb;
 
@@ -23,7 +24,7 @@ interface RdbObjectDriver
      * @param int $ttl milliseconds
      * @return int object size in bytes
      */
-    public function setObject(string $key, object $value, $ttl = 0): int;
+    public function setObject(string $key, object $value, int $ttl = 0): int;
 
 
     /**

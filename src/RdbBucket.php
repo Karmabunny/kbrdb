@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @link      https://github.com/Karmabunny
  * @copyright Copyright (c) 2021 Karmabunny
@@ -17,26 +18,26 @@ class RdbBucket
 {
 
     /** @var string */
-    public $key;
+    public string $key;
 
     /** @var string */
-    public $prefix = 'drip:';
+    public string $prefix = 'drip:';
 
     /** @var int Bucket size. */
-    public $capacity = 60;
+    public int $capacity = 60;
 
     /** @var float Drips per second. */
-    public $drip_rate = 1;
+    public float $drip_rate = 1;
 
     /** @var int[] [ name => drip size ] */
-    public $costs = [];
+    public array $costs = [];
 
 
     /** @var Rdb */
-    protected $rdb;
+    protected Rdb $rdb;
 
     /** @var array */
-    protected $drips = [];
+    protected array $drips = [];
 
 
     /**
@@ -52,7 +53,7 @@ class RdbBucket
      * @param Rdb $rdb
      * @param string|array $config
      */
-    public function __construct(Rdb $rdb, $config)
+    public function __construct(Rdb $rdb, string|array $config)
     {
         // Shorthand config.
         if (is_string($config)) {
@@ -76,7 +77,7 @@ class RdbBucket
      * @return void
      * @throws JsonException
      */
-    public function refresh()
+    public function refresh(): void
     {
         $this->drips = $this->purge($this->load());
     }
@@ -87,7 +88,7 @@ class RdbBucket
      *
      * @return array
      */
-    protected function load()
+    protected function load(): array
     {
         $drips = $this->rdb->getJson($this->prefix . $this->key);
         if (!is_array($drips)) $drips = [];
@@ -100,7 +101,7 @@ class RdbBucket
      *
      * @return void
      */
-    protected function save()
+    protected function save(): void
     {
         $this->rdb->setJson($this->prefix . $this->key, $this->drips);
     }
@@ -189,7 +190,7 @@ class RdbBucket
      *  - `false` - the bucket is full, did not add the drip
      *  - `true` - the drip was added
      */
-    public function drip($size = 1): bool
+    public function drip(int|string $size = 1): bool
     {
         // Busted!
         if ($this->isFull()) return false;
@@ -223,7 +224,7 @@ class RdbBucket
      *
      * @return array
      */
-    public function getStatus()
+    public function getStatus(): array
     {
         $level = $this->getLevel();
         $wait = $this->getWait();
@@ -241,7 +242,7 @@ class RdbBucket
      *
      * @return void
      */
-    public function writeHeaders()
+    public function writeHeaders(): void
     {
         $headers = $this->getStatus();
         foreach ($headers as $name => $value) {

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @link      https://github.com/Karmabunny
  * @copyright Copyright (c) 2021 Karmabunny
@@ -49,11 +50,11 @@ abstract class Rdb
 
 
     /** @var RdbConfig */
-    public $config;
+    public RdbConfig $config;
 
 
     /** @var RdbObjectDriver|null */
-    protected $driver;
+    protected ?RdbObjectDriver $driver = null;
 
 
     /**
@@ -64,7 +65,7 @@ abstract class Rdb
      * @param RdbConfig|array $config
      * @throws InvalidArgumentException
      */
-    protected function __construct($config)
+    protected function __construct(RdbConfig|array $config)
     {
         if ($config instanceof RdbConfig) {
             $this->config = clone $config;
@@ -108,7 +109,7 @@ abstract class Rdb
      * @return Rdb
      * @throws InvalidArgumentException
      */
-    public static function create($config): Rdb
+    public static function create(RdbConfig|array $config): Rdb
     {
         if (is_array($config)) {
             $config = new RdbConfig($config);
@@ -130,7 +131,7 @@ abstract class Rdb
      * @param iterable<string> $items
      * @return Generator<string>
      */
-    public static function prefix(string $prefix, $items): Generator
+    public static function prefix(string $prefix, iterable $items): Generator
     {
         foreach ($items as $item) {
             yield $prefix . $item;
@@ -176,7 +177,7 @@ abstract class Rdb
      * @param string $mode
      * @return int|float
      */
-    protected function cast($amount, string $mode)
+    protected function cast($amount, string $mode): int|float
     {
         if ($mode === self::CAST_FLOAT) {
             return (float) $amount;
@@ -211,7 +212,7 @@ abstract class Rdb
      * @param bool $async
      * @return void
      */
-    public abstract function flushAll(bool $async = false);
+    public abstract function flushAll(bool $async = false): void;
 
 
     /**
@@ -219,7 +220,7 @@ abstract class Rdb
      * @param bool $async
      * @return void
      */
-    public abstract function flushDb(bool $async = false);
+    public abstract function flushDb(bool $async = false): void;
 
 
     /**
@@ -227,7 +228,7 @@ abstract class Rdb
      * @param bool $scan
      * @return void
      */
-    public function flushPrefix(bool $scan = true)
+    public function flushPrefix(bool $scan = true): void
     {
         $keys = $scan ? $this->scan('*') : $this->keys('*');
         $this->del($keys);
@@ -275,9 +276,9 @@ abstract class Rdb
      * @param string $script
      * @param array $keys
      * @param array $args
-     * @return string|array|null
+     * @return int|string|array|null
      */
-    public abstract function eval(string $script, array $keys = [], array $args = []);
+    public abstract function eval(string $script, array $keys = [], array $args = []): int|string|array|null;
 
 
     /**
@@ -296,7 +297,7 @@ abstract class Rdb
      * @param int $ttl milliseconds
      * @return bool
      */
-    public abstract function expire(string $key, $ttl = 0): bool;
+    public abstract function expire(string $key, int $ttl = 0): bool;
 
 
     /**
@@ -306,7 +307,7 @@ abstract class Rdb
      * @param int $ttl milliseconds
      * @return bool
      */
-    public abstract function expireAt(string $key, $ttl = 0): bool;
+    public abstract function expireAt(string $key, int $ttl = 0): bool;
 
 
     /**
@@ -362,7 +363,7 @@ abstract class Rdb
      *    - string|null if the GET flag is set
      *    - bool for everything else
      */
-    public abstract function set(string $key, string $value, int $ttl = 0, array $flags = []);
+    public abstract function set(string $key, string $value, int $ttl = 0, array $flags = []): bool|string|null;
 
 
     /**
@@ -508,7 +509,7 @@ abstract class Rdb
      * @param string $cast one of: 'auto', 'float', 'integer'
      * @return int|float the value after incrementing
      */
-    public function incr(string $key, $amount = 1, $cast = self::CAST_AUTO)
+    public function incr(string $key, $amount = 1, string $cast = self::CAST_AUTO): int|float
     {
         $amount = self::cast($amount, $cast);
 
@@ -552,7 +553,7 @@ abstract class Rdb
      * @param string $cast one of: 'auto', 'float', 'integer'
      * @return int|float the value after decrementing
      */
-    public function decr(string $key, $amount = 1, $cast = self::CAST_AUTO)
+    public function decr(string $key, $amount = 1, string $cast = self::CAST_AUTO): int|float
     {
         $amount = self::cast($amount, $cast);
 
@@ -1214,7 +1215,7 @@ abstract class Rdb
      * @param int $ttl milliseconds
      * @return int object size in bytes
      */
-    public function setObject(string $key, $value, $ttl = 0): int
+    public function setObject(string $key, object $value, int $ttl = 0): int
     {
         return $this->getObjectDriver()->setObject($key, $value, $ttl);
     }
@@ -1237,7 +1238,7 @@ abstract class Rdb
      * @return object|null
      * @throws InvalidArgumentException
      */
-    public function getObject(string $key, ?string $expected = null)
+    public function getObject(string $key, ?string $expected = null): ?object
     {
         if (
             $expected
@@ -1268,7 +1269,7 @@ abstract class Rdb
      * @return (object|null)[] [ key => item ]
      * @throws InvalidArgumentException
      */
-    public function mGetObjects($keys, ?string $expected = null, bool $nullish = false): array
+    public function mGetObjects(iterable $keys, ?string $expected = null, bool $nullish = false): array
     {
         if (
             $expected
@@ -1361,7 +1362,7 @@ abstract class Rdb
      * @return int
      * @throws JsonException
      */
-    public function setJson(string $key, $value, $ttl = 0): int
+    public function setJson(string $key, mixed $value, int $ttl = 0): int
     {
         $value = json_encode($value);
 
@@ -1380,10 +1381,10 @@ abstract class Rdb
      *
      * @param string $key
      * @param bool $throw throw an exception if the JSON is invalid
-     * @return mixed|null
+     * @return mixed
      * @throws JsonException
      */
-    public function getJson(string $key, bool $throw = true)
+    public function getJson(string $key, bool $throw = true): mixed
     {
         $value = $this->get($key);
         if ($value === null) {
@@ -1448,7 +1449,7 @@ abstract class Rdb
      * @return int
      * @throws PackingFailedException
      */
-    public function pack(string $key, $value, int $ttl = 0): int
+    public function pack(string $key, mixed $value, int $ttl = 0): int
     {
         $value = MessagePack::pack($value);
         $ok = $this->set($key, $value, $ttl);
@@ -1465,10 +1466,10 @@ abstract class Rdb
      * Get a value from the MessagePack format.
      *
      * @param string $key
-     * @return mixed|null
+     * @return mixed
      * @throws UnpackingFailedException
      */
-    public function unpack(string $key)
+    public function unpack(string $key): mixed
     {
         $value = $this->get($key);
 
@@ -1510,7 +1511,7 @@ abstract class Rdb
      * @param array|string $config
      * @return RdbBucket
      */
-    public function getBucket($config): RdbBucket
+    public function getBucket(array|string $config): RdbBucket
     {
         return new RdbBucket($this, $config);
     }
@@ -1530,7 +1531,7 @@ abstract class Rdb
      * @throws Exception
      * @throws Exception fatal errors
      */
-    public function export($file, $config = []): int
+    public function export($file, array|string $config = []): int
     {
         $export = new RdbExport($this, $config);
         return $export->export($file);
@@ -1549,7 +1550,7 @@ abstract class Rdb
      * @return string[] errors
      * @throws Exception fatal errors
      */
-    public function import($file, $config = []): array
+    public function import($file, array|string $config = []): array
     {
         $import = new RdbImport($this, $config);
         $import->import($file);
