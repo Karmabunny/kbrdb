@@ -44,7 +44,7 @@ final class CredisTest extends TestCase
 
     public function tearDown(): void
     {
-        $this->rdb->driver = PhpObjectDriver::class;
+        $this->rdb->config->object_driver = PhpObjectDriver::class;
     }
 
 }
