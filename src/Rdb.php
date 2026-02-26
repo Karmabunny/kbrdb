@@ -1364,14 +1364,12 @@ abstract class Rdb
      */
     public function setJson(string $key, mixed $value, int $ttl = 0): int
     {
-        $value = json_encode($value);
+        $value = json_encode($value, flags: JSON_THROW_ON_ERROR);
 
-        $error = json_last_error();
-        if ($error !== JSON_ERROR_NONE) {
-            throw new JsonException(json_last_error_msg(), $error);
+        if (!$this->set($key, $value, $ttl)) {
+            return 0;
         }
 
-        if (!$this->set($key, $value, $ttl)) return 0;
         return strlen($value);
     }
 
@@ -1387,17 +1385,18 @@ abstract class Rdb
     public function getJson(string $key, bool $throw = true): mixed
     {
         $value = $this->get($key);
+
         if ($value === null) {
             return null;
         }
 
-        $value = json_decode($value, true);
+        $flags = 0;
 
-        $error = json_last_error();
-        if ($throw and $error !== JSON_ERROR_NONE) {
-            throw new JsonException(json_last_error_msg(), $error);
+        if ($throw) {
+            $flags |= JSON_THROW_ON_ERROR;
         }
 
+        $value = json_decode($value, true, flags: $flags);
         return $value;
     }
 
