@@ -26,8 +26,7 @@
     "require": {
         "predis/predis": "^2.2",
         "colinmollenhour/credis": "^1",
-        "php": ">=7.2",
-        "symfony/polyfill-php73": "^1.29",
+        "php": "^8.1",
         "rybakit/msgpack": "^0.9.1",
         "karmabunny/interfaces": "^1.1"
     },
