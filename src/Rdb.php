@@ -1228,8 +1228,12 @@ abstract class Rdb
      *
      * IMPORTANT: the `$expected` parameter will become mandatory in v2.
      *
+     * Behaviour of `$expected` changes between drivers. For PHP (default) this
+     * permits inherited assertions. For everything else (Hash, MsgPack, JSON)
+     * this must be the exact type.
+     *
      * @param string $key
-     * @param string|null $expected Ensure the result inherits/is this type
+     * @param string|null $expected
      * @return object|null
      * @throws InvalidArgumentException
      */
@@ -1254,8 +1258,12 @@ abstract class Rdb
      *
      * IMPORTANT: the `$expected` parameter will become mandatory in v2.
      *
+     * Behaviour of `$expected` changes between drivers. For PHP (default) this
+     * permits inherited assertions. For everything else (Hash, MsgPack, JSON)
+     * this must be the exact type.
+     *
      * @param iterable<string> $keys Non-prefixed keys
-     * @param string|null $expected Ensure all results inherits/is of this type
+     * @param string|null $expected
      * @param bool $nullish (false) return empty values
      * @return (object|null)[] [ key => item ]
      * @throws InvalidArgumentException
