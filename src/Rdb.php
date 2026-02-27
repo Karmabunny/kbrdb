@@ -52,8 +52,8 @@ abstract class Rdb
     public $config;
 
 
-    /** @var RdbObjectDriver */
-    public $driver;
+    /** @var RdbObjectDriver|null */
+    protected $driver;
 
 
     /**
@@ -77,6 +77,11 @@ abstract class Rdb
     }
 
 
+    /**
+     * Get the current object driver.
+     *
+     * @return RdbObjectDriver
+     */
     protected function getObjectDriver(): RdbObjectDriver
     {
         $class = $this->config->object_driver;
