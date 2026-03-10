@@ -276,9 +276,9 @@ abstract class Rdb
      * @param string $script
      * @param array $keys
      * @param array $args
-     * @return int|string|array|null
+     * @return int|string|bool|array|null
      */
-    public abstract function eval(string $script, array $keys = [], array $args = []): int|string|array|null;
+    public abstract function eval(string $script, array $keys = [], array $args = []): int|string|bool|array|null;
 
 
     /**

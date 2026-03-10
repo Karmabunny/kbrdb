@@ -136,7 +136,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function eval(string $script, array $keys = [], array $args = []): int|string|array|null
+    public function eval(string $script, array $keys = [], array $args = []): int|string|bool|array|null
     {
         $keys = $this->prefixKeys($keys);
         $result = $this->credis->eval($script, $keys, $args);

@@ -134,7 +134,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function eval(string $script, array $keys = [], array $args = []): int|string|array|null
+    public function eval(string $script, array $keys = [], array $args = []): int|string|bool|array|null
     {
         $args = array_merge($keys, $args);
         $result = $this->redis->eval($script, $args, count($keys));

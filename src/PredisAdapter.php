@@ -119,7 +119,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function eval(string $script, array $keys = [], array $args = []): int|string|array|null
+    public function eval(string $script, array $keys = [], array $args = []): int|string|bool|array|null
     {
         $args = array_merge($keys, $args);
         $result = $this->predis->eval($script, count($keys), ...$args);
