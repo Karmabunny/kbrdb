@@ -43,13 +43,14 @@ class MsgPackObjectDriver implements RdbObjectDriver
             throw new InvalidArgumentException('Object must implement JsonSerializable');
         }
 
-        $value = $value->jsonSerialize();
+        $blob = $value->jsonSerialize();
 
-        if (!is_array($value)) {
+        if (!is_array($blob)) {
             throw new InvalidArgumentException('Object must serialize to an array');
         }
 
-        return $this->rdb->pack($key, $value, $ttl);
+        $blob['__class__'] = get_class($value);
+        return $this->rdb->pack($key, $blob, $ttl);
     }
 
 
@@ -76,6 +77,11 @@ class MsgPackObjectDriver implements RdbObjectDriver
             return null;
         }
 
+        if (isset($value['__class__']) and $value['__class__'] !== $expected) {
+            return null;
+        }
+
+        unset($value['__class__']);
         return $expected::fromJson($value);
     }
 
@@ -91,14 +97,17 @@ class MsgPackObjectDriver implements RdbObjectDriver
                 continue;
             }
 
-            $item = $item->jsonSerialize();
+            $blob = $item->jsonSerialize();
 
-            if (!is_array($item)) {
+            if (!is_array($blob)) {
                 throw new InvalidArgumentException('Object must serialize to an array');
             }
 
-            $item = MessagePack::pack($item);
-            $sizes[$key] = strlen($item);
+            $blob['__class__'] = get_class($item);
+            $blob = MessagePack::pack($blob);
+
+            $sizes[$key] = strlen($blob);
+            $item = $blob;
         }
         unset($item);
 
@@ -145,6 +154,11 @@ class MsgPackObjectDriver implements RdbObjectDriver
                 continue;
             }
 
+            if (isset($value['__class__']) and $value['__class__'] !== $expected) {
+                continue;
+            }
+
+            unset($value['__class__']);
             $output[$key] = $expected::fromJson($value);
         }
 

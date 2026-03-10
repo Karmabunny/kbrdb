@@ -3,12 +3,15 @@
 namespace kbtests;
 
 use ArrayIterator;
+use Countable;
 use karmabunny\rdb\Objects\HashObjectDriver;
 use karmabunny\rdb\Objects\JsonObjectDriver;
 use karmabunny\rdb\Objects\MsgPackObjectDriver;
 use karmabunny\rdb\Objects\PhpObjectDriver;
 use karmabunny\rdb\Rdb;
+use karmabunny\rdb\RdbHelperTrait;
 use karmabunny\rdb\RdbJsonObject;
+use MessagePack\MessagePack;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Traversable;
@@ -476,16 +479,16 @@ trait AdapterTestTrait
     {
         // command - expected
         return [
-            'php' => [ PhpObjectDriver::class ],
-            'json' => [ JsonObjectDriver::class ],
-            'hash' => [ HashObjectDriver::class ],
-            'msgpack' => [ MsgPackObjectDriver::class ],
+            'php' => [ PhpObjectDriver::class, fn($object) => strlen(serialize($object)) ],
+            'json' => [ JsonObjectDriver::class, fn($object) => strlen(json_encode($object->jsonSerialize() + ['__class__' => get_class($object)])) ],
+            'hash' => [ HashObjectDriver::class, fn($object) => count($object) + 1 ],
+            'msgpack' => [ MsgPackObjectDriver::class, fn($object) => strlen(MessagePack::pack($object->jsonSerialize() + ['__class__' => get_class($object)])) ],
         ];
     }
 
 
     /** @dataProvider dataObjectDrivers */
-    public function testObjects($driver)
+    public function testObjects($driver, $lengthFn)
     {
         $this->rdb->config->object_driver = $driver;
 
@@ -493,34 +496,34 @@ trait AdapterTestTrait
         $object = new RandoObject([ 'foo' => 123, 'bar' => 456 ]);
 
         $actual = $this->rdb->setObject('obj:1', $object);
-        $expected = strlen(serialize($object));
+        $expected = $lengthFn($object);
         $this->assertEquals($expected, $actual);
 
         $exists = $this->rdb->exists('obj:1');
         $this->assertEquals(1, $exists);
 
-        $actual = $this->rdb->getObject('obj:1');
-        $this->assertEquals($object, $actual);
+        // Still test deprecated behaviour for now
+        if ($driver === PhpObjectDriver::class) {
+            $actual = $this->rdb->getObject('obj:1');
+            $this->assertEquals($object, $actual);
+        }
 
         $actual = $this->rdb->getObject('obj:1', RandoObject::class);
         $this->assertEquals($object, $actual);
 
-        $actual = $this->rdb->getObject('obj:1', stdClass::class);
+        $actual = $this->rdb->getObject('obj:1', RandoObject2::class);
         $this->assertNull($actual);
 
         // multi get/set objects
         $objects = [
             'multi:1' => new RandoObject([ 'foo' => 123, 'bar' => 456 ]),
             'multi:2' => new RandoObject([ 'foo' => 'aaa', 'bar' => ['bbb', 'ccc'] ]),
-            'multi:3' => (object) ['xyz' => 'abc', 'def' => [1,2,3,4]],
+            'multi:3' => new RandoObject2(),
         ];
 
-        $expected = array_map(function($item) {
-            return strlen(serialize($item));
-        }, $objects);
-
+        $expected = array_map($lengthFn, $objects);
         $actual = $this->rdb->mSetObjects($objects);
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual, json_encode($actual));
 
         $keys = [
             'multi:1',
@@ -529,14 +532,23 @@ trait AdapterTestTrait
             'multi:3',
         ];
 
-        // Fetch all, the null key is filtered out.
-        $actual = $this->rdb->mGetObjects($keys);
-        $this->assertEquals($objects, $actual);
+        // Fetch all, the null key and non-matching types are filtered out.
+        $actual = $this->rdb->mGetObjects($keys, RandoObject::class);
 
-        $actual = $this->rdb->mScanObjects($keys);
-        $this->assertInstanceOf(Traversable::class, $actual);
-        $actual = iterator_to_array($actual);
-        $this->assertEquals($objects, $actual);
+        $this->assertArrayHasKey('multi:1', $actual);
+        $this->assertEquals($objects['multi:1'], $actual['multi:1']);
+
+        $this->assertArrayHasKey('multi:2', $actual);
+        $this->assertEquals($objects['multi:2'], $actual['multi:2']);
+
+        $this->assertArrayNotHasKey('multi:3', $actual);
+        $this->assertArrayNotHasKey('multi:null', $actual);
+
+        // Just the one outlier.
+        $actual = $this->rdb->mGetObjects($keys, RandoObject2::class);
+        $this->assertCount(1, $actual);
+        $this->assertArrayHasKey('multi:3', $actual);
+        $this->assertEquals($objects['multi:3'], $actual['multi:3']);
 
         // Fetch all, _including_ the null key.
         $expected = [
@@ -546,13 +558,16 @@ trait AdapterTestTrait
             'multi:3' => $objects['multi:3'],
         ];
 
-        $actual = $this->rdb->mGetObjects($keys, null, true);
-        $this->assertEquals($expected, $actual);
+        // Still test deprecated behaviour for now.
+        if ($driver === PhpObjectDriver::class) {
+            $actual = $this->rdb->mGetObjects($keys, null, true);
+            $this->assertEquals($expected, $actual);
 
-        $actual = $this->rdb->mScanObjects($keys, null, true);
-        $this->assertInstanceOf(Traversable::class, $actual);
-        $actual = iterator_to_array($actual);
-        $this->assertEquals($expected, $actual);
+            $actual = $this->rdb->mScanObjects($keys, null, true);
+            $this->assertInstanceOf(Traversable::class, $actual);
+            $actual = iterator_to_array($actual);
+            $this->assertEquals($expected, $actual);
+        }
 
         // Fetch just the 'randoboject' keys.
         $expected = [
@@ -1165,8 +1180,10 @@ trait AdapterTestTrait
 }
 
 
-class RandoObject implements RdbJsonObject
+class RandoObject implements RdbJsonObject, Countable
 {
+    use RdbHelperTrait;
+
     public $foo;
     public $bar;
 
@@ -1194,5 +1211,32 @@ class RandoObject implements RdbJsonObject
     public function jsonSerialize(): array
     {
         return $this->toArray();
+    }
+
+
+    // For hash object driver.
+    public function count(): int
+    {
+        $keys = self::flattenKeys($this->toArray());
+        return count($keys);
+    }
+}
+
+
+class RandoObject2 implements RdbJsonObject, Countable
+{
+    public function jsonSerialize(): array
+    {
+        return [];
+    }
+
+    public static function fromJson(array $json): self
+    {
+        return new self();
+    }
+
+    public function count(): int
+    {
+        return 0;
     }
 }

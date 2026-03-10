@@ -52,8 +52,8 @@ abstract class Rdb
     public $config;
 
 
-    /** @var RdbObjectDriver */
-    public $driver;
+    /** @var RdbObjectDriver|null */
+    protected $driver;
 
 
     /**
@@ -73,13 +73,28 @@ abstract class Rdb
             $this->config = new RdbConfig($config);
         }
 
+        $this->getObjectDriver();
+    }
+
+
+    /**
+     * Get the current object driver.
+     *
+     * @return RdbObjectDriver
+     */
+    protected function getObjectDriver(): RdbObjectDriver
+    {
         $class = $this->config->object_driver;
 
-        if (!is_subclass_of($class, RdbObjectDriver::class)) {
-            throw new InvalidArgumentException('Invalid object driver: ' . $class);
+        if ($this->driver === null or get_class($this->driver) !== $class) {
+            if (!is_subclass_of($class, RdbObjectDriver::class)) {
+                throw new InvalidArgumentException('Invalid object driver: ' . $class);
+            }
+
+            $this->driver = new $class($this);
         }
 
-        $this->driver = new $class($this);
+        return $this->driver;
     }
 
 
@@ -1201,7 +1216,7 @@ abstract class Rdb
      */
     public function setObject(string $key, $value, $ttl = 0): int
     {
-        return $this->driver->setObject($key, $value, $ttl);
+        return $this->getObjectDriver()->setObject($key, $value, $ttl);
     }
 
 
@@ -1213,8 +1228,12 @@ abstract class Rdb
      *
      * IMPORTANT: the `$expected` parameter will become mandatory in v2.
      *
+     * Behaviour of `$expected` changes between drivers. For PHP (default) this
+     * permits inherited assertions. For everything else (Hash, MsgPack, JSON)
+     * this must be the exact type.
+     *
      * @param string $key
-     * @param string|null $expected Ensure the result inherits/is this type
+     * @param string|null $expected
      * @return object|null
      * @throws InvalidArgumentException
      */
@@ -1228,7 +1247,7 @@ abstract class Rdb
             throw new InvalidArgumentException('Not a class or interface: ' . $expected);
         }
 
-        return $this->driver->getObject($key, $expected);
+        return $this->getObjectDriver()->getObject($key, $expected);
     }
 
 
@@ -1239,8 +1258,12 @@ abstract class Rdb
      *
      * IMPORTANT: the `$expected` parameter will become mandatory in v2.
      *
+     * Behaviour of `$expected` changes between drivers. For PHP (default) this
+     * permits inherited assertions. For everything else (Hash, MsgPack, JSON)
+     * this must be the exact type.
+     *
      * @param iterable<string> $keys Non-prefixed keys
-     * @param string|null $expected Ensure all results inherits/is of this type
+     * @param string|null $expected
      * @param bool $nullish (false) return empty values
      * @return (object|null)[] [ key => item ]
      * @throws InvalidArgumentException
@@ -1261,7 +1284,7 @@ abstract class Rdb
             return [];
         }
 
-        $items = $this->driver->mGetObjects($keys, $expected);
+        $items = $this->getObjectDriver()->mGetObjects($keys, $expected);
 
         if ($nullish) {
             $items = $items + array_fill_keys($keys, null);
@@ -1325,7 +1348,7 @@ abstract class Rdb
             return [];
         }
 
-        return $this->driver->mSetObjects($items);
+        return $this->getObjectDriver()->mSetObjects($items);
     }
 
 
