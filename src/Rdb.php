@@ -1359,6 +1359,7 @@ abstract class Rdb
      * @param mixed $value
      * @param int $ttl milliseconds
      * @return int
+     * @throws JsonException
      */
     public function setJson(string $key, $value, $ttl = 0): int
     {
@@ -1378,9 +1379,11 @@ abstract class Rdb
      * Get a JSON document from this key.
      *
      * @param string $key
+     * @param bool $throw throw an exception if the JSON is invalid
      * @return mixed|null
+     * @throws JsonException
      */
-    public function getJson(string $key)
+    public function getJson(string $key, bool $throw = true)
     {
         $value = $this->get($key);
         if ($value === null) {
@@ -1390,7 +1393,7 @@ abstract class Rdb
         $value = json_decode($value, true);
 
         $error = json_last_error();
-        if ($error !== JSON_ERROR_NONE) {
+        if ($throw and $error !== JSON_ERROR_NONE) {
             throw new JsonException(json_last_error_msg(), $error);
         }
 
