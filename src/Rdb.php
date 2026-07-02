@@ -439,7 +439,7 @@ abstract class Rdb
      * All results will be unique.
      *
      * @param string $key
-     * @return string[] set members, null if not a set
+     * @return string[]|null set members, null if not a set
      */
     public abstract function sMembers(string $key): ?array;
 
