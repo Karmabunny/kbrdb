@@ -78,6 +78,11 @@ LUA;
     public function resume(): bool
     {
         $keys = $this->getKeys();
+
+        if (empty($keys)) {
+            return false;
+        }
+
         $this->values = $this->rdb->mGet($keys);
         $this->values = array_filter($this->values);
         return !empty($this->values);
@@ -87,6 +92,10 @@ LUA;
     /** @inheritdoc */
     public function acquire(float $timeout = 0): bool
     {
+        if (empty($this->names)) {
+            return false;
+        }
+
         if ($timeout <= 0) {
             return $this->tryAcquire();
         }
@@ -117,12 +126,11 @@ LUA;
     /** @inheritdoc */
     public function release(): bool
     {
-        $keys = $this->getKeys();
-
         if (empty($this->values)) {
             return false;
         }
 
+        $keys = $this->getKeys();
         $count = $this->rdb->eval(self::LUA_RELEASE, $keys, $this->values);
 
         if (!is_numeric($count)) {
@@ -141,6 +149,11 @@ LUA;
     protected function tryAcquire(): bool
     {
         $keys = $this->getKeys();
+
+        if (empty($keys)) {
+            return false;
+        }
+
         $expire = $this->autoExpire * 1000;
 
         $value = $this->generateValue();
