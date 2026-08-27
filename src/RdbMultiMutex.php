@@ -57,7 +57,7 @@ LUA;
     public function __construct(Rdb $rdb, array $names)
     {
         $this->rdb = $rdb;
-        $this->names = $names;
+        $this->names = array_unique($names);
 
         register_shutdown_function([$this, '__destruct']);
     }
