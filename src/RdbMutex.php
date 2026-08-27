@@ -45,8 +45,6 @@ LUA;
     {
         $this->rdb = $rdb;
         $this->name = $name;
-
-        register_shutdown_function([$this, '__destruct']);
     }
 
 

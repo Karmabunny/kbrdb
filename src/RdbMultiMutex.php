@@ -58,8 +58,6 @@ LUA;
     {
         $this->rdb = $rdb;
         $this->names = array_unique($names);
-
-        register_shutdown_function([$this, '__destruct']);
     }
 
 
