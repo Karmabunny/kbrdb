@@ -1202,7 +1202,7 @@ class RandoObject implements RdbJsonObject, Countable
     }
 
 
-    public static function fromJson(array $json): self
+    public static function fromJson(array $json): static
     {
         return new self($json);
     }
@@ -1230,7 +1230,7 @@ class RandoObject2 implements RdbJsonObject, Countable
         return [];
     }
 
-    public static function fromJson(array $json): self
+    public static function fromJson(array $json): static
     {
         return new self();
     }

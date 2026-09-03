@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace karmabunny\rdb\Objects;
 
@@ -44,7 +45,7 @@ class HashObjectDriver implements RdbObjectDriver
     /**
      * @var Rdb
      */
-    protected $rdb;
+    protected Rdb $rdb;
 
 
     public function __construct(Rdb $rdb)
@@ -54,7 +55,7 @@ class HashObjectDriver implements RdbObjectDriver
 
 
     /** @inheritdoc */
-    public function setObject(string $key, object $value, $ttl = 0): int
+    public function setObject(string $key, object $value, int $ttl = 0): int
     {
         if (!$value instanceof JsonSerializable) {
             throw new InvalidArgumentException('Object must implement JsonSerializable');

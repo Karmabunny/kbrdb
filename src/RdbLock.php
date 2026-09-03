@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @link      https://github.com/Karmabunny
  * @copyright Copyright (c) 2021 Karmabunny
@@ -24,13 +25,13 @@ class RdbLock
 {
 
     /** @var Rdb */
-    public $rdb;
+    public Rdb $rdb;
 
     /** @var string */
-    public $key;
+    public string $key;
 
     /** @var string */
-    public $token;
+    public string $token;
 
 
     /**
@@ -76,7 +77,7 @@ class RdbLock
      * @param int $timeout milliseconds
      * @return self|null
      */
-    public static function acquire(Rdb $rdb, string $key, int $wait = 0, int $timeout = 60000)
+    public static function acquire(Rdb $rdb, string $key, int $wait = 0, int $timeout = 60000): ?self
     {
         $token = self::createToken();
 
@@ -112,7 +113,7 @@ class RdbLock
      *
      * @return void
      */
-    public function release()
+    public function release(): void
     {
         // TODO It'd be cool if this were a little more atomic. Cue lua support.
 

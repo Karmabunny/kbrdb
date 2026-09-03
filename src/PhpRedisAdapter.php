@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @link      https://github.com/Karmabunny
  * @copyright Copyright (c) 2021 Karmabunny
@@ -25,11 +26,11 @@ class PhpRedisAdapter extends Rdb
 {
 
     /** @var Redis */
-    private $redis;
+    private Redis $redis;
 
 
     /** @inheritdoc */
-    protected function __construct($config)
+    protected function __construct(RdbConfig|array $config)
     {
         parent::__construct($config);
         $config = $this->config;
@@ -86,14 +87,14 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function flushAll(bool $async = false)
+    public function flushAll(bool $async = false): void
     {
         $this->redis->flushAll($async);
     }
 
 
     /** @inheritdoc */
-    public function flushDb(bool $async = false)
+    public function flushDb(bool $async = false): void
     {
         $this->redis->flushDB($async);
     }
@@ -133,7 +134,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function eval(string $script, array $keys = [], array $args = [])
+    public function eval(string $script, array $keys = [], array $args = []): int|string|bool|array|null
     {
         $args = array_merge($keys, $args);
         $result = $this->redis->eval($script, $args, count($keys));
@@ -255,7 +256,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function set(string $key, string $value, int $ttl = 0, array $flags = [])
+    public function set(string $key, string $value, int $ttl = 0, array $flags = []): bool|string|null
     {
         $flags = self::parseSetFlags($flags);
 
@@ -288,7 +289,7 @@ class PhpRedisAdapter extends Rdb
 
         // TODO Uhh.. does getset actually work here?
         if ($flags['get_set']) {
-            return $result === false ? null : $result;
+            return $result === false ? null : (string) $result;
         }
 
         return (bool) $result;
@@ -777,8 +778,7 @@ class PhpRedisAdapter extends Rdb
     public function zCount(string $key, float $min, float $max): ?int
     {
         /** @var int|false $res */
-        // @phpstan-ignore-next-line
-        $res = $this->redis->zCount($key, $min, $max);
+        $res = $this->redis->zCount($key, (string) $min, (string) $max);
         if ($res === false) return null;
         return $res;
     }
