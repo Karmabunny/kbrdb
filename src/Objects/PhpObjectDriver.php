@@ -43,6 +43,8 @@ class PhpObjectDriver implements RdbObjectDriver
     public function getObject(string $key, ?string $expected = null): ?object
     {
         $value = $this->rdb->get($key);
+        if ($value === null) return null;
+
         $value = @unserialize($value);
 
         if ($value === false) return null;
