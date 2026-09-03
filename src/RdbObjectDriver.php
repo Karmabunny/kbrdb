@@ -8,7 +8,7 @@ namespace karmabunny\rdb;
  *
  * These implement different methods for serialising object data.
  *
- * The `$expected` parameter will become mandatory in v2.
+ * The `$expected` parameter will become mandatory in v3.
  *
  * @package karmabunny\rdb
  */

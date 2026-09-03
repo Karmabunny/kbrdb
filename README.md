@@ -50,7 +50,7 @@ This library wouldn't ever try to _hide_ features behind target versions, but pe
 For example, `BRPOPLPUSH` is deprecated in v6.2 and might be removed in the distant future. In this case, the library would be able to dynamically replace (based on the server version) this with `BLMOVE`.
 
 
-### Plans for v2
+### Plans for v3
 
 __TTL params__
 
