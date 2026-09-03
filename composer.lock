@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "da2d509bf8308e71a3701e4d85cec877",
+    "content-hash": "0b21d103879ce2f7cb3ad687fd50c028",
     "packages": [
         {
             "name": "colinmollenhour/credis",
@@ -55,20 +55,20 @@
         },
         {
             "name": "karmabunny/interfaces",
-            "version": "v1.2.1",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Karmabunny/kbinterfaces.git",
-                "reference": "dcf87a7013dbdb29c66480d3bdb8561d1167e0fe"
+                "reference": "31513261005e7ffaf28fdf4aef5e58762790ab08"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Karmabunny/kbinterfaces/zipball/dcf87a7013dbdb29c66480d3bdb8561d1167e0fe",
-                "reference": "dcf87a7013dbdb29c66480d3bdb8561d1167e0fe",
+                "url": "https://api.github.com/repos/Karmabunny/kbinterfaces/zipball/31513261005e7ffaf28fdf4aef5e58762790ab08",
+                "reference": "31513261005e7ffaf28fdf4aef5e58762790ab08",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2|^8"
+                "php": "^8.2"
             },
             "require-dev": {
                 "phpcompatibility/php-compatibility": "^9.3",
@@ -100,9 +100,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Karmabunny/kbinterfaces/issues",
-                "source": "https://github.com/Karmabunny/kbinterfaces/tree/v1.2.1"
+                "source": "https://github.com/Karmabunny/kbinterfaces/tree/v2.0.0"
             },
-            "time": "2026-01-28T01:05:13+00:00"
+            "time": "2026-09-03T00:52:54+00:00"
         },
         {
             "name": "predis/predis",
