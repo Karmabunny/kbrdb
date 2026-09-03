@@ -1227,7 +1227,7 @@ abstract class Rdb
      * This returns null if the key is empty or the object doesn't match the
      * 'expected' type.
      *
-     * IMPORTANT: the `$expected` parameter will become mandatory in v2.
+     * IMPORTANT: the `$expected` parameter will become mandatory in v3.
      *
      * Behaviour of `$expected` changes between drivers. For PHP (default) this
      * permits inherited assertions. For everything else (Hash, MsgPack, JSON)
@@ -1257,7 +1257,7 @@ abstract class Rdb
      *
      * Empty keys are filtered out - if `nullish` is false (default).
      *
-     * IMPORTANT: the `$expected` parameter will become mandatory in v2.
+     * IMPORTANT: the `$expected` parameter will become mandatory in v3.
      *
      * Behaviour of `$expected` changes between drivers. For PHP (default) this
      * permits inherited assertions. For everything else (Hash, MsgPack, JSON)
