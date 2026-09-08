@@ -18,13 +18,13 @@ namespace karmabunny\rdb;
 class RdbSessionHandler implements \SessionHandlerInterface
 {
     /** @var Rdb */
-    protected $rdb;
+    protected Rdb $rdb;
 
     /** @var int */
-    protected $ttl;
+    protected int $ttl;
 
     /** @var string */
-    protected $prefix;
+    protected string $prefix;
 
 
     /**
@@ -44,7 +44,7 @@ class RdbSessionHandler implements \SessionHandlerInterface
 
 
     /** @inheritdoc*/
-    public function open($save_path, $session_id): bool
+    public function open(string $save_path, string $session_id): bool
     {
         return true;
     }
@@ -58,16 +58,14 @@ class RdbSessionHandler implements \SessionHandlerInterface
 
 
     /** @inheritdoc*/
-    #[\ReturnTypeWillChange]
-    public function gc($maxlifetime)
+    public function gc(int $maxlifetime): int
     {
         return 0;
     }
 
 
     /** @inheritdoc*/
-    #[\ReturnTypeWillChange]
-    public function read($session_id)
+    public function read(string $session_id): string|false
     {
         $data = $this->rdb->get($this->prefix . $session_id);
         return $data ?: '';
@@ -75,7 +73,7 @@ class RdbSessionHandler implements \SessionHandlerInterface
 
 
     /** @inheritdoc*/
-    public function write($session_id, $session_data): bool
+    public function write(string $session_id, string $session_data): bool
     {
         $this->rdb->set($this->prefix . $session_id, $session_data, $this->ttl * 1000);
         return true;
@@ -83,7 +81,7 @@ class RdbSessionHandler implements \SessionHandlerInterface
 
 
     /** @inheritdoc*/
-    public function destroy($session_id): bool
+    public function destroy(string $session_id): bool
     {
         $this->rdb->del($this->prefix . $session_id);
         return true;
