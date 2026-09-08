@@ -395,7 +395,7 @@ class CredisAdapter extends Rdb
             $items = $this->credis->sscan($it, $key, $pattern, $this->config->scan_size);
 
             // If it's backed by php-redis it might return false.
-            if ($items === false) break;
+            if ($items === false or $items === null) break;
 
             foreach ($items as $item) {
                 yield $item;
@@ -954,7 +954,7 @@ class CredisAdapter extends Rdb
 
         for (;;) {
             $items = $this->credis->hScan($it, $key, $pattern, $this->config->scan_size);
-            if ($items === false) break;
+            if ($items === false or $items === null) break;
 
             foreach ($items as $key => $item) {
                 yield $key => $item;
