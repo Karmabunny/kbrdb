@@ -257,7 +257,7 @@ class CredisAdapter extends Rdb
     public function expire(string $key, int|float $ttl = 0): bool
     {
         $key = $this->config->prefix . $key;
-        [$ms, $ttl] = self::parseTtl($ttl);
+        [$ms, $ttl] = $this->parseTtl($ttl);
         $cmd = $ms ? 'pexpire' : 'expire';
         return (bool) $this->credis->__call($cmd, [$key, $ttl]);
     }
@@ -267,7 +267,7 @@ class CredisAdapter extends Rdb
     public function expireAt(string $key, int|float $ttl = 0): bool
     {
         $key = $this->config->prefix . $key;
-        [$ms, $ttl] = self::parseTtl($ttl);
+        [$ms, $ttl] = $this->parseTtl($ttl);
         $cmd = $ms ? 'pexpireat' : 'expireat';
         return (bool) $this->credis->__call($cmd, [$key, $ttl]);
     }
