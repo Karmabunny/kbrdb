@@ -76,16 +76,24 @@ The expected type in the object method is currently optional, but most drivers r
 | adapter       | 'predis'        | Adapter type: predis, php-redis, credis |
 | object_driver | PhpObjectDriver | Object driver class                     |
 | timeout       | 5               | Connection timeout, in seconds          |
-| lock_sleep    | 5               | Tick size for locking, in milliseconds  |
+| lock_sleep    | 0.005           | Tick size for locking, in seconds       |
 | chunk_size    | 50              | Max key size for mscan methods          |
 | scan_size     | 1000            | Count hint for scan methods             |
 | scan_keys     | false           | Replace keys() with scan()              |
+| ttl_mode      | auto            | how to accept TTL values, below         |
 | options       | []              | Adapter specific options                |
 
 Notes:
 
 - The port number is default 6379 unless specified in the `host` option.
 - The protocol can be adjusted in the `host` option too: prefix `tcp://` or `udp://`.
+
+TTL modes:
+ - `TTL_AUTO`    use TTL/PTTL based on the value type (int or float, respectively)
+ - `TTL_INTEGER` use TTL only (int)
+ - `TTL_FLOAT`   use PTTL only (float)
+ - `TTL_COMPAT`  use PTTL (float) and assume the value is provided as milliseconds
+
 
 ```php
 return [
@@ -167,7 +175,7 @@ $config = require 'config.php';
 $rdb = Rdb::create($config);
 
 // Store 'blah' for 100 ms
-$rdb->set('key', 'blah', 100);
+$rdb->set('key', 'blah', 0.1);
 
 $rdb->get('key');
 // => blah
@@ -182,7 +190,6 @@ Object extensions will serialize in the PHP format. These have builtin assertion
 
 ```php
 $model = new MyModel('etc');
-$rdb->setObject('objects:key', $model);
 
 $rdb->getObject('objects:key', MyModel::class);
 // => MyModel( etc )
@@ -195,7 +202,7 @@ Locking provides a mechanism to restrict atomic access to a resource.
 
 ```php
 // Wait for a lock for up to 10 seconds.
-$lock = $rdb->lock('locks:key', 10 * 1000);
+$lock = $rdb->lock('locks:key', 10);
 
 if ($lock === null) {
     echo "Busy - too much contention\n";
