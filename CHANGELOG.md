@@ -159,3 +159,53 @@ Support for hash types.
 ### v1.28
 
 New object driver for alternate object serialisers.
+
+
+### v1.29
+
+Custom session handler.
+- Fix hash + pack tests.
+- Update implicit nullable params.
+- Fix session read.
+- Fix missing prefix in session write/destroy.
+- Validate the object driver class.
+- Fix get_set for predis driver.
+
+
+### v1.30
+
+Fix deprecated null in realpath().
+
+
+### v1.31
+
+Merge branch 'feat/mutex'
+
+
+### v1.32
+
+Update docs for RdbJsonObject.
+- Don't raise errors when decoding objects.
+
+
+### v1.33
+
+fix object driver class assertions
+
+
+### v1.34
+
+Add 'throw' option for getJson().
+- Don't open multi locks with empty lists.
+- Relocate scripts.
+
+
+### v2.34
+
+Update visor v2.3.
+- Fix null unserialize in object driver.
+
+
+### v2.35
+
+object inspect, more null return types
