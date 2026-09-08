@@ -290,7 +290,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function mGet(iterable $keys): array
     {
-        $keys = self::normalizeIterable($keys, false);
+        $keys = self::flatten($keys);
 
         if (empty($keys)) {
             return [];
@@ -313,7 +313,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function sAdd(string $key, ...$values): ?int
     {
-        $values = self::flattenArrays($values);
+        $values = self::flatten($values);
         if (empty($values)) return 0;
 
         return $this->predis->sadd($key, $values);
@@ -343,7 +343,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function sRem(string $key, ...$values): ?int
     {
-        $values = self::flattenArrays($values);
+        $values = self::flatten($values);
         if (empty($values)) return 0;
 
         return $this->predis->srem($key, $values);
@@ -489,7 +489,7 @@ class PredisAdapter extends Rdb
             $keys = [$keys];
         }
         else {
-            $keys = self::normalizeIterable($keys, false);
+            $keys = self::flatten($keys);
         }
 
         if ($timeout === null) {
@@ -507,7 +507,7 @@ class PredisAdapter extends Rdb
             $keys = [$keys];
         }
         else {
-            $keys = self::normalizeIterable($keys, false);
+            $keys = self::flatten($keys);
         }
 
         if ($timeout === null) {
@@ -532,7 +532,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function exists(...$keys): int
     {
-        $keys = self::flattenArrays($keys);
+        $keys = self::flatten($keys);
         if (empty($keys)) return 0;
 
         return $this->predis->exists(...$keys);
@@ -542,7 +542,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function del(...$keys): int
     {
-        $keys = self::flattenArrays($keys);
+        $keys = self::flatten($keys);
         if (empty($keys)) return 0;
 
         return $this->predis->del($keys);
@@ -608,7 +608,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function zRem(string $key, ...$members): int
     {
-        $args = self::flattenArrays($members);
+        $args = self::flatten($members);
         array_unshift($args, $key);
 
         return (int) @call_user_func_array([$this->predis, 'zrem'], $args);

@@ -61,7 +61,7 @@ class CredisAdapter extends Rdb
      */
     protected function prefixKeys(iterable $keys): array
     {
-        $keys = self::flattenArrays($keys);
+        $keys = self::flatten($keys);
         if (empty($keys)) return [];
 
         if ($this->config->prefix) {
@@ -341,7 +341,7 @@ class CredisAdapter extends Rdb
         }
         unset($item);
 
-        $keys = self::normalizeIterable($keys);
+        $keys = self::flatten($keys);
         $items = array_combine($keys, $items);
         return $items;
     }
@@ -411,7 +411,7 @@ class CredisAdapter extends Rdb
     /** @inheritdoc */
     public function sRem(string $key, ...$values): ?int
     {
-        $values = self::flattenArrays($values);
+        $values = self::flatten($values);
         if (empty($values)) return 0;
 
         $key = $this->config->prefix . $key;
@@ -768,7 +768,7 @@ class CredisAdapter extends Rdb
     {
         $key = $this->config->prefix . $key;
 
-        $args = self::flattenArrays($members);
+        $args = self::flatten($members);
         array_unshift($args, $key);
 
         $value = $this->credis->__call('zrem', $args);

@@ -1290,7 +1290,7 @@ abstract class Rdb
             throw new InvalidArgumentException('Not a class or interface: ' . $expected);
         }
 
-        $keys = self::normalizeIterable($keys, false);
+        $keys = self::flatten($keys);
 
         if (empty($keys)) {
             return [];

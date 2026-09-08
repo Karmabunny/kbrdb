@@ -325,7 +325,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function mGet(iterable $keys): array
     {
-        $keys = self::normalizeIterable($keys, false);
+        $keys = self::flatten($keys);
 
         if (empty($keys)) {
             return [];
@@ -355,7 +355,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function sAdd(string $key, ...$values): ?int
     {
-        $values = self::flattenArrays($values);
+        $values = self::flatten($values);
         if (empty($values)) return 0;
 
         $res = $this->redis->sAdd($key, ...$values);
@@ -408,7 +408,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function sRem(string $key, ...$values): ?int
     {
-        $values = self::flattenArrays($values);
+        $values = self::flatten($values);
         if (empty($values)) return 0;
 
         /** @var int|false $count */
@@ -580,7 +580,7 @@ class PhpRedisAdapter extends Rdb
             $keys = [$keys];
         }
         else {
-            $keys = self::normalizeIterable($keys, false);
+            $keys = self::flatten($keys);
         }
 
         if ($timeout === null) {
@@ -597,7 +597,7 @@ class PhpRedisAdapter extends Rdb
     public function brPop($keys, ?int $timeout = null): ?array
     {
         if (!is_scalar($keys)) {
-            $keys = self::normalizeIterable($keys, false);
+            $keys = self::flatten($keys);
         }
 
         if ($timeout === null) {
@@ -626,7 +626,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function exists(...$keys): int
     {
-        $keys = self::flattenArrays($keys);
+        $keys = self::flatten($keys);
         if (empty($keys)) return 0;
 
         return $this->redis->exists($keys);
@@ -636,7 +636,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function del(...$keys): int
     {
-        $keys = self::flattenArrays($keys);
+        $keys = self::flatten($keys);
         if (empty($keys)) return 0;
 
         return $this->redis->del($keys);
@@ -759,7 +759,7 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function zRem(string $key, ...$members): int
     {
-        $members = self::flattenArrays($members);
+        $members = self::flatten($members);
         return $this->redis->zRem($key, ...$members);
     }
 

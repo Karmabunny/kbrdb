@@ -9,36 +9,6 @@ trait RdbHelperTrait
      *
      * This also discards keys.
      *
-     * @param iterable $items
-     * @return array
-     * @deprecated use flatten()
-     */
-    protected static function flattenArrays(iterable $items): array
-    {
-        return self::flatten($items);
-    }
-
-
-    /**
-     * Normalize values into an array.
-     *
-     * @param iterable $items
-     * @param bool $preserve_keys ignored
-     * @return array
-     * @deprecated use flatten()
-     */
-    protected static function normalizeIterable($items, $preserve_keys = false): array
-    {
-        return self::flatten($items);
-    }
-
-
-
-    /**
-     * Flatten an array input.
-     *
-     * This also discards keys.
-     *
      * Largely ripped from karmabunny/kb.
      *
      * @param iterable $items
