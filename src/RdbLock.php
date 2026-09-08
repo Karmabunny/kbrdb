@@ -83,7 +83,7 @@ class RdbLock
         $token = self::createToken();
 
         $wait += microtime(true);
-        $tick = (int) ($rdb->config->lock_sleep * 1000);
+        $tick = (int) ($rdb->config->lock_sleep * 1_000_000);
 
         // Begin a wait loop until the lock is free.
         while (true) {
