@@ -50,21 +50,11 @@ This library wouldn't ever try to _hide_ features behind target versions, but pe
 For example, `BRPOPLPUSH` is deprecated in v6.2 and might be removed in the distant future. In this case, the library would be able to dynamically replace (based on the server version) this with `BLMOVE`.
 
 
-### Plans for v3
-
-__TTL params__
-
-There is a preference for the millisecond version of a command, particularly TTL parameters. This is clearly misleading and already wildly inconsistent. Ideally this changes so that a 'float' is converted to the millisecond version and integer remains unchanged. Thus the input is always 'seconds'. The implementation should include the 'p' millisecond version of each command, similar to how we've implemented `incr/decr`.
-
+### Future features
 
 __Type errors__
 
-Type errors are currently (hopefully) always a `null` return. This can quite confusing at times, or helpful in others. Version 2 will likely permit both, defaulting to emitting exceptions.
-
-
-__Object methods__
-
-The expected type in the object method is currently optional, but most drivers required it. Version 2 will make them required.
+Type errors are currently (hopefully) always a `null` return. This can be quite confusing at times, or helpful in others. A future version will optionally emit an exception.
 
 
 ### Config
