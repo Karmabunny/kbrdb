@@ -11,7 +11,7 @@ namespace karmabunny\rdb;
  *
  * Extend this and implement the getConfig() method.
  *
- * @method static Generator<string> prefix(string $prefix, iterable<string> $items)
+ * @method static \Generator<string> prefix(string $prefix, iterable<string> $items)
  *
  * @method static bool set(string $key, string $value, int $ttl = 0)
  * @method static string|null get(string $key)
@@ -19,7 +19,8 @@ namespace karmabunny\rdb;
  * @method static int del(...$keys)
  *
  * @method static int|null ttl(string $key)
- * @method static expire expire(string $key, int $ttl = 0)
+ * @method static bool expire(string $key, int $ttl = 0)
+ * @method static bool expireAt(string $key, int $ttl = 0)
  * @method static bool rename(string $src, string $dst)
  * @method static string|null type(string $key)
  *
@@ -50,22 +51,29 @@ namespace karmabunny\rdb;
  * @method static string|null brPoplPush(string $src, string $dst, int $timeout = null)
  *
  * @method static string[] keys(string $pattern)
- * @method static Generator<string> scan(string $pattern)
+ * @method static \Generator<string> scan(string $pattern)
  *
  * @method static (string|null)[] mGet(string $key)
  * @method static bool mSet(string[] $items)
- * @method static Generator<string|null> mScan(iterable<string> $keys)
+ * @method static \Generator<string|null> mScan(iterable<string> $keys)
  *
- * @method static int setObject(string $key, object $value)
- * @method static object|null getObject(string $key, string $expected = null)
- * @method static (object|null)[] mGetObjects(iterable<string> $keys, string $expected = null, bool $nullish = false)
- * @method static Generator<object|null> mScanObjects(iterable<string> $keys, string $expected = null, bool $nullish = false)
+ * @method static string|null inspectObject(string $key)
+ * @method static int setObject(string $key, object $value, int $ttl = 0)
+ * @method static object|null getObject(string $key, ?string $expected = null)
+ * @method static (object|null)[] mGetObjects(iterable<string> $keys, ?string $expected = null, bool $nullish = false)
+ * @method static \Generator<object|null> mScanObjects(iterable<string> $keys, ?string $expected = null, bool $nullish = false)
  * @method static int[] mSetObjects(object[] $items)
  *
- * @method static int setJson(string $key, array|\JsonSerializable $value)
+ * @method static int setJson(string $key, array|\JsonSerializable $value, int $ttl = 0)
  * @method static array|null getJson(string $key)
  *
- * @method static RdbLock|null lock(string $key, float $wait, float $ttl = 300)
+ * @method static int setHash(string $key, array $value)
+ * @method static array|null getHash(string $key)
+ *
+ * @method static int pack(string $key, mixed $value, int $ttl = 0)
+ * @method static mixed unpack(string $key)
+ *
+ * @method static RdbLock|null lock(string $key, int $wait, int $ttl = 60000)
  *
  * @method static RdbBucket getBucket(array|string $config)
  *
