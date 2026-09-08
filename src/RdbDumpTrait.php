@@ -18,22 +18,22 @@ trait RdbDumpTrait
 
 
     /** @var Rdb */
-    public $rdb;
+    public Rdb $rdb;
 
     /** @var string */
-    public $pattern;
+    public string $pattern;
 
     /** @var string[] */
-    public $excludes = [];
+    public array $excludes = [];
 
     /** @var bool */
-    public $compressed = true;
+    public bool $compressed = true;
 
     /** @var callable|null */
-    public $log = null;
+    public mixed $log = null;
 
     /** @var resource|null */
-    protected $handle = null;
+    protected mixed $handle = null;
 
 
     /**

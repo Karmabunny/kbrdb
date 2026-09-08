@@ -29,7 +29,7 @@ class RdbImport
     use RdbDumpTrait;
 
     /** @var string[] */
-    public $errors = [];
+    public array $errors = [];
 
 
     /**
