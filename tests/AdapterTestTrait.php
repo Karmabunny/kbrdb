@@ -887,6 +887,76 @@ trait AdapterTestTrait
     }
 
 
+    public function testWrongTypes()
+    {
+        $key = 'wrongtype:string';
+        $list = 'wrongtype:dst:list';
+        $set = 'wrongtype:dst:set';
+
+        $this->rdb->del($key, $list, $set);
+        $this->rdb->set($key, 'hello');
+        $this->rdb->lPush($list, 'item');
+        $this->rdb->sAdd($set, 'item');
+
+        $this->assertEquals('string', $this->rdb->type($key));
+
+        // Set commands.
+        $this->assertNull($this->rdb->sAdd($key, 'a'));
+        $this->assertNull($this->rdb->sMembers($key));
+        $this->assertSame([], iterator_to_array($this->rdb->sScan($key)));
+        $this->assertNull($this->rdb->sRem($key, 'a'));
+        $this->assertNull($this->rdb->sCard($key));
+        $this->assertNull($this->rdb->sIsMember($key, 'a'));
+        $this->assertNull($this->rdb->sMove($key, $set, 'a'));
+
+        // List commands.
+        $this->assertNull($this->rdb->lPush($key, 'a'));
+        $this->assertNull($this->rdb->rPush($key, 'a'));
+        $this->assertNull($this->rdb->lPop($key));
+        $this->assertNull($this->rdb->rPop($key));
+        $this->assertNull($this->rdb->rPoplPush($key, $list));
+        $this->assertNull($this->rdb->lRange($key));
+        $this->assertNull($this->rdb->lTrim($key, 0, -1));
+        $this->assertNull($this->rdb->lLen($key));
+        $this->assertNull($this->rdb->lSet($key, 0, 'a'));
+        $this->assertNull($this->rdb->lIndex($key, 0));
+        $this->assertNull($this->rdb->lRem($key, 'a'));
+        $this->assertNull($this->rdb->blPop($key, 0.01));
+        $this->assertNull($this->rdb->brPop($key, 0.01));
+        $this->assertNull($this->rdb->brPoplPush($key, $list, 0.01));
+
+        // Sorted set commands.
+        $this->assertNull($this->rdb->zAdd($key, ['a' => 1]));
+        $this->assertNull($this->rdb->zIncrBy($key, 1, 'a'));
+        $this->assertNull($this->rdb->zRange($key));
+        $this->assertNull($this->rdb->zRem($key, 'a'));
+        $this->assertNull($this->rdb->zCard($key));
+        $this->assertNull($this->rdb->zCount($key, 0, INF));
+        $this->assertNull($this->rdb->zScore($key, 'a'));
+        $this->assertNull($this->rdb->zRank($key, 'a'));
+        $this->assertNull($this->rdb->zRevRank($key, 'a'));
+
+        // Hash commands.
+        $this->assertNull($this->rdb->hGet($key, 'field'));
+        $this->assertNull($this->rdb->hGetAll($key));
+        $this->assertNull($this->rdb->hSet($key, 'field', 'value'));
+        $this->assertNull($this->rdb->hExists($key, 'field'));
+        $this->assertNull($this->rdb->hDel($key, 'field'));
+        $this->assertNull($this->rdb->hLen($key));
+        $this->assertNull($this->rdb->hKeys($key));
+        $this->assertNull($this->rdb->hVals($key));
+        $this->assertNull($this->rdb->hIncrBy($key, 'field', 1));
+        $this->assertNull($this->rdb->hIncrByFloat($key, 'field', 1.0));
+        $this->assertNull($this->rdb->hStrLen($key, 'field'));
+        $this->assertNull($this->rdb->hmGet($key, 'field'));
+        $this->assertNull($this->rdb->hmSet($key, ['field' => 'value']));
+        $this->assertSame([], iterator_to_array($this->rdb->hScan($key)));
+
+        // The key is still a string.
+        $this->assertEquals('string', $this->rdb->type($key));
+        $this->assertEquals('hello', $this->rdb->get($key));
+    }
+
 
     public function testSelectMove()
     {
@@ -1179,11 +1249,6 @@ trait AdapterTestTrait
         $this->rdb->hSet('hstrlen:123', 'b', 'world');
 
         $this->assertEquals(5, $this->rdb->hStrLen('hstrlen:123', 'a'));
-
-        // Wrong type tests
-        $this->rdb->set('string:123', 'hello');
-        $this->assertNull($this->rdb->hGet('string:123', 'field1'));
-        $this->assertNull($this->rdb->hGetAll('string:123'));
     }
 }
 
