@@ -23,7 +23,7 @@ namespace karmabunny\rdb;
  *
  * @method static int|string|bool|array|null eval(string $script, array $keys = [], array $args = [])
  *
- * @method static int|float|null ttl(string $key, bool $ms = false)
+ * @method static int|float ttl(string $key, bool $ms = false)
  * @method static bool expire(string $key, int|float $ttl = 0)
  * @method static bool expireAt(string $key, int|float $ttl = 0)
  * @method static bool rename(string $src, string $dst)
