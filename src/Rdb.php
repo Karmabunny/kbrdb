@@ -1242,25 +1242,15 @@ abstract class Rdb
      * This returns null if the key is empty or the object doesn't match the
      * 'expected' type.
      *
-     * IMPORTANT: the `$expected` parameter will become mandatory in v3.
-     *
-     * Behaviour of `$expected` changes between drivers. For PHP (default) this
-     * permits inherited assertions. For everything else (Hash, MsgPack, JSON)
-     * this must be the exact type.
-     *
      * @param string $key
-     * @param string|null $expected
+     * @param string $expected
      * @return object|null
      * @throws InvalidArgumentException
      */
-    public function getObject(string $key, ?string $expected = null): ?object
+    public function getObject(string $key, string $expected): ?object
     {
-        if (
-            $expected
-            and !class_exists($expected)
-            and !interface_exists($expected)
-        ) {
-            throw new InvalidArgumentException('Not a class or interface: ' . $expected);
+        if (!class_exists($expected)) {
+            throw new InvalidArgumentException('Class not found: ' . $expected);
         }
 
         return $this->getObjectDriver()->getObject($key, $expected);
@@ -1272,26 +1262,16 @@ abstract class Rdb
      *
      * Empty keys are filtered out - if `nullish` is false (default).
      *
-     * IMPORTANT: the `$expected` parameter will become mandatory in v3.
-     *
-     * Behaviour of `$expected` changes between drivers. For PHP (default) this
-     * permits inherited assertions. For everything else (Hash, MsgPack, JSON)
-     * this must be the exact type.
-     *
      * @param iterable<string> $keys Non-prefixed keys
-     * @param string|null $expected
+     * @param string $expected
      * @param bool $nullish (false) return empty values
      * @return (object|null)[] [ key => item ]
      * @throws InvalidArgumentException
      */
-    public function mGetObjects(iterable $keys, ?string $expected = null, bool $nullish = false): array
+    public function mGetObjects(iterable $keys, string $expected, bool $nullish = false): array
     {
-        if (
-            $expected
-            and !class_exists($expected)
-            and !interface_exists($expected)
-        ) {
-            throw new InvalidArgumentException('Not a class or interface: ' . $expected);
+        if (!class_exists($expected)) {
+            throw new InvalidArgumentException('Class not found: ' . $expected);
         }
 
         $keys = self::flatten($keys);
@@ -1316,19 +1296,15 @@ abstract class Rdb
      * Empty keys are filtered out - if `nullish` is false (default).
      *
      * @param iterable $keys Non-prefixed keys
-     * @param string|null $expected Ensure all results is of this type
+     * @param string $expected Ensure all results is of this type
      * @param bool $nullish (false) return empty values
      * @return Generator<object|null> [ key => item ]
      * @throws InvalidArgumentException
      */
-    public function mScanObjects(iterable $keys, ?string $expected = null, bool $nullish = false): Generator
+    public function mScanObjects(iterable $keys, string $expected, bool $nullish = false): Generator
     {
-        if (
-            $expected
-            and !class_exists($expected)
-            and !interface_exists($expected)
-        ) {
-            throw new InvalidArgumentException('Not a class or interface: ' . $expected);
+        if (!class_exists($expected)) {
+            throw new InvalidArgumentException('Class not found: ' . $expected);
         }
 
         $chunk = [];

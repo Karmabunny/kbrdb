@@ -524,12 +524,6 @@ trait AdapterTestTrait
         $class = $this->rdb->inspectObject('obj:1');
         $this->assertEquals(RandoObject::class, $class);
 
-        // Still test deprecated behaviour for now
-        if ($driver === PhpObjectDriver::class) {
-            $actual = $this->rdb->getObject('obj:1');
-            $this->assertEquals($object, $actual);
-        }
-
         $actual = $this->rdb->getObject('obj:1', RandoObject::class);
         $this->assertEquals($object, $actual);
 
@@ -584,17 +578,6 @@ trait AdapterTestTrait
             'multi:null' => null,
             'multi:3' => $objects['multi:3'],
         ];
-
-        // Still test deprecated behaviour for now.
-        if ($driver === PhpObjectDriver::class) {
-            $actual = $this->rdb->mGetObjects($keys, null, true);
-            $this->assertEquals($expected, $actual);
-
-            $actual = $this->rdb->mScanObjects($keys, null, true);
-            $this->assertInstanceOf(Traversable::class, $actual);
-            $actual = iterator_to_array($actual);
-            $this->assertEquals($expected, $actual);
-        }
 
         // Fetch just the 'randoboject' keys.
         $expected = [

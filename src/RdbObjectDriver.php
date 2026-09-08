@@ -9,8 +9,6 @@ namespace karmabunny\rdb;
  *
  * These implement different methods for serialising object data.
  *
- * The `$expected` parameter will become mandatory in v3.
- *
  * @package karmabunny\rdb
  */
 interface RdbObjectDriver
@@ -41,10 +39,10 @@ interface RdbObjectDriver
      *
      * @template T of object
      * @param string $key
-     * @param class-string<T>|null $expected
+     * @param class-string<T> $expected
      * @return T|null
      */
-    public function getObject(string $key, ?string $expected = null): ?object;
+    public function getObject(string $key, string $expected): ?object;
 
 
     /**
@@ -61,8 +59,8 @@ interface RdbObjectDriver
      *
      * @template T of object
      * @param string[] $keys
-     * @param class-string<T>|null $expected
+     * @param class-string<T> $expected
      * @return array<string, T|null>
      */
-    public function mGetObjects(array $keys, ?string $expected = null): array;
+    public function mGetObjects(array $keys, string $expected): array;
 }
