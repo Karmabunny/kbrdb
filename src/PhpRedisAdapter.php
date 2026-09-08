@@ -490,7 +490,6 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function lPop(string $key): ?string
     {
-        /** @var mixed $value */
         $value = $this->redis->lPop($key);
         if ($value === false) return null;
         return $value;
@@ -500,7 +499,6 @@ class PhpRedisAdapter extends Rdb
     /** @inheritdoc */
     public function rPop(string $key): ?string
     {
-        /** @var mixed $value */
         $value = $this->redis->rPop($key);
         if ($value === false) return null;
         return $value;

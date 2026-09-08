@@ -274,8 +274,8 @@ abstract class Rdb
      * Execute a Lua script.
      *
      * @param string $script
-     * @param array $keys
-     * @param array $args
+     * @param array<int,string> $keys
+     * @param array<int,string|int|float> $args
      * @return int|string|bool|array|null
      */
     public abstract function eval(string $script, array $keys = [], array $args = []): int|string|bool|array|null;
@@ -797,7 +797,7 @@ abstract class Rdb
      * sorted set.
      *
      * @param string $key
-     * @param float[] $members [ member => score ]
+     * @param array<string,float> $members [ member => score ]
      * @return int|null number of elements added
      */
     public abstract function zAdd(string $key, array $members): ?int;

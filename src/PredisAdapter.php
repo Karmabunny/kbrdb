@@ -74,6 +74,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function flushAll(bool $async = false): void
     {
+        // @phpstan-ignore-next-line
         @call_user_func_array([$this->predis, 'flushall'], [$async ? 'ASYNC' : 'SYNC']);
     }
 
@@ -81,6 +82,7 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function flushDb(bool $async = false): void
     {
+        // @phpstan-ignore-next-line
         @call_user_func_array([$this->predis, 'flushdb'], [$async ? 'ASYNC' : 'SYNC']);
     }
 
@@ -553,6 +555,7 @@ class PredisAdapter extends Rdb
     public function zAdd(string $key, array $members): ?int
     {
         $res = $this->predis->zadd($key, $members);
+        // @phpstan-ignore-next-line: wrongtypes.
         if (!is_numeric($res)) return null;
         return (int) $res;
     }
@@ -573,10 +576,10 @@ class PredisAdapter extends Rdb
     {
         $flags = self::parseRangeFlags($flags);
 
-        $cmd = $flags['rev'] ? 'zRevRange' : 'zRange';
+        $cmd = $flags['rev'] ? 'zrevrange' : 'zrange';
 
         if ($flags['bylex']) {
-            $cmd .= 'ByLex';
+            $cmd .= 'bylex';
 
             if ($start and !preg_match('/^\[|^\(/', $start)) {
                 $start = '[' . $start;
@@ -589,7 +592,7 @@ class PredisAdapter extends Rdb
             $stop = $stop ?? '+';
         }
         else if ($flags['byscore']) {
-            $cmd .= 'ByScore';
+            $cmd .= 'byscore';
 
             $start = $start ?? '-inf';
             $stop = $stop ?? '+inf';
@@ -631,8 +634,8 @@ class PredisAdapter extends Rdb
     /** @inheritdoc */
     public function zCount(string $key, float $min, float $max): ?int
     {
-        // @phpstan-ignore-next-line: unsure actually but it worked previously.
-        $count = $this->predis->zcount($key, $min, $max);
+        $count = $this->predis->zcount($key, (string) $min, (string) $max);
+        // @phpstan-ignore-next-line: wrongtypes.
         if (!is_numeric($count)) return null;
         return (int) $count;
     }
@@ -674,6 +677,7 @@ class PredisAdapter extends Rdb
     public function hExists(string $key, string $field): ?bool
     {
         $res = $this->predis->hexists($key, $field);
+        // @phpstan-ignore-next-line: wrongtypes.
         if (!is_numeric($res)) return null;
         return (bool) $res;
     }
@@ -685,6 +689,7 @@ class PredisAdapter extends Rdb
         if ($replace) {
             $ok = $this->predis->hset($key, $field, (string) $value);
 
+            // @phpstan-ignore-next-line: wrongtypes.
             if (!is_numeric($ok)) {
                 return null;
             }
@@ -719,6 +724,7 @@ class PredisAdapter extends Rdb
     public function hIncrBy(string $key, string $field, int $amount): ?int
     {
         $res = $this->predis->hincrby($key, $field, $amount);
+        // @phpstan-ignore-next-line: wrongtypes.
         if (!is_numeric($res)) return null;
         return (int) $res;
     }
@@ -762,6 +768,7 @@ class PredisAdapter extends Rdb
     public function hLen(string $key): ?int
     {
         $res = $this->predis->hlen($key);
+        // @phpstan-ignore-next-line: wrongtypes.
         if (!is_numeric($res)) return null;
         return (int) $res;
     }
@@ -772,6 +779,7 @@ class PredisAdapter extends Rdb
     {
         $fields = self::flatten($fields);
         $values = $this->predis->hmget($key, $fields);
+        // @phpstan-ignore-next-line: wrongtypes.
         if (!is_array($values)) return null;
         return array_values($values);
     }

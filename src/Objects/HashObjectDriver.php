@@ -103,7 +103,7 @@ class HashObjectDriver implements RdbObjectDriver
             throw new InvalidArgumentException("Expected class must implement JsonDeserializable: {$expected}");
         }
 
-        /** @var JsonDeserializable $expected */
+        /** @var class-string<JsonDeserializable> $expected */
 
         $value = $this->rdb->getHash($key);
         if ($value === null) {
@@ -156,7 +156,7 @@ class HashObjectDriver implements RdbObjectDriver
             throw new InvalidArgumentException("Expected class must implement JsonSerializable: {$expected}");
         }
 
-        /** @var JsonDeserializable $expected */
+        /** @var class-string<JsonDeserializable> $expected */
 
         $output = [];
 

@@ -79,7 +79,7 @@ class MsgPackObjectDriver implements RdbObjectDriver
             throw new InvalidArgumentException("Expected class must implement JsonDeserializable: {$expected}");
         }
 
-        /** @var JsonDeserializable $expected */
+        /** @var class-string<JsonDeserializable> $expected */
 
         try {
             $value = $this->rdb->unpack($key);
@@ -146,7 +146,7 @@ class MsgPackObjectDriver implements RdbObjectDriver
             throw new InvalidArgumentException("Expected class must implement JsonSerializable: {$expected}");
         }
 
-        /** @var JsonDeserializable $expected */
+        /** @var class-string<JsonDeserializable> $expected */
 
         $items = $this->rdb->mGet($keys);
         $output = [];

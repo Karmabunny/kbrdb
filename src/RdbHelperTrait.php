@@ -11,9 +11,10 @@ trait RdbHelperTrait
      *
      * Largely ripped from karmabunny/kb.
      *
-     * @param iterable $items
+     * @template T
+     * @param iterable<T> $items
      * @param int $depth
-     * @return array
+     * @return array<int,T>
      */
     protected static function flatten(iterable $items, int $depth = 25): array
     {
