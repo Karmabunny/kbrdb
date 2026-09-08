@@ -209,6 +209,36 @@ abstract class Rdb
 
     /**
      *
+     *
+     * @param int|float $ttl
+     * @return array{0:bool,1:int}
+     */
+    protected function parseTtl(int|float $ttl): array
+    {
+        if ($this->config->ttl_mode === RdbConfig::TTL_INTEGER) {
+            return [false, (int) $ttl];
+        }
+
+        if ($this->config->ttl_mode === RdbConfig::TTL_FLOAT) {
+            return [true, (int) ($ttl * 1000)];
+        }
+
+        if ($this->config->ttl_mode === RdbConfig::TTL_COMPAT) {
+            return [true, (int) $ttl];
+        }
+
+        // Auto mode.
+        if (is_int($ttl) or $ttl == (int) $ttl) {
+            return [false, $ttl];
+        }
+        else {
+            return [true, (int) ($ttl * 1000)];
+        }
+    }
+
+
+    /**
+     *
      * @param bool $async
      * @return void
      */
@@ -289,29 +319,30 @@ abstract class Rdb
      * - `-2` - key does not exist
      *
      * @param string $key
-     * @return int milliseconds
+     * @param bool $ms force milliseconds mode
+     * @return float|int seconds (or milliseconds, given ttl_mode or ms param)
      */
-    public abstract function ttl(string $key): int;
+    public abstract function ttl(string $key, bool $ms = false): float|int;
 
 
     /**
      * Set the expiry/TLL for a key.
      *
      * @param string $key
-     * @param int $ttl milliseconds
+     * @param int|float $ttl seconds
      * @return bool
      */
-    public abstract function expire(string $key, int $ttl = 0): bool;
+    public abstract function expire(string $key, int|float $ttl = 0): bool;
 
 
     /**
      * Set the expiry in unix time for a key.
      *
      * @param string $key
-     * @param int $ttl milliseconds
+     * @param int|float $ttl seconds
      * @return bool
      */
-    public abstract function expireAt(string $key, int $ttl = 0): bool;
+    public abstract function expireAt(string $key, int|float $ttl = 0): bool;
 
 
     /**
@@ -343,13 +374,13 @@ abstract class Rdb
      * Store a value at a key.
      *
      * Optionally specify a TTL that will cause the key to automatically
-     * delete after a period of milliseconds.
+     * delete after a period of seconds.
      *
      * Flags are an array for modifying behaviour, for example:
      *
      * ```
-     * $rdb->set('key', 'value', 1000, [
-     *    'time_at',           // PXAT
+     * $rdb->set('key', 'value', 1, [
+     *    'time_at',           // PXAT or EXAT
      *    'get_set',           // GET
      *    'replace' => false,  // NX
      * ]);
@@ -357,17 +388,17 @@ abstract class Rdb
      *
      * @param string $key
      * @param string $value
-     * @param int $ttl milliseconds
+     * @param int|float $ttl seconds
      * @param array $flags
      *  - keep_ttl: retain the TTL when replacing a key
-     *  - time_at: the TTL is an expiry unix time in milliseconds
+     *  - time_at: the TTL is an expiry unix time in seconds
      *  - get_set: get the old value before setting the new one
      *  - replace: `bool` - only set if it (not) exists (true: XX, false: NX)
      * @return bool|string|null
      *    - string|null if the GET flag is set
      *    - bool for everything else
      */
-    public abstract function set(string $key, string $value, int $ttl = 0, array $flags = []): bool|string|null;
+    public abstract function set(string $key, string $value, int|float $ttl = 0, array $flags = []): bool|string|null;
 
 
     /**
@@ -1146,12 +1177,12 @@ abstract class Rdb
     /**
      *
      * @param string $key
-     * @param int $ttl
+     * @param int|float $ttl seconds
      * @param string $value
      * @param array $flags
      * @return bool
      */
-    public abstract function restore(string $key, int $ttl, string $value, array $flags = []): bool;
+    public abstract function restore(string $key, int|float $ttl, string $value, array $flags = []): bool;
 
 
     /**
@@ -1227,10 +1258,10 @@ abstract class Rdb
      *
      * @param string $key
      * @param object $value
-     * @param int $ttl milliseconds
+     * @param int|float $ttl seconds
      * @return int object size in bytes
      */
-    public function setObject(string $key, object $value, int $ttl = 0): int
+    public function setObject(string $key, object $value, int|float $ttl = 0): int
     {
         return $this->getObjectDriver()->setObject($key, $value, $ttl);
     }
@@ -1349,11 +1380,11 @@ abstract class Rdb
      *
      * @param string $key
      * @param mixed $value
-     * @param int $ttl milliseconds
+     * @param int|float $ttl seconds
      * @return int
      * @throws JsonException
      */
-    public function setJson(string $key, mixed $value, int $ttl = 0): int
+    public function setJson(string $key, mixed $value, int|float $ttl = 0): int
     {
         $value = json_encode($value, flags: JSON_THROW_ON_ERROR);
 
@@ -1435,11 +1466,11 @@ abstract class Rdb
      *
      * @param string $key
      * @param mixed $value
-     * @param int $ttl milliseconds
+     * @param int|float $ttl seconds
      * @return int
      * @throws PackingFailedException
      */
-    public function pack(string $key, mixed $value, int $ttl = 0): int
+    public function pack(string $key, mixed $value, int|float $ttl = 0): int
     {
         $value = MessagePack::pack($value);
         $ok = $this->set($key, $value, $ttl);
@@ -1474,7 +1505,7 @@ abstract class Rdb
     /**
      * Create a lock.
      *
-     * This will block for `$wait` milliseconds until the lock is released.
+     * This will block for `$wait` seconds until the lock is released.
      * It will then return a _new_ lock if available. If the resource is still
      * locked it returns null.
      *
@@ -1485,13 +1516,13 @@ abstract class Rdb
      * If your code runs longer than 1 minute, it's recommended to bump this up.
      *
      * @param string $key
-     * @param int $wait milliseconds
-     * @param int $ttl milliseconds (default 1 minute)
+     * @param int|float $wait seconds
+     * @param int|float $ttl seconds (default 1 minute)
      * @return RdbLock|null
      */
-    public function lock(string $key, int $wait = 0, int $ttl = 60000): ?RdbLock
+    public function lock(string $key, int|float $wait = 0, int|float $ttl = 60): ?RdbLock
     {
-        return RdbLock::acquire($this, $key, (int) $wait, (int) $ttl);
+        return RdbLock::acquire($this, $key, $wait, $ttl);
     }
 
 

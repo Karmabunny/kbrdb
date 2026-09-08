@@ -37,6 +37,36 @@ class RdbConfig
 
     const TYPE_CREDIS = 'credis';
 
+    /**
+     * Switch between TTL/PTTL commands if given a int or float, respectively.
+     *
+     * Given a float Rdb will multiply by 1000 for the PTTL command.
+     */
+    const TTL_AUTO = 'auto';
+
+    /**
+     * Always use whole seconds, the TTL command.
+     *
+     * The value is provided in seconds.
+     */
+    const TTL_INTEGER = 'integer';
+
+    /**
+     * Always use float seconds, the PTTL command.
+     *
+     * The value is provided in seconds.
+     */
+    const TTL_FLOAT = 'float';
+
+    /**
+     * Always use PTTL _and_ assume the value is provided as milliseconds.
+     *
+     * Use this for compatibility with v1/v2 series.
+     *
+     * @deprecated
+     */
+    const TTL_COMPAT = 'milliseconds';
+
     /** @var string */
     public string $host = '127.0.0.1';
 
@@ -61,8 +91,8 @@ class RdbConfig
     /** @var int in seconds - connection timeout */
     public int $timeout = 5;
 
-    /** @var int in milliseconds */
-    public int $lock_sleep = 5;
+    /** @var float in seconds */
+    public float $lock_sleep = 0.005;
 
     /**
      * Replace keys() with a scan().
@@ -78,6 +108,16 @@ class RdbConfig
      * @var bool
      */
     public bool $scan_keys = false;
+
+    /**
+     * - `TTL_AUTO`    use TTL/PTTL based on the value type (int or float, respectively)
+     * - `TTL_INTEGER` use TTL only (int)
+     * - `TTL_FLOAT`   use PTTL only (float)
+     * - `TTL_COMPAT`  use PTTL (float) and assume the value is provided as milliseconds
+     *
+     * @var string RdbConfig::TTL
+     */
+    public string $ttl_mode = self::TTL_AUTO;
 
     /** @var array */
     public array $options = [];

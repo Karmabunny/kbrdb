@@ -49,7 +49,7 @@ class PhpObjectDriver implements RdbObjectDriver
 
 
     /** @inheritdoc */
-    public function setObject(string $key, object $value, int $ttl = 0): int
+    public function setObject(string $key, object $value, int|float $ttl = 0): int
     {
         $value = serialize($value);
         if (!$this->rdb->set($key, $value, $ttl)) return 0;

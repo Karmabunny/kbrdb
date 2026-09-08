@@ -196,10 +196,16 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function restore(string $key, int $ttl, string $value, array $flags = []): bool
+    public function restore(string $key, int|float $ttl, string $value, array $flags = []): bool
     {
         $key = $this->config->prefix . $key;
         $flags = $this->parseRestoreFlags($flags);
+
+        if (!$flags['ms'] and $this->config->ttl_mode !== RdbConfig::TTL_COMPAT) {
+            $ttl *= 1000;
+        }
+
+        $ttl = (int) $ttl;
 
         $options = [];
 
@@ -213,28 +219,54 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function ttl(string $key): int
+    public function ttl(string $key, bool $ms = false): float|int
     {
         $key = $this->config->prefix . $key;
-        $value = $this->credis->__call('pttl', [$key]);
-        if (!is_numeric($value)) return -2;
+
+        if (!$ms and $this->config->ttl_mode === RdbConfig::TTL_INTEGER) {
+            $value = $this->credis->__call('ttl', [$key]);
+        }
+        else {
+            $value = $this->credis->__call('pttl', [$key]);
+        }
+
+        if (!is_numeric($value)) {
+            return -2;
+        }
+
+        // Return PTTL milliseconds.
+        if ($ms or $this->config->ttl_mode === RdbConfig::TTL_COMPAT) {
+            return (int) $value;
+        }
+
+        // Return TTL seconds.
+        if ($this->config->ttl_mode === RdbConfig::TTL_INTEGER) {
+            return (int) $value;
+        }
+
+        // Convert PTTL to float seconds.
+        $value /= 1000;
         return $value;
     }
 
 
     /** @inheritdoc */
-    public function expire(string $key, $ttl = 0): bool
+    public function expire(string $key, int|float $ttl = 0): bool
     {
         $key = $this->config->prefix . $key;
-        return (bool) $this->credis->__call('pexpire', [$key, $ttl]);
+        [$ms, $ttl] = self::parseTtl($ttl);
+        $cmd = $ms ? 'pexpire' : 'expire';
+        return (bool) $this->credis->__call($cmd, [$key, $ttl]);
     }
 
 
     /** @inheritdoc */
-    public function expireAt(string $key, $ttl = 0): bool
+    public function expireAt(string $key, int|float $ttl = 0): bool
     {
         $key = $this->config->prefix . $key;
-        return (bool) $this->credis->__call('pexpireat', [$key, $ttl]);
+        [$ms, $ttl] = self::parseTtl($ttl);
+        $cmd = $ms ? 'pexpireat' : 'expireat';
+        return (bool) $this->credis->__call($cmd, [$key, $ttl]);
     }
 
 
@@ -258,14 +290,17 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function set(string $key, string $value, int $ttl = 0, array $flags = []): bool|string|null
+    public function set(string $key, string $value, int|float $ttl = 0, array $flags = []): bool|string|null
     {
         $flags = self::parseSetFlags($flags);
+        [$ms, $ttl] = $this->parseTtl($ttl);
 
         $options = [];
 
         if ($ttl) {
-            $name = $flags['time_at'] ? 'pxat' : 'px';
+            $name = $ms
+                ? ($flags['time_at'] ? 'pxat' : 'px')
+                : ($flags['time_at'] ? 'exat' : 'ex');
             $options[$name] = $ttl;
         }
 

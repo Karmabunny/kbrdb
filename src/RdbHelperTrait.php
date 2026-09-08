@@ -267,6 +267,9 @@ trait RdbHelperTrait
             'absttl' => false,
             'idletime' => null,
             'freq' => null,
+
+            // non-standard.
+            'ms' => false,
         ];
 
         // Normalise things.

@@ -28,10 +28,10 @@ interface RdbObjectDriver
      *
      * @param string $key
      * @param object $value
-     * @param int $ttl milliseconds
+     * @param int|float $ttl seconds
      * @return int object size in bytes
      */
-    public function setObject(string $key, object $value, int $ttl = 0): int;
+    public function setObject(string $key, object $value, int|float $ttl = 0): int;
 
 
     /**

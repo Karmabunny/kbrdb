@@ -44,8 +44,8 @@ LUA;
     /** @var bool */
     public bool $autoRelease = true;
 
-    /** @var int in seconds, 0 for infinite */
-    public int $autoExpire = 60;
+    /** @var int|float in seconds, 0 for infinite */
+    public int|float $autoExpire = 60;
 
     /** @var string[] */
     protected array $values = [];

@@ -58,11 +58,11 @@ class RdbLock
     /**
      * A new lock!
 
-     * This will block for `$wait` milliseconds until the lock is released.
+     * This will block for `$wait` seconds until the lock is released.
      * It returns an instance if successful, otherwise null.
      *
      * ```
-     * $lock = $rdb->lock($key, 1000);
+     * $lock = $rdb->lock($key, 1);
      *
      * if ($lock) {
      *    // use resource.
@@ -74,15 +74,15 @@ class RdbLock
      *
      * @param Rdb $rdb
      * @param string $key
-     * @param int $wait milliseconds
-     * @param int $timeout milliseconds
+     * @param int|float $wait seconds
+     * @param int|float $timeout seconds
      * @return self|null
      */
-    public static function acquire(Rdb $rdb, string $key, int $wait = 0, int $timeout = 60000): ?self
+    public static function acquire(Rdb $rdb, string $key, int|float $wait = 0, int|float $timeout = 60): ?self
     {
         $token = self::createToken();
 
-        $wait = microtime(true) + ($wait / 1000);
+        $wait += microtime(true);
         $tick = (int) ($rdb->config->lock_sleep * 1000);
 
         // Begin a wait loop until the lock is free.
@@ -127,11 +127,11 @@ class RdbLock
 
 
     /**
-     * Extend the timeout for this lock by X milliseconds.
+     * Extend the timeout for this lock by X seconds.
      *
      * @return bool False if expired
      */
-    public function extend(int $timeout = 60000): bool
+    public function extend(int|float $timeout = 60): bool
     {
         if (!$this->isLocked()) return false;
         return $this->rdb->set($this->key, $this->token, $timeout, [

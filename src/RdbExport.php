@@ -41,7 +41,7 @@ class RdbExport
      * This encodes and zips (if enabled).
      *
      * @param string $key
-     * @param int $ttl
+     * @param int $ttl milliseconds
      * @param string $value
      * @return void
      */
@@ -80,6 +80,7 @@ class RdbExport
             $value = $this->rdb->dump($key);
 
             $ttl = $this->rdb->ttl($key);
+            $ttl = $this->rdb->ttl($key, true);
             $ttl = max(0, $ttl);
 
             yield $index => [$key, $ttl, $value];

@@ -192,9 +192,15 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function restore(string $key, int $ttl, string $value, array $flags = []): bool
+    public function restore(string $key, int|float $ttl, string $value, array $flags = []): bool
     {
         $flags = $this->parseRestoreFlags($flags);
+
+        if (!$flags['ms'] and $this->config->ttl_mode !== RdbConfig::TTL_COMPAT) {
+            $ttl *= 1000;
+        }
+
+        $ttl = (int) $ttl;
 
         if ($flags['replace']) {
             $this->del($key);
@@ -206,25 +212,58 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function ttl(string $key): int
+    public function ttl(string $key, bool $ms = false): float|int
     {
-        $value = $this->redis->pttl($key);
-        if ($value === false) return -2;
+        if (!$ms and $this->config->ttl_mode === RdbConfig::TTL_INTEGER) {
+            $value = $this->redis->ttl($key);
+        }
+        else {
+            $value = $this->redis->pttl($key);
+        }
+
+        if ($value === false) {
+            return -2;
+        }
+
+        // Return PTTL milliseconds.
+        if ($ms or $this->config->ttl_mode === RdbConfig::TTL_COMPAT) {
+            return (int) $value;
+        }
+
+        // Return TTL seconds.
+        if ($this->config->ttl_mode === RdbConfig::TTL_INTEGER) {
+            return (int) $value;
+        }
+
+        // Convert PTTL to float seconds.
+        $value /= 1000;
         return $value;
     }
 
 
     /** @inheritdoc */
-    public function expire(string $key, $ttl = 0): bool
+    public function expire(string $key, int|float $ttl = 0): bool
     {
-        return $this->redis->pExpire($key, $ttl);
+        [$ms, $ttl] = $this->parseTtl($ttl);
+
+        $value = $ms
+            ? $this->redis->pexpire($key, $ttl)
+            : $this->redis->expire($key, $ttl);
+
+        return (bool) $value;
     }
 
 
     /** @inheritdoc */
-    public function expireAt(string $key, $ttl = 0): bool
+    public function expireAt(string $key, int|float $ttl = 0): bool
     {
-        return $this->redis->pExpireAt($key, $ttl);
+        [$ms, $ttl] = $this->parseTtl($ttl);
+
+        $value = $ms
+            ? $this->redis->pexpireAt($key, $ttl)
+            : $this->redis->expireAt($key, $ttl);
+
+        return (bool) $value;
     }
 
 
@@ -256,14 +295,17 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function set(string $key, string $value, int $ttl = 0, array $flags = []): bool|string|null
+    public function set(string $key, string $value, int|float $ttl = 0, array $flags = []): bool|string|null
     {
         $flags = self::parseSetFlags($flags);
+        [$ms, $ttl] = $this->parseTtl($ttl);
 
         $options = [];
 
         if ($ttl) {
-            $name = $flags['time_at'] ? 'pxat' : 'px';
+            $name = $ms
+                ? ($flags['time_at'] ? 'pxat' : 'px')
+                : ($flags['time_at'] ? 'exat' : 'ex');
             $options[$name] = $ttl;
         }
 
