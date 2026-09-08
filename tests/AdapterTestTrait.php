@@ -502,6 +502,9 @@ trait AdapterTestTrait
         $exists = $this->rdb->exists('obj:1');
         $this->assertEquals(1, $exists);
 
+        $class = $this->rdb->inspectObject('obj:1');
+        $this->assertEquals(RandoObject::class, $class);
+
         // Still test deprecated behaviour for now
         if ($driver === PhpObjectDriver::class) {
             $actual = $this->rdb->getObject('obj:1');
@@ -513,6 +516,11 @@ trait AdapterTestTrait
 
         $actual = $this->rdb->getObject('obj:1', RandoObject2::class);
         $this->assertNull($actual);
+
+        $this->rdb->del('obj:1');
+
+        $class = $this->rdb->inspectObject('obj:1');
+        $this->assertNull($class);
 
         // multi get/set objects
         $objects = [

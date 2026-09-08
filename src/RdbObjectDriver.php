@@ -17,6 +17,15 @@ interface RdbObjectDriver
 {
 
     /**
+     * Inspect the object stored in the key.
+     *
+     * @param string $key
+     * @return string|null the object class name
+     */
+    public function inspect(string $key): ?string;
+
+
+    /**
      * Set an object.
      *
      * @param string $key

@@ -1206,6 +1206,17 @@ abstract class Rdb
     }
 
 
+    /**
+     * Inspect the object stored in the key.
+     *
+     * @param string $key
+     * @return null|string class name
+     */
+    public function inspectObject(string $key): ?string
+    {
+        return $this->getObjectDriver()->inspect($key);
+    }
+
 
     /**
      * Store an object at this key.

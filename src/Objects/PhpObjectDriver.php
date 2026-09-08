@@ -31,6 +31,24 @@ class PhpObjectDriver implements RdbObjectDriver
 
 
     /** @inheritdoc */
+    public function inspect(string $key): ?string
+    {
+        $value = $this->rdb->get($key);
+
+        if ($value === null) {
+            return null;
+        }
+
+        if (!preg_match('/^O:\d+:"([^"]+)"/', $value, $matches)) {
+            return null;
+        }
+
+        [, $class] = $matches;
+        return $class;
+    }
+
+
+    /** @inheritdoc */
     public function setObject(string $key, object $value, int $ttl = 0): int
     {
         $value = serialize($value);

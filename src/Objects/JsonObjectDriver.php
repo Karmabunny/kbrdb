@@ -36,6 +36,19 @@ class JsonObjectDriver implements RdbObjectDriver
 
 
     /** @inheritdoc */
+    public function inspect(string $key): ?string
+    {
+        $value = $this->rdb->getJson($key);
+
+        if ($value === null or !is_array($value)) {
+            return null;
+        }
+
+        return $value['__class__'] ?? null;
+    }
+
+
+    /** @inheritdoc */
     public function setObject(string $key, object $value, int $ttl = 0): int
     {
         if (!$value instanceof JsonSerializable) {
