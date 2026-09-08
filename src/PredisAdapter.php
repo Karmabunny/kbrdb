@@ -525,7 +525,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function blPop($keys, ?int $timeout = null): ?array
+    public function blPop($keys, int|float|null $timeout = null): ?array
     {
         if (is_scalar($keys)) {
             $keys = [$keys];
@@ -543,7 +543,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPop($keys, ?int $timeout = null): ?array
+    public function brPop($keys, int|float|null $timeout = null): ?array
     {
         if (is_scalar($keys)) {
             $keys = [$keys];
@@ -561,7 +561,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPoplPush(string $src, string $dst, ?int $timeout = null): ?string
+    public function brPoplPush(string $src, string $dst, int|float|null $timeout = null): ?string
     {
         if ($timeout === null) {
             $timeout = $this->config->timeout;

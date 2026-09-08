@@ -778,10 +778,10 @@ abstract class Rdb
      * aka: BLOCKING LET POP
      *
      * @param string[]|string $keys
-     * @param int $timeout in seconds - if unset, the config/connection timeout
+     * @param int|float|null $timeout in seconds - if unset, the config/connection timeout
      * @return string[]|null [key, item] or `null` if the timeout occurs
      */
-    public abstract function blPop($keys, ?int $timeout = null): ?array;
+    public abstract function blPop($keys, int|float|null $timeout = null): ?array;
 
 
     /**
@@ -791,10 +791,10 @@ abstract class Rdb
      * aka: BLOCKING RIGHT POP
      *
      * @param string[]|string $keys
-     * @param int $timeout in seconds - if unset, the config/connection timeout
+     * @param int|float|null $timeout in seconds - if unset, the config/connection timeout
      * @return string[]|null [key, item] or `null` if the timeout occurs
      */
-    public abstract function brPop($keys, ?int $timeout = null): ?array;
+    public abstract function brPop($keys, int|float|null $timeout = null): ?array;
 
 
     /**
@@ -808,10 +808,10 @@ abstract class Rdb
      *
      * @param string $src
      * @param string $dst
-     * @param int $timeout in seconds - if unset, the config/connection timeout
+     * @param int|float|null $timeout in seconds - if unset, the config/connection timeout
      * @return string|null item being moved or `null` if the timeout occurs
      */
-    public abstract function brPoplPush(string $src, string $dst, ?int $timeout = null): ?string;
+    public abstract function brPoplPush(string $src, string $dst, int|float|null $timeout = null): ?string;
 
 
     /**

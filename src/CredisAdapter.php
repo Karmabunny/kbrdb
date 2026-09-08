@@ -611,7 +611,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function blPop($keys, ?int $timeout = null): ?array
+    public function blPop($keys, int|float|null $timeout = null): ?array
     {
         if (is_scalar($keys)) {
             $keys = $this->config->prefix . $keys;
@@ -640,7 +640,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPop($keys, ?int $timeout = null): ?array
+    public function brPop($keys, int|float|null $timeout = null): ?array
     {
         if (is_scalar($keys)) {
             $keys = $this->config->prefix . $keys;
@@ -665,7 +665,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPoplPush(string $src, string $dst, ?int $timeout = null): ?string
+    public function brPoplPush(string $src, string $dst, int|float|null $timeout = null): ?string
     {
         $src = $this->config->prefix . $src;
         $dst = $this->config->prefix . $dst;
