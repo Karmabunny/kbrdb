@@ -33,22 +33,22 @@ return redis.call("MGET", unpack(KEYS))
 LUA;
 
     /** @var Rdb */
-    public $rdb;
+    public Rdb $rdb;
 
     /** @var string[] */
-    public $names;
+    public array $names;
 
     /** @var string */
-    public $prefix = 'mutex:';
+    public string $prefix = 'mutex:';
 
     /** @var bool */
-    public $autoRelease = true;
+    public bool $autoRelease = true;
 
     /** @var int in seconds, 0 for infinite */
-    public $autoExpire = 60;
+    public int $autoExpire = 60;
 
     /** @var string[] */
-    protected $values = [];
+    protected array $values = [];
 
     /**
      * @param Rdb $rdb

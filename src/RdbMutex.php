@@ -20,22 +20,22 @@ end
 LUA;
 
     /** @var Rdb */
-    public $rdb;
+    public Rdb $rdb;
 
     /** @var string */
-    public $name;
+    public string $name;
 
     /** @var string */
-    public $prefix = 'mutex:';
+    public string $prefix = 'mutex:';
 
     /** @var bool */
-    public $autoRelease = true;
+    public bool $autoRelease = true;
 
     /** @var int in seconds, 0 for infinite */
-    public $autoExpire = 60;
+    public int $autoExpire = 60;
 
     /** @var string|null */
-    protected $value = null;
+    protected ?string $value = null;
 
     /**
      * @param Rdb $rdb
