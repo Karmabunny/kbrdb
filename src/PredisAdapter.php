@@ -692,6 +692,7 @@ class PredisAdapter extends Rdb
             return (bool) $ok;
         } else {
             $ok = $this->predis->hsetnx($key, $field, (string) $value);
+            // @phpstan-ignore-next-line
             if ($ok === null) return null;
             return (bool) $ok;
         }

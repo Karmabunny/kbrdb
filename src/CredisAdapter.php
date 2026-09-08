@@ -395,6 +395,7 @@ class CredisAdapter extends Rdb
             $items = $this->credis->sscan($it, $key, $pattern, $this->config->scan_size);
 
             // If it's backed by php-redis it might return false.
+            // @phpstan-ignore-next-line
             if ($items === false or $items === null) break;
 
             foreach ($items as $item) {
@@ -967,6 +968,8 @@ class CredisAdapter extends Rdb
 
         for (;;) {
             $items = $this->credis->hScan($it, $key, $pattern, $this->config->scan_size);
+
+            // @phpstan-ignore-next-line
             if ($items === false or $items === null) break;
 
             foreach ($items as $key => $item) {

@@ -14,6 +14,10 @@ use RedisException;
  * @method bool move(string $key, int $index)
  * @method float incrByFloat(string $key, float $amount)
  * @method int|null hStrLen(string $key, string $field)
+ * @method bool|null hExists(string $key, string $field)
+ * @method int|null hDel(string $key, string ...$field)
+ * @method bool|int|null hSet(string $key, string $field, string $value)
+ * @method bool|null hSetNx(string $key, string $field, string $value)
  *
  * @package karmabunny\rdb\Wrappers
  */
