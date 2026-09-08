@@ -129,6 +129,25 @@ trait AdapterTestTrait
     }
 
 
+    public function testTtl()
+    {
+        $actual = $this->rdb->ttl('ttl:test');
+        $this->assertEquals(-2, $actual);
+
+        $this->rdb->set('ttl:test', 'test');
+        $actual = $this->rdb->ttl('ttl:test');
+        $this->assertEquals(-1, $actual);
+
+        $this->rdb->expire('ttl:test', 5000);
+        $actual = $this->rdb->ttl('ttl:test');
+        $this->assertEqualsWithDelta(5000, $actual, 100);
+
+        usleep(500000);
+        $actual = $this->rdb->ttl('ttl:test');
+        $this->assertEqualsWithDelta(4500, $actual, 100);
+    }
+
+
     public function testAppend()
     {
         // No exist.
