@@ -947,7 +947,7 @@ class PhpRedisAdapter extends Rdb
     {
         $res = $this->redis->hmSet($key, $fields);
 
-        if ($res === false or $res < 0) {
+        if (!$res and $this->redis->type($key) !== Redis::REDIS_HASH) {
             return null;
         }
 
