@@ -19,7 +19,7 @@ trait LockingTestTrait
     public function testLock()
     {
         $time = microtime(true);
-        $lock1 = $this->rdb->lock('lock:1', 1000);
+        $lock1 = $this->rdb->lock('lock:1', 1);
 
         // Matching key + token.
         $this->assertEquals($lock1->key, 'lock:1');
