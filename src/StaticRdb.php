@@ -23,13 +23,13 @@ namespace karmabunny\rdb;
  *
  * @method static int|string|bool|array|null eval(string $script, array $keys = [], array $args = [])
  *
- * @method static int|null ttl(string $key)
- * @method static bool expire(string $key, int $ttl = 0)
- * @method static bool expireAt(string $key, int $ttl = 0)
+ * @method static int|float|null ttl(string $key, bool $ms = false)
+ * @method static bool expire(string $key, int|float $ttl = 0)
+ * @method static bool expireAt(string $key, int|float $ttl = 0)
  * @method static bool rename(string $src, string $dst)
  * @method static string|null type(string $key)
  *
- * @method static bool|string|null set(string $key, string $value, int $ttl = 0, array $flags = [])
+ * @method static bool|string|null set(string $key, string $value, int|float $ttl = 0, array $flags = [])
  * @method static int append(string $key, string $value)
  * @method static string|null get(string $key)
  * @method static string|null getRange(string $key, int $from = 0, int $to = -1)
@@ -61,9 +61,9 @@ namespace karmabunny\rdb;
  * @method static bool|null lSet(string $key, int $index, string $item)
  * @method static string|null lIndex(string $key, int $index)
  * @method static int|null lRem(string $key, string $item, int $count = 0)
- * @method static array|null blPop(string[]|string $keys, ?int $timeout = null)
- * @method static array|null brPop(string[]|string $keys, ?int $timeout = null)
- * @method static string|null brPoplPush(string $src, string $dst, ?int $timeout = null)
+ * @method static array|null blPop(string[]|string $keys, int|float|null $timeout = null)
+ * @method static array|null brPop(string[]|string $keys, int|float|null $timeout = null)
+ * @method static string|null brPoplPush(string $src, string $dst, int|float|null $timeout = null)
  *
  * @method static int|null zAdd(string $key, float[] $members)
  * @method static float|null zIncrBy(string $key, float $value, string $member)
@@ -101,22 +101,22 @@ namespace karmabunny\rdb;
  * @method static \Generator<string|null> mScan(iterable<string> $keys)
  *
  * @method static string|null inspectObject(string $key)
- * @method static int setObject(string $key, object $value, int $ttl = 0)
- * @method static object|null getObject(string $key, ?string $expected = null)
- * @method static (object|null)[] mGetObjects(iterable<string> $keys, ?string $expected = null, bool $nullish = false)
- * @method static \Generator<object|null> mScanObjects(iterable<string> $keys, ?string $expected = null, bool $nullish = false)
+ * @method static int setObject(string $key, object $value, int|float $ttl = 0)
+ * @method static object|null getObject(string $key, string $expected)
+ * @method static (object|null)[] mGetObjects(iterable<string> $keys, string $expected, bool $nullish = false)
+ * @method static \Generator<object|null> mScanObjects(iterable<string> $keys, string $expected, bool $nullish = false)
  * @method static int[] mSetObjects(object[] $items)
  *
- * @method static int setJson(string $key, mixed $value, int $ttl = 0)
+ * @method static int setJson(string $key, mixed $value, int|float $ttl = 0)
  * @method static mixed getJson(string $key, bool $throw = true)
  *
  * @method static int setHash(string $key, array $value)
  * @method static array|null getHash(string $key)
  *
- * @method static int pack(string $key, mixed $value, int $ttl = 0)
+ * @method static int pack(string $key, mixed $value, int|float $ttl = 0)
  * @method static mixed unpack(string $key)
  *
- * @method static RdbLock|null lock(string $key, int $wait = 0, int $ttl = 60000)
+ * @method static RdbLock|null lock(string $key, int|float $wait = 0, int|float $ttl = 60)
  * @method static RdbBucket getBucket(array|string $config)
  *
  * @method static int export(string|resource $file, array|string $config = [])
