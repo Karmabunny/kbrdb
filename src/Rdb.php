@@ -860,7 +860,7 @@ abstract class Rdb
      *  - a keyed array like `[ member => score ]` (withscores)
      *  - `null` if the key is not a sorted set
      */
-    public abstract function zRange(string $key, $start = null, $stop = null, array $flags = []): ?array;
+    public abstract function zRange(string $key, int|string|null $start = null, int|string|null $stop = null, array $flags = []): ?array;
 
 
     /**
@@ -954,7 +954,7 @@ abstract class Rdb
      * @param bool $replace use `hSetNx` if false
      * @return bool
      */
-    public abstract function hSet(string $key, string $field, $value, bool $replace = true): bool;
+    public abstract function hSet(string $key, string $field, mixed $value, bool $replace = true): bool;
 
 
     /**
@@ -985,11 +985,11 @@ abstract class Rdb
      *
      * @param string $key
      * @param string $field
-     * @param int|float|string $amount
+     * @param int|float $amount
      * @param string $cast one of: 'auto', 'float', 'integer'
      * @return int|float the value after incrementing
      */
-    public function hIncr(string $key, string $field, $amount = 1, $cast = self::CAST_AUTO)
+    public function hIncr(string $key, string $field, int|float $amount = 1, string $cast = self::CAST_AUTO): int|float
     {
         $amount = self::cast($amount, $cast);
 

@@ -692,7 +692,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zRange(string $key, $start = null, $stop = null, array $flags = []): ?array
+    public function zRange(string $key, int|string|null $start = null, int|string|null $stop = null, array $flags = []): ?array
     {
         $key = $this->config->prefix . $key;
 
@@ -836,14 +836,14 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function hSet(string $key, string $field, $value, bool $replace = true): bool
+    public function hSet(string $key, string $field, mixed $value, bool $replace = true): bool
     {
         $key = $this->config->prefix . $key;
         if ($replace) {
-            $ok = $this->credis->hSet($key, $field, $value);
+            $ok = $this->credis->hSet($key, $field, (string) $value);
         }
         else {
-            $ok = $this->credis->hSetNx($key, $field, $value);
+            $ok = $this->credis->hSetNx($key, $field, (string) $value);
         }
         return (bool) $ok;
     }

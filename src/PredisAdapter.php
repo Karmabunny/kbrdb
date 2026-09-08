@@ -565,7 +565,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zRange(string $key, $start = null, $stop = null, array $flags = []): ?array
+    public function zRange(string $key, int|string|null $start = null, int|string|null $stop = null, array $flags = []): ?array
     {
         $flags = self::parseRangeFlags($flags);
 
@@ -671,12 +671,12 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function hSet(string $key, string $field, $value, bool $replace = true): bool
+    public function hSet(string $key, string $field, mixed $value, bool $replace = true): bool
     {
         if ($replace) {
-            $ok = $this->predis->hset($key, $field, $value);
+            $ok = $this->predis->hset($key, $field, (string) $value);
         } else {
-            $ok = $this->predis->hsetnx($key, $field, $value);
+            $ok = $this->predis->hsetnx($key, $field, (string) $value);
         }
 
         return (bool) $ok;
