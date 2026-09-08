@@ -38,31 +38,31 @@ class RdbConfig
     const TYPE_CREDIS = 'credis';
 
     /** @var string */
-    public $host = '127.0.0.1';
+    public string $host = '127.0.0.1';
 
     /** @var string */
-    public $prefix = '';
+    public string $prefix = '';
 
     /** @var int */
-    public $database = 0;
+    public int $database = 0;
 
     /** @var string RdbConfig::TYPE */
-    public $adapter = self::TYPE_PREDIS;
+    public string $adapter = self::TYPE_PREDIS;
 
     /** @var class-string<RdbObjectDriver> */
-    public $object_driver = PhpObjectDriver::class;
+    public string $object_driver = PhpObjectDriver::class;
 
     /** @var int for mscan and friends (mScanObjects) */
-    public $chunk_size = 50;
+    public int $chunk_size = 50;
 
     /** @var int for scan and friends (sscan, hscan, zscan) */
-    public $scan_size = 1000;
+    public int $scan_size = 1000;
 
     /** @var int in seconds - connection timeout */
-    public $timeout = 5;
+    public int $timeout = 5;
 
     /** @var int in milliseconds */
-    public $lock_sleep = 5;
+    public int $lock_sleep = 5;
 
     /**
      * Replace keys() with a scan().
@@ -77,17 +77,17 @@ class RdbConfig
      *
      * @var bool
      */
-    public $scan_keys = false;
+    public bool $scan_keys = false;
 
     /** @var array */
-    public $options = [];
+    public array $options = [];
 
     /**
      * Create a new config object.
      *
      * @param iterable $config
      */
-    public function __construct($config)
+    public function __construct(iterable $config)
     {
         foreach ($config as $key => $value) {
             if (!property_exists($this, $key)) continue;
@@ -102,7 +102,7 @@ class RdbConfig
      * @param bool $port Include the port number.
      * @return string
      */
-    public function getHost($port = false): string
+    public function getHost(bool $port = false): string
     {
         $host = $this->host;
 
