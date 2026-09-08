@@ -213,11 +213,11 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function ttl(string $key): ?int
+    public function ttl(string $key): int
     {
         $key = $this->config->prefix . $key;
         $value = $this->credis->__call('pttl', [$key]);
-        if (!is_numeric($value))  return null;
+        if (!is_numeric($value)) return -2;
         return $value;
     }
 

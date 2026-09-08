@@ -206,10 +206,10 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function ttl(string $key): ?int
+    public function ttl(string $key): int
     {
         $value = $this->redis->pttl($key);
-        if ($value === false) return null;
+        if ($value === false) return -2;
         return $value;
     }
 

@@ -79,7 +79,7 @@ class RdbExport
             $index++;
             $value = $this->rdb->dump($key);
 
-            $ttl = $this->rdb->ttl($key) ?? 0;
+            $ttl = $this->rdb->ttl($key);
             $ttl = max(0, $ttl);
 
             yield $index => [$key, $ttl, $value];

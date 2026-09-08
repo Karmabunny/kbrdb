@@ -284,10 +284,14 @@ abstract class Rdb
     /**
      * Get the TTL for a key.
      *
+     * Special return values:
+     * - `-1` - key exists but has no TTL
+     * - `-2` - key does not exist
+     *
      * @param string $key
-     * @return int|null milliseconds
+     * @return int milliseconds
      */
-    public abstract function ttl(string $key): ?int;
+    public abstract function ttl(string $key): int;
 
 
     /**
