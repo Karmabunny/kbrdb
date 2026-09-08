@@ -9,6 +9,7 @@ use karmabunny\rdb\Objects\JsonObjectDriver;
 use karmabunny\rdb\Objects\MsgPackObjectDriver;
 use karmabunny\rdb\Objects\PhpObjectDriver;
 use karmabunny\rdb\Rdb;
+use karmabunny\rdb\RdbConfig;
 use karmabunny\rdb\RdbHelperTrait;
 use karmabunny\rdb\RdbJsonObject;
 use MessagePack\MessagePack;
@@ -129,22 +130,64 @@ trait AdapterTestTrait
     }
 
 
+    public static function dataTtlModes()
+    {
+        return [
+            'auto' => [RdbConfig::TTL_AUTO],
+            'integer' => [RdbConfig::TTL_INTEGER],
+            'float' => [RdbConfig::TTL_FLOAT],
+            'compat' => [RdbConfig::TTL_COMPAT],
+        ];
+    }
+
+
     public function testTtl()
     {
-        $actual = $this->rdb->ttl('ttl:test');
-        $this->assertEquals(-2, $actual);
+        $oldMode = $this->rdb->config->ttl_mode;
 
-        $this->rdb->set('ttl:test', 'test');
-        $actual = $this->rdb->ttl('ttl:test');
-        $this->assertEquals(-1, $actual);
+        try {
+            $this->rdb->config->ttl_mode = RdbConfig::TTL_AUTO;
 
-        $this->rdb->expire('ttl:test', 5000);
-        $actual = $this->rdb->ttl('ttl:test');
-        $this->assertEqualsWithDelta(5000, $actual, 100);
+            $actual = $this->rdb->ttl('ttl:test');
+            $this->assertEquals(-2, $actual);
 
-        usleep(500000);
-        $actual = $this->rdb->ttl('ttl:test');
-        $this->assertEqualsWithDelta(4500, $actual, 100);
+            $this->rdb->set('ttl:test', 'test');
+            $actual = $this->rdb->ttl('ttl:test');
+            $this->assertEquals(-1, $actual);
+
+            $this->rdb->expire('ttl:test', 5);
+            $actual = $this->rdb->ttl('ttl:test');
+            $this->assertEqualsWithDelta(5, $actual, 0.1);
+
+            usleep(500000);
+            $actual = $this->rdb->ttl('ttl:test');
+            $this->assertEqualsWithDelta(4.5, $actual, 0.1);
+
+            // force milliseconds.
+            $actual = $this->rdb->ttl('ttl:test', true);
+            $this->assertEqualsWithDelta(4500, $actual, 100);
+
+            // Compat mode.
+            $this->rdb->config->ttl_mode = RdbConfig::TTL_COMPAT;
+            $actual = $this->rdb->ttl('ttl:test');
+            $this->assertEqualsWithDelta(4500, $actual, 100);
+
+            // Float mode.
+            $this->rdb->config->ttl_mode = RdbConfig::TTL_FLOAT;
+            $this->rdb->expire('ttl:test', 2.5);
+
+            $actual = $this->rdb->ttl('ttl:test');
+            $this->assertEqualsWithDelta(2.5, $actual, 0.1);
+
+            // Integer mode (truncate behaviours).
+            $this->rdb->config->ttl_mode = RdbConfig::TTL_INTEGER;
+            $this->rdb->expire('ttl:test', 2.5);
+            $actual = $this->rdb->ttl('ttl:test');
+            $this->assertEquals(2, $actual);
+        }
+        finally {
+            $this->rdb->config->ttl_mode = $oldMode;
+        }
     }
 
 
