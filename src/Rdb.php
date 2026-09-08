@@ -505,11 +505,11 @@ abstract class Rdb
      * the 'cast' param.
      *
      * @param string $key
-     * @param int|float|string $amount
+     * @param int|float $amount
      * @param string $cast one of: 'auto', 'float', 'integer'
      * @return int|float the value after incrementing
      */
-    public function incr(string $key, $amount = 1, string $cast = self::CAST_AUTO): int|float
+    public function incr(string $key, int|float $amount = 1, string $cast = self::CAST_AUTO): int|float
     {
         $amount = self::cast($amount, $cast);
 
@@ -549,11 +549,11 @@ abstract class Rdb
      * for floats.
      *
      * @param string $key
-     * @param int|float|string $amount
+     * @param int|float $amount
      * @param string $cast one of: 'auto', 'float', 'integer'
      * @return int|float the value after decrementing
      */
-    public function decr(string $key, $amount = 1, string $cast = self::CAST_AUTO): int|float
+    public function decr(string $key, int|float $amount = 1, string $cast = self::CAST_AUTO): int|float
     {
         $amount = self::cast($amount, $cast);
 
