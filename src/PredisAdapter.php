@@ -393,7 +393,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function decrBy(string $key, int $amount): int
+    public function decrBy(string $key, int $amount): ?int
     {
         return $this->predis->decrby($key, $amount);
     }
@@ -550,17 +550,21 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zAdd(string $key, array $members): int
+    public function zAdd(string $key, array $members): ?int
     {
-        return $this->predis->zadd($key, $members);
+        $res = $this->predis->zadd($key, $members);
+        if (!is_numeric($res)) return null;
+        return (int) $res;
     }
 
 
     /** @inheritdoc */
-    public function zIncrBy(string $key, float $value, string $member): float
+    public function zIncrBy(string $key, float $value, string $member): ?float
     {
         // @phpstan-ignore-next-line: yeah no, increment can be a float.
-        return (float) $this->predis->zincrby($key, $value, $member);
+        $res = $this->predis->zincrby($key, $value, $member);
+        if (!is_numeric($res)) return null;
+        return (float) $res;
     }
 
 
@@ -606,12 +610,14 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zRem(string $key, ...$members): int
+    public function zRem(string $key, ...$members): ?int
     {
         $args = self::flatten($members);
         array_unshift($args, $key);
 
-        return (int) @call_user_func_array([$this->predis, 'zrem'], $args);
+        $value = @call_user_func_array([$this->predis, 'zrem'], $args);
+        if ($value === null) return null;
+        return (int) $value;
     }
 
 
@@ -656,30 +662,39 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function hDel(string $key, ...$fields): int
+    public function hDel(string $key, ...$fields): ?int
     {
         $fields = self::flatten($fields);
-        return $this->predis->hdel($key, $fields);
+        $res = $this->predis->hdel($key, $fields);
+        return $res;
     }
 
 
     /** @inheritdoc */
-    public function hExists(string $key, string $field): bool
+    public function hExists(string $key, string $field): ?bool
     {
-        return (bool) $this->predis->hexists($key, $field);
+        $res = $this->predis->hexists($key, $field);
+        if (!is_numeric($res)) return null;
+        return (bool) $res;
     }
 
 
     /** @inheritdoc */
-    public function hSet(string $key, string $field, mixed $value, bool $replace = true): bool
+    public function hSet(string $key, string $field, mixed $value, bool $replace = true): ?bool
     {
         if ($replace) {
             $ok = $this->predis->hset($key, $field, (string) $value);
+
+            if (!is_numeric($ok)) {
+                return null;
+            }
+
+            return (bool) $ok;
         } else {
             $ok = $this->predis->hsetnx($key, $field, (string) $value);
+            if ($ok === null) return null;
+            return (bool) $ok;
         }
-
-        return (bool) $ok;
     }
 
 
@@ -700,16 +715,20 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function hIncrBy(string $key, string $field, int $amount): int
+    public function hIncrBy(string $key, string $field, int $amount): ?int
     {
-        return $this->predis->hincrby($key, $field, $amount);
+        $res = $this->predis->hincrby($key, $field, $amount);
+        if (!is_numeric($res)) return null;
+        return (int) $res;
     }
 
 
     /** @inheritdoc */
-    public function hIncrByFloat(string $key, string $field, float $amount): float
+    public function hIncrByFloat(string $key, string $field, float $amount): ?float
     {
-        return (float) $this->predis->hincrbyfloat($key, $field, $amount);
+        $res = $this->predis->hincrbyfloat($key, $field, $amount);
+        if (!is_numeric($res)) return null;
+        return (float) $res;
     }
 
 
@@ -739,25 +758,30 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function hLen(string $key): int
+    public function hLen(string $key): ?int
     {
-        return (int) $this->predis->hlen($key);
+        $res = $this->predis->hlen($key);
+        if (!is_numeric($res)) return null;
+        return (int) $res;
     }
 
 
     /** @inheritdoc */
-    public function hmGet(string $key, ...$fields): array
+    public function hmGet(string $key, ...$fields): ?array
     {
         $fields = self::flatten($fields);
-        return $this->predis->hmget($key, $fields);
+        $values = $this->predis->hmget($key, $fields);
+        if (!is_array($values)) return null;
+        return array_values($values);
     }
 
 
     /** @inheritdoc */
-    public function hmSet(string $key, array $fields): bool
+    public function hmSet(string $key, array $fields): ?bool
     {
-        $ok = $this->predis->hmset($key, $fields);
-        return (bool) $ok;
+        $res = $this->predis->hmset($key, $fields);
+        if ($res === null) return null;
+        return (bool) $res;
     }
 
 

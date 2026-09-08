@@ -452,7 +452,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function incrBy(string $key, int $amount): int
+    public function incrBy(string $key, int $amount): ?int
     {
         $key = $this->config->prefix . $key;
         return $this->credis->incrBy($key, $amount);
@@ -460,7 +460,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function incrByFloat(string $key, float $amount): float
+    public function incrByFloat(string $key, float $amount): ?float
     {
         $key = $this->config->prefix . $key;
         return (float) $this->credis->incrByFloat($key, $amount);
@@ -468,7 +468,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function decrBy(string $key, int $amount): int
+    public function decrBy(string $key, int $amount): ?int
     {
         $key = $this->config->prefix . $key;
         return $this->credis->decrBy($key, $amount);
@@ -666,7 +666,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zAdd(string $key, array $members): int
+    public function zAdd(string $key, array $members): ?int
     {
         $key = $this->config->prefix . $key;
 
@@ -679,15 +679,18 @@ class CredisAdapter extends Rdb
         }
 
         $res = $this->credis->__call('zadd', $args);
+        if (!is_numeric($res)) return null;
         return (int) $res;
     }
 
 
     /** @inheritdoc */
-    public function zIncrBy(string $key, float $value, string $member): float
+    public function zIncrBy(string $key, float $value, string $member): ?float
     {
         $key = $this->config->prefix . $key;
-        return (float) $this->credis->zIncrBy($key, $value, $member);
+        $res = $this->credis->zIncrBy($key, $value, $member);
+        if (!is_numeric($res)) return null;
+        return (float) $res;
     }
 
 
@@ -764,7 +767,7 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zRem(string $key, ...$members): int
+    public function zRem(string $key, ...$members): ?int
     {
         $key = $this->config->prefix . $key;
 
@@ -772,6 +775,7 @@ class CredisAdapter extends Rdb
         array_unshift($args, $key);
 
         $value = $this->credis->__call('zrem', $args);
+        if ($value === null) return null;
         return (int) $value;
     }
 
@@ -819,24 +823,28 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function hDel(string $key, ...$fields): int
+    public function hDel(string $key, ...$fields): ?int
     {
         $key = $this->config->prefix . $key;
         $fields = self::flatten($fields);
-        return (int) $this->credis->hDel($key, ...$fields);
+        $res = $this->credis->hDel($key, ...$fields);
+        if ($res === null) return null;
+        return (int) $res;
     }
 
 
     /** @inheritdoc */
-    public function hExists(string $key, string $field): bool
+    public function hExists(string $key, string $field): ?bool
     {
         $key = $this->config->prefix . $key;
-        return (bool) $this->credis->hExists($key, $field);
+        $ok = $this->credis->hExists($key, $field);
+        if ($ok === null) return null;
+        return (bool) $ok;
     }
 
 
     /** @inheritdoc */
-    public function hSet(string $key, string $field, mixed $value, bool $replace = true): bool
+    public function hSet(string $key, string $field, mixed $value, bool $replace = true): ?bool
     {
         $key = $this->config->prefix . $key;
         if ($replace) {
@@ -845,6 +853,8 @@ class CredisAdapter extends Rdb
         else {
             $ok = $this->credis->hSetNx($key, $field, (string) $value);
         }
+
+        if ($ok === null) return null;
         return (bool) $ok;
     }
 
@@ -870,18 +880,22 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function hIncrBy(string $key, string $field, int $amount): int
+    public function hIncrBy(string $key, string $field, int $amount): ?int
     {
         $key = $this->config->prefix . $key;
-        return $this->credis->hIncrBy($key, $field, $amount);
+        $res = $this->credis->hIncrBy($key, $field, $amount);
+        if (!is_numeric($res)) return null;
+        return (int) $res;
     }
 
 
     /** @inheritdoc */
-    public function hIncrByFloat(string $key, string $field, float $amount): float
+    public function hIncrByFloat(string $key, string $field, float $amount): ?float
     {
         $key = $this->config->prefix . $key;
-        return (float) $this->credis->hIncrByFloat($key, $field, $amount);
+        $res = $this->credis->hIncrByFloat($key, $field, $amount);
+        if (!is_numeric($res)) return null;
+        return (float) $res;
     }
 
 
@@ -916,11 +930,11 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function hLen(string $key): int
+    public function hLen(string $key): ?int
     {
         $key = $this->config->prefix . $key;
         $res = $this->credis->hLen($key);
-        if (!is_numeric($res)) return 0;
+        if (!is_numeric($res)) return null;
         return (int) $res;
     }
 
@@ -937,11 +951,10 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function hmSet(string $key, array $fields): bool
+    public function hmSet(string $key, array $fields): ?bool
     {
         $key = $this->config->prefix . $key;
-        $ok = $this->credis->hMSet($key, $fields);
-        return (bool) $ok;
+        return $this->credis->hMSet($key, $fields);
     }
 
 

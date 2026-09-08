@@ -429,7 +429,7 @@ abstract class Rdb
      *
      * @param string $key
      * @param mixed $values
-     * @return int number of new items added, `null` if not a set
+     * @return int|null number of new items added, `null` if not a set
      */
     public abstract function sAdd(string $key, ...$values): ?int;
 
@@ -462,7 +462,7 @@ abstract class Rdb
      *
      * @param string $key
      * @param mixed $values
-     * @return int number of items removed, null if not a set
+     * @return int|null number of items removed, null if not a set
      */
     public abstract function sRem(string $key, ...$values): ?int;
 
@@ -471,7 +471,7 @@ abstract class Rdb
      * Get the cardinality (size) of a set.
      *
      * @param string $key
-     * @return int number of items in the set, null if not a set
+     * @return int|null number of items in the set, null if not a set
      */
     public abstract function sCard(string $key): ?int;
 
@@ -481,7 +481,7 @@ abstract class Rdb
      *
      * @param string $key
      * @param string $value
-     * @return bool true if a member, null if not a set
+     * @return bool|null true if a member, null if not a set
      */
     public abstract function sIsMember(string $key, string $value): ?bool;
 
@@ -492,7 +492,7 @@ abstract class Rdb
      * @param string $src
      * @param string $dst
      * @param string $value
-     * @return bool true if moved, or false if not a member, null if not a set
+     * @return bool|null true if moved, or false if not a member, null if not a set
      */
     public abstract function sMove(string $src, string $dst, string $value): ?bool;
 
@@ -507,9 +507,9 @@ abstract class Rdb
      * @param string $key
      * @param int|float $amount
      * @param string $cast one of: 'auto', 'float', 'integer'
-     * @return int|float the value after incrementing
+     * @return int|float|null the value after incrementing
      */
-    public function incr(string $key, int|float $amount = 1, string $cast = self::CAST_AUTO): int|float
+    public function incr(string $key, int|float $amount = 1, string $cast = self::CAST_AUTO): int|float|null
     {
         $amount = self::cast($amount, $cast);
 
@@ -527,9 +527,9 @@ abstract class Rdb
      *
      * @param string $key
      * @param int $amount
-     * @return int the value after incrementing
+     * @return int|null the value after incrementing
      */
-    public abstract function incrBy(string $key, int $amount): int;
+    public abstract function incrBy(string $key, int $amount): ?int;
 
 
     /**
@@ -537,9 +537,9 @@ abstract class Rdb
      *
      * @param string $key
      * @param float $amount
-     * @return float the value after incrementing
+     * @return float|null the value after incrementing
      */
-    public abstract function incrByFloat(string $key, float $amount): float;
+    public abstract function incrByFloat(string $key, float $amount): ?float;
 
 
     /**
@@ -551,9 +551,9 @@ abstract class Rdb
      * @param string $key
      * @param int|float $amount
      * @param string $cast one of: 'auto', 'float', 'integer'
-     * @return int|float the value after decrementing
+     * @return int|float|null the value after decrementing
      */
-    public function decr(string $key, int|float $amount = 1, string $cast = self::CAST_AUTO): int|float
+    public function decr(string $key, int|float $amount = 1, string $cast = self::CAST_AUTO): int|float|null
     {
         $amount = self::cast($amount, $cast);
 
@@ -571,9 +571,9 @@ abstract class Rdb
      *
      * @param string $key
      * @param int $amount
-     * @return int the value after decrementing
+     * @return int|null the value after decrementing
      */
-    public abstract function decrBy(string $key, int $amount): int;
+    public abstract function decrBy(string $key, int $amount): ?int;
 
 
     /**
@@ -798,9 +798,9 @@ abstract class Rdb
      *
      * @param string $key
      * @param float[] $members [ member => score ]
-     * @return int number of elements added
+     * @return int|null number of elements added
      */
-    public abstract function zAdd(string $key, array $members): int;
+    public abstract function zAdd(string $key, array $members): ?int;
 
 
     /**
@@ -811,9 +811,9 @@ abstract class Rdb
      * @param string $key
      * @param float $value an amount to update by, can be negative
      * @param string $member
-     * @return float the value after updated
+     * @return float|null the value after updated
      */
-    public abstract function zIncrBy(string $key, float $value, string $member): float;
+    public abstract function zIncrBy(string $key, float $value, string $member): ?float;
 
 
     /**
@@ -868,9 +868,9 @@ abstract class Rdb
      *
      * @param string $key
      * @param string[]|string $members
-     * @return int number of removed items
+     * @return int|null number of removed items
      */
-    public abstract function zRem(string $key, ...$members): int;
+    public abstract function zRem(string $key, ...$members): ?int;
 
 
     /**
@@ -930,9 +930,9 @@ abstract class Rdb
      *
      * @param string $key
      * @param string ...$fields
-     * @return int Number of fields removed
+     * @return int|null Number of fields removed
      */
-    public abstract function hDel(string $key, ...$fields): int;
+    public abstract function hDel(string $key, ...$fields): ?int;
 
 
     /**
@@ -940,9 +940,9 @@ abstract class Rdb
      *
      * @param string $key
      * @param string $field
-     * @return bool True if field exists
+     * @return bool|null True if field exists
      */
-    public abstract function hExists(string $key, string $field): bool;
+    public abstract function hExists(string $key, string $field): ?bool;
 
 
     /**
@@ -952,9 +952,9 @@ abstract class Rdb
      * @param string $field
      * @param mixed $value
      * @param bool $replace use `hSetNx` if false
-     * @return bool
+     * @return bool|null
      */
-    public abstract function hSet(string $key, string $field, mixed $value, bool $replace = true): bool;
+    public abstract function hSet(string $key, string $field, mixed $value, bool $replace = true): ?bool;
 
 
     /**
@@ -987,9 +987,9 @@ abstract class Rdb
      * @param string $field
      * @param int|float $amount
      * @param string $cast one of: 'auto', 'float', 'integer'
-     * @return int|float the value after incrementing
+     * @return int|float|null the value after incrementing
      */
-    public function hIncr(string $key, string $field, int|float $amount = 1, string $cast = self::CAST_AUTO): int|float
+    public function hIncr(string $key, string $field, int|float $amount = 1, string $cast = self::CAST_AUTO): int|float|null
     {
         $amount = self::cast($amount, $cast);
 
@@ -1008,9 +1008,9 @@ abstract class Rdb
      * @param string $key
      * @param string $field
      * @param int $amount Amount to increment by
-     * @return int New value after increment
+     * @return int|null New value after increment
      */
-    public abstract function hIncrBy(string $key, string $field, int $amount): int;
+    public abstract function hIncrBy(string $key, string $field, int $amount): ?int;
 
 
     /**
@@ -1019,9 +1019,9 @@ abstract class Rdb
      * @param string $key
      * @param string $field
      * @param float $amount Amount to increment by
-     * @return float New value after increment
+     * @return float|null New value after increment
      */
-    public abstract function hIncrByFloat(string $key, string $field, float $amount): float;
+    public abstract function hIncrByFloat(string $key, string $field, float $amount): ?float;
 
 
     /**
@@ -1056,9 +1056,9 @@ abstract class Rdb
      * Get the number of fields in a hash.
      *
      * @param string $key
-     * @return int Number of fields
+     * @return int|null Number of fields
      */
-    public abstract function hLen(string $key): int;
+    public abstract function hLen(string $key): ?int;
 
 
     /**
@@ -1076,9 +1076,9 @@ abstract class Rdb
      *
      * @param string $key
      * @param array $fields Array of field-value pairs
-     * @return bool True if successful
+     * @return bool|null True if successful
      */
-    public abstract function hmSet(string $key, array $fields): bool;
+    public abstract function hmSet(string $key, array $fields): ?bool;
 
 
     /**

@@ -461,7 +461,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function decrBy(string $key, int $amount): int
+    public function decrBy(string $key, int $amount): ?int
     {
         return $this->redis->decrby($key, $amount);
     }
@@ -644,7 +644,7 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zAdd(string $key, array $members): int
+    public function zAdd(string $key, array $members): ?int
     {
         $args = [];
         $args[] = $key;
@@ -654,14 +654,18 @@ class PhpRedisAdapter extends Rdb
             $args[] = $member;
         }
 
-        return (int) @call_user_func_array([$this->redis, 'zAdd'], $args);
+        $res = @call_user_func_array([$this->redis, 'zAdd'], $args);
+        if (!is_numeric($res)) return null;
+        return (int) $res;
     }
 
 
     /** @inheritdoc */
-    public function zIncrBy(string $key, float $value, string $member): float
+    public function zIncrBy(string $key, float $value, string $member): ?float
     {
-        return $this->redis->zIncrBy($key, $value, $member);
+        $res = $this->redis->zIncrBy($key, $value, $member);
+        if ($res === false) return null;
+        return (float) $res;
     }
 
 
@@ -757,10 +761,12 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zRem(string $key, ...$members): int
+    public function zRem(string $key, ...$members): ?int
     {
         $members = self::flatten($members);
-        return $this->redis->zRem($key, ...$members);
+        $res = $this->redis->zRem($key, ...$members);
+        if ($res === false) return null;
+        return $res;
     }
 
 
@@ -814,30 +820,44 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function hDel(string $key, ...$fields): int
+    public function hDel(string $key, ...$fields): ?int
     {
         $fields = self::flatten($fields);
-        return $this->redis->hDel($key, ...$fields);
+        $res = $this->redis->hDel($key, ...$fields);
+        if ($res === false) return null;
+        return $res;
     }
 
 
     /** @inheritdoc */
-    public function hExists(string $key, string $field): bool
+    public function hExists(string $key, string $field): ?bool
     {
-        return (bool) $this->redis->hExists($key, $field);
+        $res = $this->redis->hExists($key, $field);
+
+        if (!$res and $this->redis->type($key) !== Redis::REDIS_HASH) {
+            return null;
+        }
+
+        return (bool) $res;
     }
 
 
     /** @inheritdoc */
-    public function hSet(string $key, string $field, mixed $value, bool $replace = true): bool
+    public function hSet(string $key, string $field, mixed $value, bool $replace = true): ?bool
     {
         if ($replace) {
             $ok = $this->redis->hSet($key, $field, (string) $value);
+
+            if (!is_numeric($ok)) {
+                return null;
+            }
+
+            return (bool) $ok;
         }
         else {
             $ok = $this->redis->hSetNx($key, $field, (string) $value);
+            return $ok;
         }
-        return (bool) $ok;
     }
 
 
@@ -860,17 +880,19 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function hIncrBy(string $key, string $field, int $amount): int
+    public function hIncrBy(string $key, string $field, int $amount): ?int
     {
         $res = $this->redis->hIncrBy($key, $field, $amount);
+        if (!is_numeric($res)) return null;
         return (int) $res;
     }
 
 
     /** @inheritdoc */
-    public function hIncrByFloat(string $key, string $field, float $amount): float
+    public function hIncrByFloat(string $key, string $field, float $amount): ?float
     {
         $res = $this->redis->hIncrByFloat($key, $field, $amount);
+        if (!is_numeric($res)) return null;
         return (float) $res;
     }
 
@@ -903,10 +925,10 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function hLen(string $key): int
+    public function hLen(string $key): ?int
     {
         $res = $this->redis->hLen($key);
-        if (!is_numeric($res)) return 0;
+        if (!is_numeric($res)) return null;
         return (int) $res;
     }
 
@@ -921,9 +943,14 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function hmSet(string $key, array $fields): bool
+    public function hmSet(string $key, array $fields): ?bool
     {
         $res = $this->redis->hmSet($key, $fields);
+
+        if ($res === false or $res < 0) {
+            return null;
+        }
+
         return (bool) $res;
     }
 
