@@ -245,7 +245,10 @@ class CredisAdapter extends Rdb
         }
 
         // Convert PTTL to float seconds.
-        $value /= 1000;
+        if ($value > 0) {
+            $value /= 1000;
+        }
+
         return $value;
     }
 

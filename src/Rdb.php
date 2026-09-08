@@ -228,7 +228,7 @@ abstract class Rdb
         }
 
         // Auto mode.
-        if (is_int($ttl) or $ttl == (int) $ttl) {
+        if (is_int($ttl)) {
             return [false, $ttl];
         }
         else {
