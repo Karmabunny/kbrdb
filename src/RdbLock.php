@@ -19,6 +19,7 @@ namespace karmabunny\rdb;
  * Inspired by:
  * https://github.com/cheprasov/php-redis-lock
  *
+ * @deprecated use mutexes
  * @package karmabunny\rdb
  */
 class RdbLock
