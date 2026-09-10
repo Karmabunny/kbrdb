@@ -34,17 +34,7 @@ class PhpObjectDriver implements RdbObjectDriver
     public function inspect(string $key): ?string
     {
         $value = $this->rdb->get($key);
-
-        if ($value === null) {
-            return null;
-        }
-
-        if (!preg_match('/^O:\d+:"([^"]+)"/', $value, $matches)) {
-            return null;
-        }
-
-        [, $class] = $matches;
-        return $class;
+        return $this->getClass($value);
     }
 
 
@@ -63,7 +53,11 @@ class PhpObjectDriver implements RdbObjectDriver
         $value = $this->rdb->get($key);
         if ($value === null) return null;
 
-        $value = @unserialize($value, ['allowed_classes' => [$expected]]);
+        if ($this->getClass($value) !== $expected) {
+            return null;
+        }
+
+        $value = @unserialize($value);
 
         if ($value === false) return null;
         if (!is_object($value)) return null;
@@ -105,7 +99,11 @@ class PhpObjectDriver implements RdbObjectDriver
         foreach ($items as $key => $item) {
             if (!$key or !$item) continue;
 
-            $item = @unserialize($item, ['allowed_classes' => [$expected]]);
+            if ($this->getClass($item) !== $expected) {
+                continue;
+            }
+
+            $item = @unserialize($item);
 
             if (!$item) continue;
             if (!is_object($item)) continue;
@@ -115,5 +113,20 @@ class PhpObjectDriver implements RdbObjectDriver
         }
 
         return $output;
+    }
+
+
+    protected static function getClass(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if (!preg_match('/^O:\d+:"([^"]+)"/', $value, $matches)) {
+            return null;
+        }
+
+        [, $class] = $matches;
+        return $class;
     }
 }
