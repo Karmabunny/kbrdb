@@ -832,7 +832,7 @@ abstract class Rdb
      * sorted set.
      *
      * @param string $key
-     * @param array<string,float> $members [ member => score ]
+     * @param array<string|int,float> $members [ member => score ]
      * @return int|null number of elements added
      */
     public abstract function zAdd(string $key, array $members): ?int;
