@@ -119,7 +119,7 @@ class RdbImport
         foreach ($data as $index => $item) {
             [$key, $ttl, $value] = $item;
 
-            $this->rdb->restore($key, $ttl, $value, ['replace']);
+            $this->rdb->restore($key, $ttl, $value, ['replace', 'ms']);
 
             if ($this->log) {
                 ($this->log)($index);

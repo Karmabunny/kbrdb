@@ -127,10 +127,9 @@ LUA;
     protected function tryAcquire(): bool
     {
         $key = $this->getKey();
-        $expire = $this->autoExpire * 1000;
 
         $value = $this->generateValue();
-        $ok = $this->rdb->set($key, $value, $expire, ['replace' => 'NX']);
+        $ok = $this->rdb->set($key, $value, $this->autoExpire, ['replace' => 'NX']);
 
         if ($ok) {
             $this->value = $value;

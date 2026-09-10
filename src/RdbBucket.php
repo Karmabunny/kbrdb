@@ -132,9 +132,9 @@ class RdbBucket
      *
      * This will be zero if the bucket isn't full.
      *
-     * @return int milliseconds
+     * @return float seconds
      */
-    public function getWait(): int
+    public function getWait(): float
     {
         if (!$this->isFull()) return 0;
 
@@ -143,7 +143,7 @@ class RdbBucket
 
         $period = $this->capacity / $this->drip_rate;
         $period -= $time;
-        return (int) ($period * 1000);
+        return $period;
     }
 
 

@@ -34,7 +34,7 @@ trait MutexTestTrait
         $this->assertNotNull($value1);
 
         $ttl = $lock1->rdb->ttl($key1);
-        $this->assertGreaterThan(($lock1->autoExpire - 1) * 1000, $ttl);
+        $this->assertGreaterThan(($lock1->autoExpire - 1), $ttl);
 
         // No existing lock - no waiting, got a lock.
         $this->assertLessThan(0.01, microtime(true) - $time);

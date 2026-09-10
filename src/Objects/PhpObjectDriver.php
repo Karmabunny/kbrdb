@@ -49,7 +49,7 @@ class PhpObjectDriver implements RdbObjectDriver
 
 
     /** @inheritdoc */
-    public function setObject(string $key, object $value, int $ttl = 0): int
+    public function setObject(string $key, object $value, int|float $ttl = 0): int
     {
         $value = serialize($value);
         if (!$this->rdb->set($key, $value, $ttl)) return 0;
@@ -58,16 +58,16 @@ class PhpObjectDriver implements RdbObjectDriver
 
 
     /** @inheritdoc */
-    public function getObject(string $key, ?string $expected = null): ?object
+    public function getObject(string $key, string $expected): ?object
     {
         $value = $this->rdb->get($key);
         if ($value === null) return null;
 
-        $value = @unserialize($value);
+        $value = @unserialize($value, ['allowed_classes' => [$expected]]);
 
         if ($value === false) return null;
         if (!is_object($value)) return null;
-        if ($expected and !is_a($value, $expected, false)) return null;
+        if ($expected !== get_class($value)) return null;
 
         return $value;
     }
@@ -96,7 +96,7 @@ class PhpObjectDriver implements RdbObjectDriver
 
 
     /** @inheritdoc */
-    public function mGetObjects(array $keys, ?string $expected = null): array
+    public function mGetObjects(array $keys, string $expected): array
     {
         $items = $this->rdb->mGet($keys);
 
@@ -105,13 +105,11 @@ class PhpObjectDriver implements RdbObjectDriver
         foreach ($items as $key => $item) {
             if (!$key or !$item) continue;
 
-            $item = @unserialize($item) ?: null;
+            $item = @unserialize($item, ['allowed_classes' => [$expected]]);
 
             if (!$item) continue;
-
             if (!is_object($item)) continue;
-
-            if ($expected and !is_a($item, $expected, false)) continue;
+            if ($expected !== get_class($item)) continue;
 
             $output[$key] = $item;
         }

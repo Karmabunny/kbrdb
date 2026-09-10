@@ -169,9 +169,15 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function restore(string $key, int $ttl, string $value, array $flags = []): bool
+    public function restore(string $key, int|float $ttl, string $value, array $flags = []): bool
     {
         $flags = $this->parseRestoreFlags($flags);
+
+        if (!$flags['ms'] and $this->config->ttl_mode !== RdbConfig::TTL_COMPAT) {
+            $ttl *= 1000;
+        }
+
+        $ttl = (int) $ttl;
 
         $args = [$key, $ttl, $value];
 
@@ -186,23 +192,57 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function ttl(string $key): int
+    public function ttl(string $key, bool $ms = false): float|int
     {
-        return $this->predis->pttl($key);
+        if (!$ms and $this->config->ttl_mode === RdbConfig::TTL_INTEGER) {
+            $value = $this->predis->ttl($key);
+        }
+        else {
+            $value = $this->predis->pttl($key);
+        }
+
+        // Return PTTL milliseconds.
+        if ($ms or $this->config->ttl_mode === RdbConfig::TTL_COMPAT) {
+            return $value;
+        }
+
+        // Return TTL seconds.
+        if ($this->config->ttl_mode === RdbConfig::TTL_INTEGER) {
+            return $value;
+        }
+
+        // Convert PTTL to float seconds.
+        if ($value > 0) {
+            $value /= 1000;
+        }
+
+        return $value;
     }
 
 
     /** @inheritdoc */
-    public function expire(string $key, $ttl = 0): bool
+    public function expire(string $key, int|float $ttl = 0): bool
     {
-        return (bool) $this->predis->pexpire($key, $ttl);
+        [$ms, $ttl] = $this->parseTtl($ttl);
+
+        $value = $ms
+            ? $this->predis->pexpire($key, $ttl)
+            : $this->predis->expire($key, $ttl);
+
+        return (bool) $value;
     }
 
 
     /** @inheritdoc */
-    public function expireAt(string $key, $ttl = 0): bool
+    public function expireAt(string $key, int|float $ttl = 0): bool
     {
-        return (bool) $this->predis->pexpireat($key, $ttl);
+        [$ms, $ttl] = $this->parseTtl($ttl);
+
+        $value = $ms
+            ? $this->predis->pexpireat($key, $ttl)
+            : $this->predis->expireat($key, $ttl);
+
+        return (bool) $value;
     }
 
 
@@ -223,16 +263,19 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function set(string $key, string $value, int $ttl = 0, array $flags = []): bool|string|null
+    public function set(string $key, string $value, int|float $ttl = 0, array $flags = []): bool|string|null
     {
         $flags = self::parseSetFlags($flags);
+        [$ms, $ttl] = $this->parseTtl($ttl);
 
         $args = [];
         $args[] = $key;
         $args[] = $value;
 
         if ($ttl) {
-            $args[] = $flags['time_at'] ? 'PXAT' : 'PX';
+            $args[] = $ms
+                ? ($flags['time_at'] ? 'PXAT' : 'PX')
+                : ($flags['time_at'] ? 'EXAT' : 'EX');
             $args[] = $ttl;
         }
 
@@ -485,7 +528,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function blPop($keys, ?int $timeout = null): ?array
+    public function blPop($keys, int|float|null $timeout = null): ?array
     {
         if (is_scalar($keys)) {
             $keys = [$keys];
@@ -503,7 +546,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPop($keys, ?int $timeout = null): ?array
+    public function brPop($keys, int|float|null $timeout = null): ?array
     {
         if (is_scalar($keys)) {
             $keys = [$keys];
@@ -521,7 +564,7 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function brPoplPush(string $src, string $dst, ?int $timeout = null): ?string
+    public function brPoplPush(string $src, string $dst, int|float|null $timeout = null): ?string
     {
         if ($timeout === null) {
             $timeout = $this->config->timeout;

@@ -50,21 +50,11 @@ This library wouldn't ever try to _hide_ features behind target versions, but pe
 For example, `BRPOPLPUSH` is deprecated in v6.2 and might be removed in the distant future. In this case, the library would be able to dynamically replace (based on the server version) this with `BLMOVE`.
 
 
-### Plans for v3
-
-__TTL params__
-
-There is a preference for the millisecond version of a command, particularly TTL parameters. This is clearly misleading and already wildly inconsistent. Ideally this changes so that a 'float' is converted to the millisecond version and integer remains unchanged. Thus the input is always 'seconds'. The implementation should include the 'p' millisecond version of each command, similar to how we've implemented `incr/decr`.
-
+### Future features
 
 __Type errors__
 
-Type errors are currently (hopefully) always a `null` return. This can quite confusing at times, or helpful in others. Version 2 will likely permit both, defaulting to emitting exceptions.
-
-
-__Object methods__
-
-The expected type in the object method is currently optional, but most drivers required it. Version 2 will make them required.
+Type errors are currently (hopefully) always a `null` return. This can be quite confusing at times, or helpful in others. A future version will optionally emit an exception.
 
 
 ### Config
@@ -76,16 +66,24 @@ The expected type in the object method is currently optional, but most drivers r
 | adapter       | 'predis'        | Adapter type: predis, php-redis, credis |
 | object_driver | PhpObjectDriver | Object driver class                     |
 | timeout       | 5               | Connection timeout, in seconds          |
-| lock_sleep    | 5               | Tick size for locking, in milliseconds  |
+| lock_sleep    | 0.005           | Tick size for locking, in seconds       |
 | chunk_size    | 50              | Max key size for mscan methods          |
 | scan_size     | 1000            | Count hint for scan methods             |
 | scan_keys     | false           | Replace keys() with scan()              |
+| ttl_mode      | auto            | how to accept TTL values, below         |
 | options       | []              | Adapter specific options                |
 
 Notes:
 
 - The port number is default 6379 unless specified in the `host` option.
 - The protocol can be adjusted in the `host` option too: prefix `tcp://` or `udp://`.
+
+TTL modes:
+ - `TTL_AUTO`    use TTL/PTTL based on the value type (int or float, respectively)
+ - `TTL_INTEGER` use TTL only (int)
+ - `TTL_FLOAT`   use PTTL only (float)
+ - `TTL_COMPAT`  use PTTL (float) and assume the value is provided as milliseconds
+
 
 ```php
 return [
@@ -167,7 +165,7 @@ $config = require 'config.php';
 $rdb = Rdb::create($config);
 
 // Store 'blah' for 100 ms
-$rdb->set('key', 'blah', 100);
+$rdb->set('key', 'blah', 0.1);
 
 $rdb->get('key');
 // => blah
@@ -182,7 +180,6 @@ Object extensions will serialize in the PHP format. These have builtin assertion
 
 ```php
 $model = new MyModel('etc');
-$rdb->setObject('objects:key', $model);
 
 $rdb->getObject('objects:key', MyModel::class);
 // => MyModel( etc )
@@ -195,7 +192,7 @@ Locking provides a mechanism to restrict atomic access to a resource.
 
 ```php
 // Wait for a lock for up to 10 seconds.
-$lock = $rdb->lock('locks:key', 10 * 1000);
+$lock = $rdb->lock('locks:key', 10);
 
 if ($lock === null) {
     echo "Busy - too much contention\n";
