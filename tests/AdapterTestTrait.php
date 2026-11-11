@@ -929,6 +929,131 @@ trait AdapterTestTrait
         $expected = 1;
         $actual = $this->rdb->zRevRank('ztest', 'b');
         $this->assertEquals($expected, $actual);
+
+        // zRemRangeByRank.
+        $this->rdb->del('zrem:rank');
+        $this->rdb->zAdd('zrem:rank', [
+            'a' => 1,
+            'b' => 2,
+            'c' => 3,
+            'd' => 4,
+            'e' => 5,
+        ]);
+
+        $expected = 2;
+        $actual = $this->rdb->zRemRangeByRank('zrem:rank', 1, 2);
+        $this->assertEquals($expected, $actual);
+
+        $expected = ['a', 'd', 'e'];
+        $actual = $this->rdb->zRange('zrem:rank');
+        $this->assertEquals($expected, $actual);
+
+        // Negative ranks address the tail.
+        $expected = 1;
+        $actual = $this->rdb->zRemRangeByRank('zrem:rank', -1, -1);
+        $this->assertEquals($expected, $actual);
+
+        $expected = ['a', 'd'];
+        $actual = $this->rdb->zRange('zrem:rank');
+        $this->assertEquals($expected, $actual);
+
+        // A missing key removes nothing.
+        $expected = 0;
+        $actual = $this->rdb->zRemRangeByRank('zrem:missing', 0, -1);
+        $this->assertEquals($expected, $actual);
+
+        // zRemRangeByScore.
+        $this->rdb->del('zrem:score');
+        $this->rdb->zAdd('zrem:score', [
+            'a' => 1,
+            'b' => 2,
+            'c' => 3,
+            'd' => 4,
+            'e' => 5,
+        ]);
+
+        $expected = 3;
+        $actual = $this->rdb->zRemRangeByScore('zrem:score', 2, 4);
+        $this->assertEquals($expected, $actual);
+
+        $expected = ['a', 'e'];
+        $actual = $this->rdb->zRange('zrem:score');
+        $this->assertEquals($expected, $actual);
+
+        // Exclusive max, same bound syntax as zRange byscore.
+        $this->rdb->zAdd('zrem:score', [
+            'b' => 2,
+            'c' => 3,
+            'd' => 4,
+        ]);
+
+        $expected = 2;
+        $actual = $this->rdb->zRemRangeByScore('zrem:score', '-inf', '(3');
+        $this->assertEquals($expected, $actual);
+
+        $expected = ['c', 'd', 'e'];
+        $actual = $this->rdb->zRange('zrem:score');
+        $this->assertEquals($expected, $actual);
+
+        // Omitted bounds remove the remainder.
+        $expected = 3;
+        $actual = $this->rdb->zRemRangeByScore('zrem:score');
+        $this->assertEquals($expected, $actual);
+
+        $expected = [];
+        $actual = $this->rdb->zRange('zrem:score');
+        $this->assertEquals($expected, $actual);
+
+        $expected = 0;
+        $actual = $this->rdb->zRemRangeByScore('zrem:missing', 0, 1);
+        $this->assertEquals($expected, $actual);
+
+        // zRemRangeByLex. Equal scores keep the set in lexicographical order.
+        $this->rdb->del('zrem:lex');
+        $this->rdb->zAdd('zrem:lex', [
+            'a' => 0,
+            'b' => 0,
+            'c' => 0,
+            'd' => 0,
+            'e' => 0,
+            'f' => 0,
+        ]);
+
+        $expected = 3;
+        $actual = $this->rdb->zRemRangeByLex('zrem:lex', '[b', '[d');
+        $this->assertEquals($expected, $actual);
+
+        $expected = ['a', 'e', 'f'];
+        $actual = $this->rdb->zRange('zrem:lex');
+        $this->assertEquals($expected, $actual);
+
+        // Exclusive bounds.
+        $this->rdb->zAdd('zrem:lex', [
+            'b' => 0,
+            'c' => 0,
+            'd' => 0,
+        ]);
+
+        $expected = 2;
+        $actual = $this->rdb->zRemRangeByLex('zrem:lex', '(a', '(d');
+        $this->assertEquals($expected, $actual);
+
+        $expected = ['a', 'd', 'e', 'f'];
+        $actual = $this->rdb->zRange('zrem:lex');
+        $this->assertEquals($expected, $actual);
+
+        // Omitted bounds remove the remainder.
+        $expected = 4;
+        $actual = $this->rdb->zRemRangeByLex('zrem:lex');
+        $this->assertEquals($expected, $actual);
+
+        $expected = [];
+        $actual = $this->rdb->zRange('zrem:lex');
+        $this->assertEquals($expected, $actual);
+
+        $expected = 0;
+        $actual = $this->rdb->zRemRangeByLex('zrem:missing', '-', '+');
+        $this->assertEquals($expected, $actual);
     }
 
 
@@ -975,6 +1100,9 @@ trait AdapterTestTrait
         $this->assertNull($this->rdb->zIncrBy($key, 1, 'a'));
         $this->assertNull($this->rdb->zRange($key));
         $this->assertNull($this->rdb->zRem($key, 'a'));
+        $this->assertNull($this->rdb->zRemRangeByRank($key, 0, -1));
+        $this->assertNull($this->rdb->zRemRangeByScore($key, 0, 1));
+        $this->assertNull($this->rdb->zRemRangeByLex($key, '-', '+'));
         $this->assertNull($this->rdb->zCard($key));
         $this->assertNull($this->rdb->zCount($key, 0, INF));
         $this->assertNull($this->rdb->zScore($key, 'a'));

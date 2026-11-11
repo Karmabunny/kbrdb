@@ -18,6 +18,10 @@ use RedisException;
  * @method int|null hDel(string $key, string ...$field)
  * @method bool|int|null hSet(string $key, string $field, string $value)
  * @method bool|null hSetNx(string $key, string $field, string $value)
+ * @method int|null zRem(string $key, string ...$member)
+ * @method int|null zRemRangeByRank(string $key, int $start, int $stop)
+ * @method int|null zRemRangeByScore(string $key, float|string|null $min = null, float|string|null $max = null)
+ * @method int|null zRemRangeByLex(string $key, string|null $min = null, string|null $max = null)
  *
  * @package karmabunny\rdb\Wrappers
  */

@@ -909,6 +909,39 @@ abstract class Rdb
 
 
     /**
+     * Remove members from a sorted set by rank.
+     *
+     * @param string $key
+     * @param int $start
+     * @param int $stop
+     * @return null|int
+     */
+    public abstract function zRemRangeByRank(string $key, int $start, int $stop): ?int;
+
+
+    /**
+     * Remove members from a sorted set by score.
+     *
+     * @param string $key
+     * @param float|string|null $min
+     * @param float|string|null $max
+     * @return null|int
+     */
+    public abstract function zRemRangeByScore(string $key, float|string|null $min = null, float|string|null $max = null): ?int;
+
+
+    /**
+     * Remove members from a sorted set by lexicographical range.
+     *
+     * @param string $key
+     * @param string|null $min
+     * @param string|null $max
+     * @return null|int
+     */
+    public abstract function zRemRangeByLex(string $key, string|null $min = null, string|null $max = null): ?int;
+
+
+    /**
      * Get the number of members in a sorted set.
      *
      * @param string $key

@@ -668,6 +668,31 @@ class PredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function zRemRangeByRank(string $key, int|string $start, int|string $stop): ?int
+    {
+        return $this->predis->zremrangebyrank($key, $start, $stop);
+    }
+
+
+    /** @inheritdoc */
+    public function zRemRangeByScore(string $key, float|string|null $min = null, float|string|null $max = null): ?int
+    {
+        $min ??= '-inf';
+        $max ??= '+inf';
+        return $this->predis->zremrangebyscore($key, $min, $max);
+    }
+
+
+    /** @inheritdoc */
+    public function zRemRangeByLex(string $key, string|null $min = null, string|null $max = null): ?int
+    {
+        $min ??= '-';
+        $max ??= '+';
+        return $this->predis->zremrangebylex($key, $min, $max);
+    }
+
+
+    /** @inheritdoc */
     public function zCard(string $key): ?int
     {
         return $this->predis->zcard($key);

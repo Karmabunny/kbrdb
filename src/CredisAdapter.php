@@ -820,6 +820,42 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function zRemRangeByRank(string $key, int|string $start, int|string $stop): ?int
+    {
+        $key = $this->config->prefix . $key;
+        $res = $this->credis->zremrangebyrank($key, $start, $stop);
+        if (!is_numeric($res)) return null;
+        return (int) $res;
+    }
+
+
+    /** @inheritdoc */
+    public function zRemRangeByScore(string $key, float|string|null $min = null, float|string|null $max = null): ?int
+    {
+        $key = $this->config->prefix . $key;
+        $min ??= '-inf';
+        $max ??= '+inf';
+
+        $res = $this->credis->zRemRangeByScore($key, (string) $min, (string) $max);
+        if (!is_numeric($res)) return null;
+        return (int) $res;
+    }
+
+
+    /** @inheritdoc */
+    public function zRemRangeByLex(string $key, string|null $min = null, string|null $max = null): ?int
+    {
+        $key = $this->config->prefix . $key;
+        $min ??= '-';
+        $max ??= '+';
+
+        $res = $this->credis->zremrangebylex($key, $min, $max);
+        if (!is_numeric($res)) return null;
+        return (int) $res;
+    }
+
+
+    /** @inheritdoc */
     public function zCard(string $key): ?int
     {
         $key = $this->config->prefix . $key;

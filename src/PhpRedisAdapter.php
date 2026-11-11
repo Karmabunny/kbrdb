@@ -814,6 +814,40 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function zRemRangeByRank(string $key, int|string $start, int|string $stop): ?int
+    {
+        $res = $this->redis->zRemRangeByRank($key, $start, $stop);
+        if ($res === false) return null;
+        return $res;
+    }
+
+
+    /** @inheritdoc */
+    public function zRemRangeByScore(string $key, float|string|null $min = null, float|string|null $max = null): ?int
+    {
+        $min ??= '-inf';
+        $max ??= '+inf';
+
+        $res = $this->redis->zRemRangeByScore($key, (string) $min, (string) $max);
+        if ($res === false) return null;
+        return $res;
+    }
+
+
+    /** @inheritdoc */
+    public function zRemRangeByLex(string $key, string|null $min = null, string|null $max = null): ?int
+    {
+        $min ??= '-';
+        $max ??= '+';
+
+        $res = $this->redis->zRemRangeByLex($key, $min, $max);
+        if ($res === false) return null;
+        return $res;
+    }
+
+
+
+    /** @inheritdoc */
     public function zCard(string $key): ?int
     {
         /** @var int|false $res */
