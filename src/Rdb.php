@@ -956,11 +956,11 @@ abstract class Rdb
      * This has the same semantics as zRange 'by score'.
      *
      * @param string $key
-     * @param float $min
-     * @param float $max
+     * @param float|null $min null for -inf
+     * @param float|null $max null for +inf
      * @return int|null number of items
      */
-    public abstract function zCount(string $key, float $min, float $max): ?int;
+    public abstract function zCount(string $key, ?float $min, ?float $max): ?int;
 
 
     /**

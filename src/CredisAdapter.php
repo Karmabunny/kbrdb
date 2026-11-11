@@ -864,8 +864,11 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zCount(string $key, float $min, float $max): ?int
+    public function zCount(string $key, ?float $min, ?float $max): ?int
     {
+        $min ??= '-inf';
+        $max ??= '+inf';
+
         $key = $this->config->prefix . $key;
         return $this->credis->zCount($key, $min, $max);
     }

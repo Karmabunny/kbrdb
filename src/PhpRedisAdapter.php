@@ -858,8 +858,11 @@ class PhpRedisAdapter extends Rdb
 
 
     /** @inheritdoc */
-    public function zCount(string $key, float $min, float $max): ?int
+    public function zCount(string $key, ?float $min, ?float $max): ?int
     {
+        $min ??= '-inf';
+        $max ??= '+inf';
+
         /** @var int|false $res */
         $res = $this->redis->zCount($key, (string) $min, (string) $max);
         if ($res === false) return null;
