@@ -40,11 +40,21 @@ LUA;
     /**
      * @param Rdb $rdb
      * @param string $name
+     * @param array{prefix?:string,autoRelease?:bool,autoExpire?:int} $options
      */
-    public function __construct(Rdb $rdb, string $name)
+    public function __construct(Rdb $rdb, string $name, array $options = [])
     {
         $this->rdb = $rdb;
         $this->name = $name;
+
+        unset($options['name']);
+        unset($options['rdb']);
+
+        foreach ($options as $key => $value) {
+            if (property_exists($this, $key)) {
+                $this->$key = $value;
+            }
+        }
     }
 
 

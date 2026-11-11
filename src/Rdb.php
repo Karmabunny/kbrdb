@@ -1519,10 +1519,37 @@ abstract class Rdb
      * @param int|float $wait seconds
      * @param int|float $ttl seconds (default 1 minute)
      * @return RdbLock|null
+     * @deprecated use mutexes instead
      */
     public function lock(string $key, int|float $wait = 0, int|float $ttl = 60): ?RdbLock
     {
         return RdbLock::acquire($this, $key, $wait, $ttl);
+    }
+
+
+    /**
+     * Create a mutex.
+     *
+     * @param string $name
+     * @param array{prefix?:string,autoRelease?:bool,autoExpire?:int} $options
+     * @return RdbMutex
+     */
+    public function createMutex(string $name, array $options = []): RdbMutex
+    {
+        return new RdbMutex($this, $name, $options);
+    }
+
+
+    /**
+     * Create a multi-mutex.
+     *
+     * @param string[] $names
+     * @param array{prefix?:string,autoRelease?:bool,autoExpire?:int} $options
+     * @return RdbMultiMutex
+     */
+    public function createMultiMutex(array $names, array $options = []): RdbMultiMutex
+    {
+        return new RdbMultiMutex($this, $names, $options);
     }
 
 
