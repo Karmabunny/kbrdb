@@ -266,6 +266,15 @@ abstract class Rdb
 
 
     /**
+     * Get the current time in seconds.
+     *
+     * @param bool $as_float
+     * @return ($as_float is true ? float : array{0:int,0:int})
+     */
+    public abstract function time(bool $as_float = false): array|float;
+
+
+    /**
      * Change the active database.
      *
      * @param int $database

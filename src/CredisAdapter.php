@@ -98,6 +98,15 @@ class CredisAdapter extends Rdb
 
 
     /** @inheritdoc */
+    public function time(bool $as_float = false): array|float
+    {
+        $time = $this->credis->time();
+        $time = array_map('intval', $time);
+        return $as_float ? $time[0] + $time[1] / 10000000 : $time;
+    }
+
+
+    /** @inheritdoc */
     public function select(int $database): bool
     {
         return (bool) $this->credis->select($database);

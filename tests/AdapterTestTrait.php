@@ -32,6 +32,28 @@ trait AdapterTestTrait
     }
 
 
+    public function testTime()
+    {
+        $expected = explode(' ', microtime(false));
+        $expected = [(int) $expected[1], (int) ($expected[0] * 1000000)];
+
+        $time = $this->rdb->time();
+
+        $this->assertIsArray($time);
+        $this->assertCount(2, $time);
+        $this->assertIsInt($time[0]);
+        $this->assertIsInt($time[1]);
+        $this->assertEqualsWithDelta($expected[0], $time[0], 1);
+        // Don't test microseconds because it wraps to 0 per second.
+
+        $expected = microtime(true);
+        $time = $this->rdb->time(true);
+
+        $this->assertIsFloat($time);
+        $this->assertEqualsWithDelta($expected, $time, 1);
+    }
+
+
     public function testSetGet()
     {
         // No exist.
