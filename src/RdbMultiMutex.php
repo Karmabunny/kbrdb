@@ -60,8 +60,8 @@ LUA;
         $this->rdb = $rdb;
         $this->names = array_unique($names);
 
-        unset($options['names']);
-        unset($options['rdb']);
+        // @phpstan-ignore-next-line
+        unset($options['name'], $options['rdb']);
 
         foreach ($options as $key => $value) {
             if (property_exists($this, $key)) {
